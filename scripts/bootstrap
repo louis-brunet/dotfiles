@@ -7,7 +7,7 @@
 cd "$(dirname "$0")/.."
 DOTFILES_ROOT=$(pwd -P)
 GITCONFIG_FILE=git/gitconfig.local
-GITCONFIG_TEMPLATE=$GITCONFIG_FILE.example
+GITCONFIG_TEMPLATE=$GITCONFIG_FILE.template
 
 set -e
 
@@ -35,9 +35,9 @@ setup_gitconfig () {
   if ! [ -f "$GITCONFIG_FILE" ]
   then
     info 'setup gitconfig'
-    if [ -f $GITCONFIG_TEMPLATE ]
+    if [ ! -f $GITCONFIG_TEMPLATE ]
     then
-      fail "could not find gitconfig template '$GITCONFIG_TEMPLATE'"
+      fail "could not find local gitconfig template '$GITCONFIG_TEMPLATE'"
     fi
 
     git_credential='cache'
@@ -48,7 +48,7 @@ setup_gitconfig () {
     read -e git_authoremail
 
     sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" "$GITCONFIG_TEMPLATE" > "$GITCONFIG_FILE"
-    echo "$GITCONFIG_FILE:.gitconfig" > git/symlinks.conf
+    # echo "$GITCONFIG_FILE:.gitconfig" > git/symlinks.conf
 
     success 'gitconfig'
   fi
@@ -147,8 +147,9 @@ setup_symlinks_with_file () {
     then
       continue
     fi
-    local src=$DOTFILES_ROOT/${line%"$SYMLINK_DELIMITER"*}
-    local dst=$DESTINATION_ROOT/${line#*"$SYMLINK_DELIMITER"}
+    local symlink_delimiter=":"
+    local src=$DOTFILES_ROOT/${line%"$symlink_delimiter"*}
+    local dst=$DESTINATION_ROOT/${line#*"$symlink_delimiter"}
 
     # echo "$line"
     # echo "src = $src"
