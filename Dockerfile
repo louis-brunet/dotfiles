@@ -1,5 +1,6 @@
 FROM ubuntu:latest
-WORKDIR ~/dotfiles
+WORKDIR /home/louis/dotfiles
 COPY . .
-CMD /bin/bash # scripts/install
+RUN /bin/bash 
+# CMD /bin/bash scripts/install
 

@@ -149,7 +149,7 @@ setup_symlinks_with_file () {
     fi
     local symlink_delimiter=":"
     local src=$DOTFILES_ROOT/${line%"$symlink_delimiter"*}
-    local dst=$DESTINATION_ROOT/${line#*"$symlink_delimiter"}
+    local dst=$HOME/${line#*"$symlink_delimiter"}
 
     # echo "$line"
     # echo "src = $src"

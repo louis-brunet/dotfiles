@@ -115,72 +115,55 @@ source $ZSH/oh-my-zsh.sh
 ########## END OF oh-my-zsh config ##########
 #############################################
 
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-# Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
 bindkey -e
-# End of lines configured by zsh-newuser-install
-source ~/powerlevel10k/powerlevel10k.zsh-theme
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='nvim'
-else
-  export EDITOR='nvim'
-fi
-
-# use nvim as the default git editor
-export GIT_EDITOR=$EDITOR
-
-# Ignore duplicates in history
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_IGNORE_SPACE
-setopt HIST_FIND_NO_DUPS
-setopt HIST_SAVE_NO_DUPS
-
-# Ctrl+arrow navigate word-by-word
-# bindkey ";5D" backward-word
-# bindkey ";5C" forward-word
-# bindkey "^H" backward-kill-word
-# bindkey "5~" kill-word
-
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
 
 # color for tmux in GNOME terminal
 alias tmux="TERM=xterm-256color tmux"
 
-export PATH="$HOME/.local/scripts:$PATH"
-
-
 # open tmux-sessionizer with Ctrl-F
 bindkey -s "^F" 'tmux-sessionizer^M'
+
+##########
+
+# your project folder that we can `c [tab]` to
+export PROJECTS=~/code
+
+# shortcut to this dotfiles path is $DOTFILES
+export DOTFILES=$PROJECTS/dotfiles
+
+# Stash your environment variables in ~/.localrc. This means they'll stay out
+# of your main dotfiles repository (which may be public, like this one), but
+# you'll have access to them in your scripts.
+if [[ -a ~/.localrc ]]
+then
+  source ~/.localrc
+fi
+
+# all of the zsh files in topic directories
+typeset -U config_files
+config_files=($DOTFILES/*/*.zsh)
+
+# load the path files
+for file in ${(M)config_files:#*/path.zsh}
+do
+  source "$file"
+done
+
+# load everything but the path and completion files
+for file in ${${config_files:#*/path.zsh}:#*/completion.zsh}
+do
+  source "$file"
+done
+
+# initialize autocomplete here, otherwise functions won't be loaded
+autoload -U compinit
+compinit
+
+# load every completion after autocomplete loads
+for file in ${(M)config_files:#*/completion.zsh}
+do
+  source "$file"
+done
+
+unset config_files
 
