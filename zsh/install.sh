@@ -23,9 +23,11 @@ then
 else
     # install oh-my-zsh
     # apt install curl git -y
+    omz_install_script=install_omz.sh
     apt install wget git -y
-    wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-    sh install.sh --keep-zshrc
+    wget -O "$omz_install_script" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    sh "$omz_install_script" --keep-zshrc
+    rm "$omz_install_script"
     # sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     echo "✅ installed oh-my-zsh"
 fi

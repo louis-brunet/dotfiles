@@ -128,8 +128,12 @@ bindkey -s "^F" 'tmux-sessionizer^M'
 # your project folder that we can `c [tab]` to
 export PROJECTS=~/code
 
+# get the absolute path of the symlinked ~/.zshrc file
+zshrc_path=$(readlink -f ~/.zshrc)
+
 # shortcut to this dotfiles path is $DOTFILES
-export DOTFILES=$PROJECTS/dotfiles
+# it should be the grandparent directory of the symlink target .zshrc
+export DOTFILES=$(dirname $(dirname "$zshrc_path"))
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
@@ -141,7 +145,15 @@ fi
 
 # all of the zsh files in topic directories
 typeset -U config_files
-config_files=($DOTFILES/*/*.zsh)
+
+# exclude bin/* and scripts/*
+old_extended_glob=$options[extended_glob]
+setopt extended_glob
+config_files=($DOTFILES/*/*.zsh~$DOTFILES/bin/*~$DOTFILES/scripts/*)
+if [ $old_extended_glob != on ]
+then
+  unsetopt extended_glob
+fi
 
 # load the path files
 for file in ${(M)config_files:#*/path.zsh}
