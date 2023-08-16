@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # install the recommended nerd font for the theme powerlevel10k 
 FONTS_DIR=~/.local/share/fonts/truetype
 mkdir -p "$FONTS_DIR"

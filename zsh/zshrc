@@ -117,12 +117,6 @@ source $ZSH/oh-my-zsh.sh
 
 bindkey -e
 
-# color for tmux in GNOME terminal
-alias tmux="TERM=xterm-256color tmux"
-
-# open tmux-sessionizer with Ctrl-F
-bindkey -s "^F" 'tmux-sessionizer^M'
-
 ##########
 
 # your project folder that we can `c [tab]` to
@@ -132,7 +126,7 @@ export PROJECTS=~/code
 zshrc_path=$(readlink -f ~/.zshrc)
 
 # shortcut to this dotfiles path is $DOTFILES
-# it should be the grandparent directory of the symlink target .zshrc
+# it should be the grandparent directory of the symlink target (this file)
 export DOTFILES=$(dirname $(dirname "$zshrc_path"))
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
