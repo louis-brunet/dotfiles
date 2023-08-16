@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# dot
+#
+# `dot` handles installation, updates, things like that. Run it periodically
+# to make sure you're on the latest and greatest.
+
+set -e
+
+parentDirectory="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)"
+dotfilesDirectory="$(cd "$( dirname "$parentDirectory" )" && pwd -P)"
+
+displayUsageAndExit() {
+	echo "dot -- dotfiles management"
+	echo ""
+	echo "Usage: dot <option>"
+	echo ""
+	echo "Options:"
+	echo "  -e, --edit        Open dotfiles directory for editing"
+	echo "  -h, --help        Show this help message and exit"
+	echo "  -i, --install     Run dotfiles installation scripts"
+	exit
+}
+
+while test $# -gt 0; do
+	case "$1" in
+		"-h"|"--help")
+			displayUsageAndExit
+			;;
+
+		"-e"|"--edit")
+			exec "$EDITOR" "$dotfilesDirectory"
+			exit
+			;;
+
+		"-i"|"--install")
+			if [ ! -d "$DOTFILES" ]; then 
+				echo "\$DOTFILES environment variable is not a directory ($DOTFILES)"
+				exit 1
+			fi
+			if [ ! -f "$DOTFILES/scripts/install"]; then 
+				echo "\$DOTFILES/scripts/install does not exist"
+				exit 1
+			fi
+
+			# Update apt repositories
+			echo "› apt update"
+			apt update
+
+			# Run install scripts for all dotfiles dirctories
+			echo "› $DOTFILES/scripts/install"
+			$DOTFILES/scripts/install
+
+			exit
+			;;
+
+		*)
+			echo "Invalid option: $1"
+			displayUsageAndExit
+			;;
+	esac
+	shift
+done
+
