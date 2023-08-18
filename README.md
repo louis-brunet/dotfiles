@@ -91,3 +91,7 @@ This configuration will create a file symlink `$HOME/.config/tmux/tmux.conf` and
 
 bash scripts ran by `scripts/install`
 
+## Credit
+
+Most of the dotfile management logic is taken from [Zach Holman's dotfiles](https://github.com/holman/dotfiles/).
+
