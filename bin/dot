@@ -26,9 +26,9 @@ displayUsageAndExit() {
 	echo "Usage: dot <option>"
 	echo ""
 	echo "Options:"
-	echo "  e, -e, --edit        Open dotfiles directory for editing"
-	echo "  h, -h, --help        Show this help message and exit"
-	echo "  i, -i, --install     Run dotfiles installation scripts"
+	echo "  e, edit        Open dotfiles directory for editing"
+	echo "  h, help        Show this help message and exit"
+	echo "  i, install     Run dotfiles installation scripts"
 	exit
 }
 
@@ -36,16 +36,16 @@ displayUsageAndExit() {
 
 while [ $# -gt 0 ]; do
 	case "$1" in
-		"h"|"-h"|"--help")
+		"h"|"help")
 			displayUsageAndExit
 			;;
 
-		"e"|"-e"|"--edit")
+		"e"|"edit")
 			exec "$EDITOR" "$dotfilesDirectory"
 			exit
 			;;
 
-		"i"|"-i"|"--install")
+		"i"|"install")
 
 			if [ ! -d "$DOTFILES" ]; then 
 				echo "\$DOTFILES environment variable is not a directory ($DOTFILES)"

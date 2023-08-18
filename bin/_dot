@@ -1,0 +1,19 @@
+#compdef dot
+
+local edit_desc="Open dotfiles directory for editing"
+local help_desc="Show this help and exit"
+local install_desc="Run dotfiles installation scripts"
+
+local -a subcmds
+subcmds=(
+    "e:$edit_desc"
+    "edit:$edit_desc"
+
+    "h:$help_desc"
+    "help:$help_desc"
+
+    "i:$install_desc"
+    "install:$install_desc"
+)
+_describe 'command' subcmds
+
