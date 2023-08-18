@@ -42,7 +42,7 @@ then
 fi
 
 ZSH_AUTOSUGGESTIONS_DIR="$zsh_custom/plugins/zsh-autosuggestions"
-if [ ! -d "$ZSH_AUTOSUGGESTION_DIR" ]
+if [ ! -d "$ZSH_AUTOSUGGESTIONS_DIR" ]
 then
     git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_AUTOSUGGESTIONS_DIR"
     echo "✅ downloaded zsh-autosuggestions plugin"

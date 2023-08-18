@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 #
 # dot
 #
@@ -7,8 +7,18 @@
 
 set -e
 
-parentDirectory="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)"
-dotfilesDirectory="$(cd "$( dirname "$parentDirectory" )" && pwd -P)"
+# get the absolute path of the symlinked ~/.zshrc file
+zshrc_path=$(readlink -f ~/.zshrc)
+
+# dotfiles path should be the grandparent directory of the symlink target zshrc
+dotfiles_path=$(dirname $(dirname "$zshrc_path"))
+
+if [ "$dotfiles_path" != "$DOTFILES" ]; then
+	echo "\$DOTFILES environment variable does not have the expected value:"
+	echo "  expected '$dotfiles_path'"
+	echo "  got      '$DOTFILES'"
+	exit 1
+fi
 
 displayUsageAndExit() {
 	echo "dot -- dotfiles management"
@@ -16,24 +26,27 @@ displayUsageAndExit() {
 	echo "Usage: dot <option>"
 	echo ""
 	echo "Options:"
-	echo "  -e, --edit        Open dotfiles directory for editing"
-	echo "  -h, --help        Show this help message and exit"
-	echo "  -i, --install     Run dotfiles installation scripts"
+	echo "  e, -e, --edit        Open dotfiles directory for editing"
+	echo "  h, -h, --help        Show this help message and exit"
+	echo "  i, -i, --install     Run dotfiles installation scripts"
 	exit
 }
 
-while test $# -gt 0; do
+[ $# -gt 0 ] || displayUsageAndExit
+
+while [ $# -gt 0 ]; do
 	case "$1" in
-		"-h"|"--help")
+		"h"|"-h"|"--help")
 			displayUsageAndExit
 			;;
 
-		"-e"|"--edit")
+		"e"|"-e"|"--edit")
 			exec "$EDITOR" "$dotfilesDirectory"
 			exit
 			;;
 
-		"-i"|"--install")
+		"i"|"-i"|"--install")
+
 			if [ ! -d "$DOTFILES" ]; then 
 				echo "\$DOTFILES environment variable is not a directory ($DOTFILES)"
 				exit 1

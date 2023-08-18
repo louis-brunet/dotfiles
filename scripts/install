@@ -8,6 +8,12 @@ set -e
 
 cd "$(dirname $0)"/..
 
+
+GREEN='\033[0;32m'
+FGRESET='\033[0m' # No Color
 # find the installers and run them iteratively
-find . -maxdepth 2 -name install.sh -not -path './scripts/*' -not -path '*.git*' | while read installer ; do sh -c "echo '${installer}' && ${installer}" ; done
+find . -maxdepth 2 -name install.sh -not -path './scripts/*' -not -path '*.git*' | while read installer
+do sh -c "
+    echo -e \"$FGGREEN${installer}$FGRESET\" && ${installer}" 
+done
 
