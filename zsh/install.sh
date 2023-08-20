@@ -3,32 +3,22 @@
 set -e
 
 # install zsh
-apt update && apt install zsh -y
-echo "✅ installed zsh"
+apt update && apt install zsh -y && echo "✅ installed zsh"
 zsh --version
-# if [ ! $(which zsh) ]
-# then
-# fi
 
 # set zsh as default shell
-chsh -s $(which zsh)
-echo "✅ set zsh as default shell"
-# if [ $(basename -- "$SHELL") != "zsh" ]
-# then
-# fi
+chsh -s $(which zsh) && echo "✅ set zsh as default shell"
 
 if [ -n "$ZSH" ] && [ -d "$ZSH" ]
 then
     echo "✅ \$ZSH variable is set ($ZSH). Considering oh-my-zsh as installed."
 else
     # install oh-my-zsh
-    # apt install curl git -y
     omz_install_script=install_omz.sh
     apt install wget git -y
     wget -O "$omz_install_script" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
     sh "$omz_install_script" --keep-zshrc
     rm "$omz_install_script"
-    # sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     echo "✅ installed oh-my-zsh"
 fi
 zsh_custom=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
@@ -48,7 +38,3 @@ then
     echo "✅ downloaded zsh-autosuggestions plugin"
 fi
 
-# else
-#     echo "❌ \$ZSH_CUSTOM is not a directory ! ('$ZSH_CUSTOM')"
-# fi
-#
