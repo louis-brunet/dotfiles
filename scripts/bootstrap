@@ -2,7 +2,7 @@
 #
 # Initialize local git config and create symlinks in $HOME.
 #
-# adapted from https://github.com/holman/dotfiles/blob/master/script/bootstrap
+# Adapted from https://github.com/holman/dotfiles/blob/master/script/bootstrap
 
 cd "$(dirname "$0")/.."
 DOTFILES_ROOT=$(pwd -P)
@@ -14,7 +14,7 @@ set -e
 echo ''
 
 info () {
-  printf "\r  [ \033[00;34m..\033[0m ] %s\n" "$1"
+  printf "\r  [\033[00;34minfo\033[0m] %s\n" "$1"
 }
 
 user () {
