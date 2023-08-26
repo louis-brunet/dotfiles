@@ -74,6 +74,7 @@ HYPHEN_INSENSITIVE="true"
 plugins=(
     git
     npm
+    nvm
     # custom plugins (added in $ZSH_CUSTOM/plugins)
     zsh-autosuggestions
 )
