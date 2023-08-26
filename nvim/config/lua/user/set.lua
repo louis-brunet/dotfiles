@@ -11,6 +11,8 @@ vim.cmd.highlight("DiagnosticVirtualTextInfo guibg=none")
 vim.cmd.highlight("DiagnosticVirtualTextHint guibg=none")
 vim.cmd.highlight("DiagnosticVirtualTextOk guibg=none")
 
+-- vim.cmd.highlight("LspSignatureActiveParameter gui=underline guibg=none")
+
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4

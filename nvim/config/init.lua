@@ -65,6 +65,9 @@ require('lazy').setup({
             -- Adds LSP completion capabilities
             'hrsh7th/cmp-nvim-lsp',
 
+            -- Adds LSP signature help
+            'hrsh7th/cmp-nvim-lsp-signature-help',
+
             -- Adds a number of user-friendly snippets
             'rafamadriz/friendly-snippets',
         },
@@ -147,7 +150,14 @@ require('lazy').setup({
     },
 
     -- "gc" to comment visual regions/lines
-    { 'numToStr/Comment.nvim',         opts = {} },
+    {
+        'numToStr/Comment.nvim',
+        opts = {},
+        keys = {
+            { '<leader>cc', '<Plug>(comment_toggle_linewise_current)', mode = 'n', desc = 'Comment toggle linewise' },
+            { '<leader>c', '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = 'Comment toggle linewise' },
+        },
+    },
 
     -- Fuzzy Finder (files, lsp, etc)
     { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
@@ -360,18 +370,20 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
-    -- NOTE: Remember that lua is a real programming language, and as such it is possible
-    -- to define small helper and utility functions so you don't have to repeat yourself
-    -- many times.
-    --
-    -- In this case, we create a function that lets us more easily define mappings specific
-    -- for LSP related items. It sets the mode, buffer and description for us each time.
-    local nmap = function(keys, func, desc)
+    local map = function(modes, keys, func, desc)
         if desc then
             desc = 'LSP: ' .. desc
         end
 
-        vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+        vim.keymap.set(modes, keys, func, { buffer = bufnr, desc = desc })
+    end
+
+    local nmap = function(keys, func, desc)
+        map('n', keys, func, desc)
+    end
+
+    local imap = function(keys, func, desc)
+        map('i', keys, func, desc)
     end
 
     nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -386,7 +398,8 @@ local on_attach = function(_, bufnr)
 
     -- See `:help K` for why this keymap
     nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-    nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+    nmap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
+    -- imap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
     -- Lesser used LSP functionality
     nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -407,6 +420,7 @@ local on_attach = function(_, bufnr)
     vim.api.nvim_create_autocmd("CursorHold", { callback = vim.lsp.buf.document_highlight, group = highlight_augroup })
     vim.api.nvim_create_autocmd("CursorHoldI", { callback = vim.lsp.buf.document_highlight, group = highlight_augroup })
     vim.api.nvim_create_autocmd("CursorMoved", { callback = vim.lsp.buf.clear_references, group = highlight_augroup })
+    vim.api.nvim_create_autocmd("CursorMovedI", { callback = vim.lsp.buf.clear_references, group = highlight_augroup })
 end
 
 -- Enable the following language servers
@@ -419,6 +433,8 @@ local servers = {
     -- gopls = {},
     -- pyright = {},
     -- tsserver = {},
+    html = {},
+
     rust_analyzer = {
         ["rust-analyzer"] = {
             check = {
@@ -504,6 +520,7 @@ cmp.setup {
         end, { 'i', 's' }),
     },
     sources = {
+        { name = 'nvim_lsp_signature_help' },
         { name = 'nvim_lsp' },
         { name = 'luasnip' },
     },
