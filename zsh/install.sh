@@ -3,11 +3,14 @@
 set -e
 
 # install zsh
-apt update && apt install zsh -y && echo "✅ installed zsh"
+sudo apt update
+sudo apt install zsh -y
+echo "✅ installed zsh"
 zsh --version
 
 # set zsh as default shell
-chsh -s $(which zsh) && echo "✅ set zsh as default shell"
+sudo chsh -s $(which zsh) $(whoami)
+echo "✅ set zsh as default shell"
 
 if [ -n "$ZSH" ] && [ -d "$ZSH" ]
 then
@@ -15,7 +18,7 @@ then
 else
     # install oh-my-zsh
     omz_install_script=install_omz.sh
-    apt install wget git -y
+    sudo apt install wget git -y
     wget -O "$omz_install_script" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
     sh "$omz_install_script" --keep-zshrc
     rm "$omz_install_script"
