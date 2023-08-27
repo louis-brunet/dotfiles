@@ -155,7 +155,7 @@ require('lazy').setup({
         opts = {},
         keys = {
             { '<leader>cc', '<Plug>(comment_toggle_linewise_current)', mode = 'n', desc = 'Comment toggle linewise' },
-            { '<leader>c', '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = 'Comment toggle linewise' },
+            { '<leader>c',  '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = 'Comment toggle linewise' },
         },
     },
 
@@ -179,7 +179,10 @@ require('lazy').setup({
         -- Highlight, edit, and navigate code
         'nvim-treesitter/nvim-treesitter',
         dependencies = {
+            -- manipulate treesitter objects (parameter names, functions, properties, etc.)
             'nvim-treesitter/nvim-treesitter-textobjects',
+            -- keep context of cursor position (e.g. fn name) sticky at the top
+            { 'nvim-treesitter/nvim-treesitter-context', opts = { line_numbers = false } },
         },
         build = ':TSUpdate',
     },
@@ -299,12 +302,15 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
+    ensure_installed = { 'c', 'go', 'html', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
 
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-    auto_install = false,
+    -- Autoinstall languages that are not installed. Defaults to false
+    auto_install = true,
 
-    highlight = { enable = true },
+    highlight = {
+        enable = true,
+        disable = { 'html' },
+    },
     indent = { enable = true },
     incremental_selection = {
         enable = true,
@@ -416,11 +422,20 @@ local on_attach = function(_, bufnr)
 
 
     -- Create an autocommand to highlight hovered word
-    local highlight_augroup = vim.api.nvim_create_augroup("LspDocumentHighlightGroup", { clear = true })
-    vim.api.nvim_create_autocmd("CursorHold", { callback = vim.lsp.buf.document_highlight, group = highlight_augroup })
-    vim.api.nvim_create_autocmd("CursorHoldI", { callback = vim.lsp.buf.document_highlight, group = highlight_augroup })
-    vim.api.nvim_create_autocmd("CursorMoved", { callback = vim.lsp.buf.clear_references, group = highlight_augroup })
-    vim.api.nvim_create_autocmd("CursorMovedI", { callback = vim.lsp.buf.clear_references, group = highlight_augroup })
+    local highlight_augroup_name = "LspDocumentHighlightGroup"
+    local highlight_augroup = vim.api.nvim_create_augroup(highlight_augroup_name, { clear = true })
+    local highlight_augroup_opts = function (callback)
+        return {
+            callback = callback,
+            group = highlight_augroup,
+            buffer = bufnr,
+        }
+    end
+
+    vim.api.nvim_create_autocmd("CursorHold", highlight_augroup_opts(vim.lsp.buf.document_highlight))
+    vim.api.nvim_create_autocmd("CursorHoldI", highlight_augroup_opts(vim.lsp.buf.document_highlight))
+    vim.api.nvim_create_autocmd("CursorMoved", highlight_augroup_opts(vim.lsp.buf.clear_references))
+    vim.api.nvim_create_autocmd("CursorMovedI", highlight_augroup_opts(vim.lsp.buf.clear_references))
 end
 
 -- Enable the following language servers
@@ -432,7 +447,12 @@ local servers = {
     -- clangd = {},
     -- gopls = {},
     -- pyright = {},
-    -- tsserver = {},
+    tsserver = {
+        hostInfo = 'neovim',
+        preferences = {
+            quotePreference = 'single',
+        },
+    },
     html = {},
 
     rust_analyzer = {
