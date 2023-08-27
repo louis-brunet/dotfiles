@@ -102,14 +102,40 @@ require('lazy').setup({
         -- Theme inspired by Atom
         'navarasu/onedark.nvim',
         priority = 1000,
-        config = function()
-            require('onedark').setup({
+        opts = {
+            transparent = true,
+            lualine = {
                 transparent = true,
-                lualine = {
-                    transparent = true,
-                },
-            })
+            },
+            highlights = {
+                TreesitterContextBottom = { fmt = "underline", sp = "Grey" },
+                NvimTreeIndentMarker = { fg = "#31353f" },
+                NvimTreeNormal = { bg = "none" },
+                NvimTreeEndOfBuffer = { bg = "none" },
+                NvimTreeVertSplit = { bg = "none" },
+                TabLineSel = { bg="#31353f", fg="#999999" },
+                TabLine = { bg="#31353f", fg="#555555" },
+                CursorLineNr = { fmt = "bold", fg="#ccbb44" },
+                DiagnosticVirtualTextError = { bg="none" },
+                DiagnosticVirtualTextWarn = { bg="none" },
+                DiagnosticVirtualTextInfo = { bg="none" },
+                DiagnosticVirtualTextHint = { bg="none" },
+                DiagnosticVirtualTextOk = { bg="none" },
+                LspSignatureActiveParameter = { fmt="bold,underline"},
+            },
+        },
+        config = function(_, opts)
+            require('onedark').setup(opts)
             vim.cmd.colorscheme 'onedark'
+
+            vim.api.nvim_create_user_command('TransparentToggle', function()
+                local onedark = require 'onedark'
+                onedark.setup {
+                    transparent = not vim.g.onedark_config.transparent,
+                }
+                vim.cmd.colorscheme 'onedark'
+                -- onedark.load()
+            end, { desc = "Toggle transparent background" })
         end,
     },
 
@@ -182,7 +208,13 @@ require('lazy').setup({
             -- manipulate treesitter objects (parameter names, functions, properties, etc.)
             'nvim-treesitter/nvim-treesitter-textobjects',
             -- keep context of cursor position (e.g. fn name) sticky at the top
-            { 'nvim-treesitter/nvim-treesitter-context', opts = { line_numbers = false } },
+            {
+                'nvim-treesitter/nvim-treesitter-context',
+                opts = { line_numbers = false },
+                config = function(_, opts)
+                    require('treesitter-context').setup(opts)
+                end
+            },
         },
         build = ':TSUpdate',
     },
@@ -424,7 +456,7 @@ local on_attach = function(_, bufnr)
     -- Create an autocommand to highlight hovered word
     local highlight_augroup_name = "LspDocumentHighlightGroup"
     local highlight_augroup = vim.api.nvim_create_augroup(highlight_augroup_name, { clear = true })
-    local highlight_augroup_opts = function (callback)
+    local highlight_augroup_opts = function(callback)
         return {
             callback = callback,
             group = highlight_augroup,

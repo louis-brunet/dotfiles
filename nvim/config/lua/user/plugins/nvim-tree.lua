@@ -4,13 +4,10 @@ return {
         dependencies = {
             'nvim-tree/nvim-web-devicons',
         },
+        -- highlights are defined in the onedark config
         config = function()
             vim.g.loaded_netrw = 1
             vim.g.loaded_netrwPlugin = 1
-            vim.cmd.highlight("NvimTreeIndentMarker guifg=#31353f")
-            vim.cmd.highlight("NvimTreeNormal guibg=none")
-            vim.cmd.highlight("NvimTreeEndOfBuffer guibg=none")
-            vim.cmd.highlight("NvimTreeVertSplit guibg=none")
             require('nvim-tree').setup({
                 filters = {
                     git_ignored = false,
