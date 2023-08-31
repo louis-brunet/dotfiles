@@ -113,15 +113,15 @@ require('lazy').setup({
                 NvimTreeNormal = { bg = "none" },
                 NvimTreeEndOfBuffer = { bg = "none" },
                 NvimTreeVertSplit = { bg = "none" },
-                TabLineSel = { bg="#31353f", fg="#999999" },
-                TabLine = { bg="#31353f", fg="#555555" },
-                CursorLineNr = { fmt = "bold", fg="#ccbb44" },
-                DiagnosticVirtualTextError = { bg="none" },
-                DiagnosticVirtualTextWarn = { bg="none" },
-                DiagnosticVirtualTextInfo = { bg="none" },
-                DiagnosticVirtualTextHint = { bg="none" },
-                DiagnosticVirtualTextOk = { bg="none" },
-                LspSignatureActiveParameter = { fmt="bold,underline"},
+                TabLineSel = { bg = "#31353f", fg = "#999999" },
+                TabLine = { bg = "#31353f", fg = "#555555" },
+                CursorLineNr = { fmt = "bold", fg = "#ccbb44" },
+                DiagnosticVirtualTextError = { bg = "none" },
+                DiagnosticVirtualTextWarn = { bg = "none" },
+                DiagnosticVirtualTextInfo = { bg = "none" },
+                DiagnosticVirtualTextHint = { bg = "none" },
+                DiagnosticVirtualTextOk = { bg = "none" },
+                LspSignatureActiveParameter = { fmt = "bold,underline" },
             },
         },
         config = function(_, opts)
@@ -208,13 +208,7 @@ require('lazy').setup({
             -- manipulate treesitter objects (parameter names, functions, properties, etc.)
             'nvim-treesitter/nvim-treesitter-textobjects',
             -- keep context of cursor position (e.g. fn name) sticky at the top
-            {
-                'nvim-treesitter/nvim-treesitter-context',
-                opts = { line_numbers = false },
-                config = function(_, opts)
-                    require('treesitter-context').setup(opts)
-                end
-            },
+            'nvim-treesitter/nvim-treesitter-context',
         },
         build = ':TSUpdate',
     },
