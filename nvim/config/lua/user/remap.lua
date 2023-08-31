@@ -37,3 +37,6 @@ vim.keymap.set("n", "<A-h>", vim.cmd.tabprevious, { desc = "Previous tab" })
 
 -- toggle transparent background
 vim.keymap.set({"n", "v"}, "<leader>t", vim.cmd.TransparentToggle, { desc = "Toggle transparent background" })
+
+vim.keymap.set("i", "<M-BS>", "<C-W>", { desc = "Delete word backwards" })
+

@@ -302,8 +302,8 @@ require('telescope').setup {
     defaults = {
         mappings = {
             i = {
-                ['<C-u>'] = false,
-                ['<C-d>'] = false,
+                -- ['<C-u>'] = false,
+                -- ['<C-d>'] = false,
             },
         },
     },
@@ -324,6 +324,7 @@ vim.keymap.set('n', '<leader>/', function()
 end, { desc = '[/] Fuzzily search in current buffer' })
 
 vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
+vim.keymap.set('n', '<leader>gs', require('telescope.builtin').git_status, { desc = 'Search [G]it [S]tatus' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
@@ -341,9 +342,12 @@ require('nvim-treesitter.configs').setup {
 
     highlight = {
         enable = true,
+        -- disable highlighting because of treesitter errors (TODO: enable ?)
         disable = { 'html' },
     },
+
     indent = { enable = true },
+
     incremental_selection = {
         enable = true,
         keymaps = {
@@ -353,6 +357,7 @@ require('nvim-treesitter.configs').setup {
             node_decremental = '<M-space>',
         },
     },
+
     textobjects = {
         select = {
             enable = true,
