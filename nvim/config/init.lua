@@ -157,6 +157,7 @@ require('lazy').setup({
                         path = 3,
                     }
                 },
+                lualine_x = {'filetype'},
             },
             tabline = {
                 -- lualine_a = { 'tabs' },
