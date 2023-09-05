@@ -1,3 +1,17 @@
+local function attached_lsp_clients()
+    local names_str = ''
+    for _, client in ipairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
+        if client.name ~= '' then
+            if names_str == '' then
+                names_str = client.name
+            else
+                names_str = names_str .. ' ' .. client.name
+            end
+        end
+    end
+    return names_str
+end
+
 ---@type LazySpec
 return {
     {
@@ -9,7 +23,9 @@ return {
             lualine = {
                 transparent = true,
             },
+            style = 'warm',
             highlights = {
+                -- Normal = { bg = "#2e3436" }, -- change default background from #282c34
                 TreesitterContextBottom = { fmt = "underline", sp = "Grey" },
                 TreesitterContext = { bg = "none" },
                 NvimTreeIndentMarker = { fg = "#31353f" },
@@ -74,7 +90,7 @@ return {
                         path = 3,
                     },
                 },
-                lualine_x = { 'filetype' },
+                lualine_x = { attached_lsp_clients, 'filetype' },
                 lualine_y = { 'location' },
                 lualine_z = {},
             },
@@ -84,19 +100,19 @@ return {
         },
     },
 
-    {
-        'alvarosevilla95/luatab.nvim',
-        dependencies = {
-            'nvim-tree/nvim-web-devicons',
-        },
-        config = function()
-            -- highlight groups are defined in onedark config
-            require('luatab').setup {
-                separator = function() -- (index)
-                    -- return ''
-                    return ''
-                end
-            }
-        end
-    },
+    -- {
+    --     'alvarosevilla95/luatab.nvim',
+    --     dependencies = {
+    --         'nvim-tree/nvim-web-devicons',
+    --     },
+    --     config = function()
+    --         -- highlight groups are defined in onedark config
+    --         require('luatab').setup {
+    --             separator = function() -- (index)
+    --                 -- return ''
+    --                 return ''
+    --             end
+    --         }
+    --     end
+    -- },
 }

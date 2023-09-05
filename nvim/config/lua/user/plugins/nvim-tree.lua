@@ -19,6 +19,9 @@ return {
                         close = true,
                     },
                 },
+                view = {
+                    width = 25,
+                },
                 renderer = {
                     group_empty = true,
                     add_trailing = true,
@@ -38,7 +41,10 @@ return {
                     },
                 },
             })
-            vim.keymap.set('n', '<C-n>', ':NvimTreeFindFileToggle<CR>');
+            vim.keymap.set('n', '<C-n>', ':NvimTreeFindFileToggle<CR>', {
+                silent = true,
+                desc = 'nvim-tree: toggle sidebar',
+            });
         end,
     },
 }

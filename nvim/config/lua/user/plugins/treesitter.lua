@@ -25,6 +25,13 @@ local treesitter_opts = {
     },
 
     textobjects = {
+        -- lsp_interop = {
+        --     enable = true,
+        --     peek_definition_code = {
+        --         ['<leader>df'] = '@function.outer',
+        --         ['<leader>dF'] = '@class.outer',
+        --     },
+        -- },
         select = {
             enable = true,
             lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
@@ -36,6 +43,11 @@ local treesitter_opts = {
                 ['if'] = '@function.inner',
                 ['ac'] = '@class.outer',
                 ['ic'] = '@class.inner',
+            },
+            selection_modes = { -- '<c-v>' for blockwise
+                ['@parameter.outer'] = 'v', -- charwise
+                ['@function.outer'] = 'V', -- linewise
+                ['@class.outer'] = 'V',
             },
         },
         move = {
