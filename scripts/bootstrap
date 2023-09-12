@@ -151,10 +151,6 @@ setup_symlinks_with_file () {
     local src=$DOTFILES_ROOT/${line%"$symlink_delimiter"*}
     local dst=$HOME/${line#*"$symlink_delimiter"}
 
-    # echo "$line"
-    # echo "src = $src"
-    # echo "dst = $dst"
-
     if [ ! -f "$src" ] && [ ! -d "$src" ] 
     then
       fail "$config_file: '$src' is not a file or a directory"

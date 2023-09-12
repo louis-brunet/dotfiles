@@ -14,9 +14,10 @@ zshrc_path=$(readlink -f ~/.zshrc)
 dotfiles_path=$(dirname $(dirname "$zshrc_path"))
 
 if [ "$dotfiles_path" != "$DOTFILES" ]; then
-	echo "\$DOTFILES environment variable does not have the expected value:"
+	echo "The \$DOTFILES environment variable does not have the expected value:"
 	echo "  expected '$dotfiles_path'"
 	echo "  got      '$DOTFILES'"
+	echo "Is ~/.zshrc symlinked ? If not, try running scripts/bootsrap."
 	exit 1
 fi
 
