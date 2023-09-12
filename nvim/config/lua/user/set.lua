@@ -74,7 +74,7 @@ vim.diagnostic.config({
 -- override default diagnostic signs
 local signs = {
     -- Error = " ",
-    Warn = " ",
+    -- Warn = " ",
     Hint = " ",
     Info = " ",
 }
