@@ -2,6 +2,7 @@
 return {
     {
         'christoomey/vim-tmux-navigator',
+        event = 'VeryLazy',
         -- config = function()
         --     print('setup vim-tmux-navigator')
         --     vim.g.tmux_navigator_no_mappings = 1

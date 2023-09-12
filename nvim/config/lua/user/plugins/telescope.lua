@@ -4,6 +4,9 @@ return {
     {
         'nvim-telescope/telescope.nvim',
         branch = '0.1.x',
+        -- Loading Telescope on VeryLazy does not handle keymaps pressed before
+        -- nvim was initialized (e.g. `$ nvim<Enter><Space>sf` in terminal)
+        -- event = 'VeryLazy',
         dependencies = {
             'nvim-lua/plenary.nvim',
             'nvim-telescope/telescope-ui-select.nvim',
@@ -32,6 +35,9 @@ return {
                 extensions = {
                     ["ui-select"] = {
                         telescope_themes.get_cursor {
+                            layout_config = {
+                                height = 12,
+                            },
                             -- even more opts
                         }
 
@@ -51,6 +57,15 @@ return {
                     },
                 },
                 defaults = {
+                    -- see `:h telescope.defaults.layout_config`
+                    layout_config = {
+                        horizontal = {
+                            width = 0.9
+                        },
+                        vertical = {
+                            width = 0.9
+                        }
+                    },
                     mappings = {
                         -- i = {
                         --     ['<C-u>'] = false,
@@ -91,6 +106,7 @@ return {
             vim.keymap.set('n', '<leader>sg', telescope_builtin.live_grep, { desc = '[S]earch by [G]rep' })
             vim.keymap.set('n', '<leader>sd', telescope_builtin.diagnostics,
                 { desc = '[S]earch [D]iagnostics' })
+            vim.keymap.set('n', '<leader>sr', telescope_builtin.resume, { desc = '[S]earch [R]esume' })
         end
     },
 }

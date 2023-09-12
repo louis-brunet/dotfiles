@@ -66,25 +66,29 @@ return {
             options = {
                 -- icons_enabled = false,
                 theme = 'onedark',
-                -- component_separators = '|',
-                -- section_separators = '',
+                component_separators = '', -- '|',
+                section_separators = '',
             },
             sections = {
                 lualine_a = {
-                    {
-                        'mode',
-                        fmt = function(str)
-                            if str:sub(1, 2) == 'V-' then
-                                return str:lower()
-                            end
-
-                            return str:sub(1, 1):lower()
-                        end,
-                    },
+                    function ()
+                        -- `:h mode()`: non-zero first arg for more than 1st char
+                        return vim.api.nvim_call_function("mode", { 1 })
+                    end,
+                    -- {
+                    --     'mode',
+                    --     fmt = function(str)
+                    --         if str:sub(1, 2) == 'V-' then
+                    --             return str:lower()
+                    --         end
+                    --
+                    --         return str:sub(1, 1):lower()
+                    --     end,
+                    -- },
                 },
-                -- lualine_b = { 'branch', 'diff' },
+                lualine_b = { 'diagnostics' },
+                -- lualine_b = { 'branch', 'diff', 'diagnostics' },
                 lualine_c = {
-                    -- 'diagnostics',
                     {
                         'filename',
                         path = 3,

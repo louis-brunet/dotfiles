@@ -1,7 +1,7 @@
 ---@type TSConfig
 local treesitter_opts = {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'go', 'html', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
+    ensure_installed = { 'c', 'go', 'html', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim' },
 
     -- Autoinstall languages that are not installed. Defaults to false
     auto_install = true,
@@ -87,6 +87,7 @@ return {
     {
         -- Highlight, edit, and navigate code
         'nvim-treesitter/nvim-treesitter',
+        event = 'VeryLazy',
         dependencies = {
             -- manipulate treesitter objects (parameter names, functions, properties, etc.)
             'nvim-treesitter/nvim-treesitter-textobjects',
