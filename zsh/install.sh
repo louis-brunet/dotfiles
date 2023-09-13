@@ -9,7 +9,7 @@ echo "✅ installed zsh"
 zsh --version
 
 # set zsh as default shell
-sudo chsh -s $(which zsh) $(whoami)
+sudo chsh -s "$(which zsh)" "$(whoami)"
 echo "✅ set zsh as default shell"
 
 if [ -n "$ZSH" ] && [ -d "$ZSH" ]

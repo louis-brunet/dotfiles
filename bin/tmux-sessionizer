@@ -4,6 +4,8 @@
 # credit to ThePrimeagen
 # requires the command fzf
 
+set -e
+
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
