@@ -12,8 +12,25 @@ M.servers = {
                 quotePreference = "single",
             },
         },
-        -- settings = {
-        -- },
+        settings = {
+            typescript = {
+                format = {
+                    indentSize = vim.o.shiftwidth,
+                    convertTabsToSpaces = vim.o.expandtab,
+                    tabSize = vim.o.tabstop,
+                },
+            },
+            javascript = {
+                format = {
+                    indentSize = vim.o.shiftwidth,
+                    convertTabsToSpaces = vim.o.expandtab,
+                    tabSize = vim.o.tabstop,
+                },
+            },
+            completions = {
+                completeFunctionCalls = true,
+            },
+        },
     },
     html = {},
     -- TODO: how to configure tailwind to attach to .pug files ?
@@ -30,11 +47,30 @@ M.servers = {
 
     rust_analyzer = {
         ["rust-analyzer"] = {
-            check = {
-                -- command = "clippy",
-                overrideCommand = { "cargo", "clippy", "--workspace", "--message-format=json", "--all-targets", "--",
-                    "-A", "clippy::needless_return", },
+            cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                runBuildScripts = true,
             },
+            -- Add clippy lints for Rust.
+            checkOnSave = {
+                allFeatures = true,
+                command = "clippy",
+                extraArgs = { "--no-deps", "-A", "clippy::needless_return" },
+            },
+            procMacro = {
+                enable = true,
+                ignored = {
+                    ["async-trait"] = { "async_trait" },
+                    ["napi-derive"] = { "napi" },
+                    ["async-recursion"] = { "async_recursion" },
+                },
+            },
+            -- check = {
+            --     -- command = "clippy",
+            --     overrideCommand = { "cargo", "clippy", "--workspace", "--message-format=json", "--all-targets", "--",
+            --         "-A", "clippy::needless_return", },
+            -- },
         },
     },
 
@@ -131,4 +167,3 @@ M.on_attach = function(client, bufnr)
 end
 
 return M
-
