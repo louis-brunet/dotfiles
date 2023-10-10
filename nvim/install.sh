@@ -7,7 +7,7 @@ set -e
 # $HOME/bin should be in PATH
 echo "🌐 pulling latest stable nvim appimage"
 nvim_path="$HOME/bin/nvim" 
-mkdir -p $(dirname "$nvim_path")
+mkdir -p "$(dirname "$nvim_path")"
 curl -o "$nvim_path" -L https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
 chmod u+x "$nvim_path"
 

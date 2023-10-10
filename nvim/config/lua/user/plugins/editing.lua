@@ -12,10 +12,18 @@ local M = {
         -- Enable `lukas-reineke/indent-blankline.nvim`
         -- See `:help indent_blankline.txt`
         event = 'VeryLazy',
+        main = 'ibl',
         opts = {
-            char = '┊',
-            show_trailing_blankline_indent = false,
-            use_treesitter = true,
+            indent = {
+                char = '▏',
+                -- char = '┊',
+            },
+            scope = {
+                enabled = true,
+            },
+            -- whitespace = {
+            --     remove_blankline_trail = true,
+            -- },
         },
         dependencies = {
             'nvim-treesitter/nvim-treesitter',
@@ -34,7 +42,7 @@ local M = {
                 'javascript',
                 'typescriptreact',
                 'javascriptreact',
-                -- 'python',
+                'python',
             },
             jsx_brackets = true,            -- must add brackets to jsx attributes
             remove_template_string = false, -- remove backticks when there are no template string
