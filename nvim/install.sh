@@ -13,7 +13,17 @@ chmod u+x "$nvim_path"
 
 # sudo snap install nvim --classic
 nvim --version
-echo "✅ installed nvim"
+if [ $? -ne 0 ]; then
+    sudo apt install libfuse2 -y
+    nvim --version
+    if [ ! nvim --version ]; then
+        echo "❗ could not run 'nvim --version', is FUSE installed ? (to run AppImages)"
+    else 
+        echo "✅ installed nvim"
+    fi
+else 
+    echo "✅ installed nvim"
+fi 
 
 sudo apt install ripgrep
 rg --version
