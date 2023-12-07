@@ -97,5 +97,11 @@ return {
         build = ':TSUpdate',
         main = 'nvim-treesitter.configs',
         opts = treesitter_opts,
+        config = function (_, opts)
+            vim.treesitter.language.register('html', 'ejs')
+            -- local ft_to_parser = require"nvim-treesitter.parsers".filetype_to_parsername
+            -- ft_to_parser.ejs = "html"
+            require("nvim-treesitter.configs").setup(opts)
+        end
     },
 }
