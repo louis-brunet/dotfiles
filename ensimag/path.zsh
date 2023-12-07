@@ -1,0 +1,2 @@
+export ENSIMAG="$HOME/ensimag"
+
