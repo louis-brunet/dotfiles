@@ -25,6 +25,8 @@ local M = {
                     { buffer = bufnr, desc = '[G]it: [P]revious Hunk' })
                 vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk,
                     { buffer = bufnr, desc = '[G]it: [N]ext Hunk' })
+                vim.keymap.set('n', '<leader>gr', require('gitsigns').reset_hunk,
+                    { buffer = bufnr, desc = '[G]it: [R]eset Hunk' })
                 vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk_inline,
                     { buffer = bufnr, desc = 'Git: [P]review [H]unk' })
             end,
