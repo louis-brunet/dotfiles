@@ -4,17 +4,22 @@
 
 [alias]
         co = checkout
+        tree = log --graph --decorate --pretty=oneline --abbrev-commit
+
 [color]
         diff = auto
         status = auto
         branch = auto
         ui = true
+
 [core]
         excludesfile = ~/.gitignore
+
 [push]
         # See `git help config` (search for push.default)
         # for more information on different options of the below setting.
         default = simple
+
 [init]
 	defaultBranch = master
 
