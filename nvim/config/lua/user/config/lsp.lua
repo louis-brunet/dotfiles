@@ -127,8 +127,8 @@ M.on_attach = function(client, bufnr)
 
     -- See `:help K` for why this keymap
     nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-    nmap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
-    imap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
+    nmap('<C-s>', vim.lsp.buf.signature_help, '[S]ignature Documentation')
+    imap('<C-s>', vim.lsp.buf.signature_help, '[S]ignature Documentation')
 
     -- Lesser used LSP functionality
     nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -144,7 +144,7 @@ M.on_attach = function(client, bufnr)
     end, { desc = 'Format current buffer with LSP' })
 
 
-    -- Create an autocommand to highlight hovered word
+    -- Create an autocommand to highlight hovered word using attached LSP
     local highlight_augroup_name = "LspDocumentHighlightGroup"
     local highlight_augroup = vim.api.nvim_create_augroup(highlight_augroup_name, { clear = true })
     local highlight_augroup_opts = function(callback)
