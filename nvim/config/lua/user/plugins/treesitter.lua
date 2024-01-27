@@ -1,4 +1,5 @@
 ---@type TSConfig
+---@diagnostic disable-next-line: missing-fields
 local treesitter_opts = {
     -- Add languages to be installed here that you want installed for treesitter
     ensure_installed = { 'c', 'go', 'html', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim' },
