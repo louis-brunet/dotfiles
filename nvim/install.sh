@@ -14,15 +14,10 @@ if [[ ! -x "$nvim_path" ]]; then
 fi
 
 # sudo snap install nvim --classic
-nvim --version
-if [ $? -ne 0 ]; then
+
+if ! nvim --version; then
     sudo apt install libfuse2 -y
-    nvim --version
-    if [ ! nvim --version ]; then
-        echo "❗ could not run 'nvim --version', is FUSE installed ? (to run AppImages)"
-    else 
-        echo "✅ installed nvim"
-    fi
+    echo "✅ installed libfuse2 to run AppImages"
 else 
     echo "✅ installed nvim"
 fi 
