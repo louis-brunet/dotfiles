@@ -111,9 +111,9 @@ local M = {
             --     duration = 200,
             -- },
         },
-        config = function(_, opts)
-            require("nvim-surround").setup(opts)
-        end
+        -- config = function(_, opts)
+        --     require("nvim-surround").setup(opts)
+        -- end
     }
 }
 
