@@ -74,19 +74,19 @@ M.servers = {
         },
     },
 
-    gopls = {
-        gopls = { -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-            templateExtensions = { 'tmpl', 'gotmpl' },
-            analyses = {
-                unusedparams = true,
-            },
-        },
-        filetypes = {
-            'template',
-            -- default filtetypes
-            'go', 'gomod', 'gowork', 'gotmpl',
-        },
-    },
+    -- gopls = {
+    --     gopls = { -- https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+    --         templateExtensions = { 'tmpl', 'gotmpl' },
+    --         analyses = {
+    --             unusedparams = true,
+    --         },
+    --     },
+    --     filetypes = {
+    --         'template',
+    --         -- default filtetypes
+    --         'go', 'gomod', 'gowork', 'gotmpl',
+    --     },
+    -- },
 
     lua_ls = {
         Lua = {
