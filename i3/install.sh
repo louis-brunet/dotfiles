@@ -31,3 +31,6 @@ else
     echo "✅ i3blocks already installed, skipping"
 fi 
 
+# Install graphical app arandr to generate xrandr commands for a multi-monitor setup
+sudo apt-get install -y arandr
+
