@@ -34,6 +34,6 @@ fi
 # arandr: GUI to generate xrandr commands for a multi-monitor setup
 # rofi: A window switcher, Application launcher and dmenu replacement. https://github.com/davatorium/rofi
 # compton: window compositor for transparency & other effects
-sudo apt-get install -y arandr rofi compton
-echo "✅ installed arandr, rofi and compton for i3"
+sudo apt-get install -y arandr compton pactl rofi 
+echo "✅ installed arandr, compton, pactl and rofi for i3"
 

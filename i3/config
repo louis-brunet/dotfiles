@@ -38,21 +38,23 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
-# Media player controls
+# Media player controls (Pulse Audio)
 
 # Use pactl to adjust volume in PulseAudio.
-set $refresh_i3status killall -SIGUSR1 i3status
+set $refresh_i3status pkill -SIGRTMIN+10 i3blocks
+# set $refresh_i3status killall -SIGRTMIN+10 i3status
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
 bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
-bindsym XF86AudioPlay exec playerctl play-pause && $refresh_i3status
-bindsym XF86AudioPause exec playerctl play-pause && $refresh_i3status
-bindsym XF86AudioNext exec playerctl next && $refresh_i3status
-bindsym XF86AudioPrev exec playerctl previous && $refresh_i3status
-# bindsym XF86AudioStop exec playerctl stop
+# Use playerctl for play/pause/next/prev
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause && $refresh_i3status
+bindsym XF86AudioPause exec --no-startup-id playerctl play-pause && $refresh_i3status
+bindsym XF86AudioNext exec --no-startup-id playerctl next && $refresh_i3status
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous && $refresh_i3status
+# bindsym XF86AudioStop exec --no-startup-id playerctl stop && $refresh_i3status
 
 
 # Use Mouse+$mod to drag floating windows to their wanted position ($mod + right click to resize)
@@ -68,7 +70,7 @@ bindsym $mod+Shift+A kill
 # bindsym $mod+d exec --no-startup-id dmenu_run
 # A more modern dmenu replacement is rofi:
 # bindsym $mod+d exec "rofi -show combi"
-bindsym $mod+d exec "rofi -show drun"
+bindsym $mod+d exec --no-startup-id "rofi -show drun"
 # bindsym $mod+d exec "rofi -modi drun,run -show drun -matching fuzzy -show-icons -drun-display-format '{name} {exec}'"
 # There also is i3-dmenu-desktop which only displays applications shipping a
 # .desktop file. It is a wrapper around dmenu, so you need that installed.
@@ -137,7 +139,14 @@ set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
-set $ws10 "10"
+set $ws10 "10:  GIMP"
+
+set $modeResize "resize"
+
+# Assign programs to workspaces (to find class values, run `xprop` cmd, click on desired window, then read WM_CLASS(STRING) value)
+assign [class="(?i)firefox"] $ws1
+# assign [class="(?i)gnome-terminal"] $ws2
+assign [class="^(?i)gimp-.*"]$ws10
 
 # switch to workspace
 bindsym $mod+ampersand workspace number $ws1
@@ -174,7 +183,7 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # resize window (you can also use the mouse for that: mod+right click)
-mode "resize" {
+mode $modeResize {
         # These bindings trigger as soon as you enter the resize mode
 
         # Pressing left will shrink the window’s width.
@@ -197,7 +206,7 @@ mode "resize" {
         bindsym Escape mode "default"
         bindsym $mod+r mode "default"
 }
-bindsym $mod+r mode "resize"
+bindsym $mod+r mode $modeResize
 
 ##### Custom keymaps
 
@@ -205,16 +214,9 @@ bindsym $mod+r mode "resize"
 # Mod + escape to lock screen
 bindsym $mod+Escape exec i3lock -c 331133
 
-# Media keys
-
-# Pulse Audio controls
-# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
-# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
-# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
-
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
-bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
 
 # Touchpad controls
 # bindsym XF86TouchpadToggle exec /some/path/to/toggletouchpad.sh # toggle touchpad
@@ -222,16 +224,12 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightne
 
 
 # Send signal 11 to i3blocks to indicated Caps/Num lock pressed
-bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
-bindsym --release Num_Lock  exec pkill -SIGRTMIN+11 i3blocks
+bindsym --release Caps_Lock exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
+bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
 
-
-# Assign programs to workspaces (to find class values, run `xprop` cmd, click on desired window, then read WM_CLASS(STRING) value)
-assign [class="firefox"] $ws1
-# assign [class="Gnome-terminal"] $ws2
 
 # Monitor config generated with arandr GUI (`apt install arandr`)
-exec_always xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 
 
 ###########################
