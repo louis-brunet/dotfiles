@@ -291,4 +291,13 @@ bar {
         }
 }
 
+########################
+# execute startup cmds #
+########################
+
+# background wallpaper 
+exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
+
+# compton window compositor 
+exec --no-startup-id compton -d
 

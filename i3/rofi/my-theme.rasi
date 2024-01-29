@@ -144,7 +144,7 @@ button selected {
     text-color:       var(selected-normal-foreground);
 }
 textbox-prompt-sep {
-    margin:     0px 16px 0px 0px ;
+    margin:     0px 8px 0px 0px ;
     expand:     false;
     str:        ":";
     text-color: var(normal-foreground);
