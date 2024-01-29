@@ -16,7 +16,9 @@ set $mod Mod4
 # is used in the bar {} block below.
 
 # use the nerd font installed in $DOTFILES/system/install.sh
-font pango:MesloLGS NF Regular 10
+set $fontFamily MesloLGS NF Regular
+set $fontSize 10
+font pango:$fontFamily $fontSize
 # font pango:monospace 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
@@ -130,8 +132,9 @@ bindsym $mod+q focus parent
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1:  Browser"
-set $ws2 "2:  Terminal"
+# set $ws1 "1:  Browser"
+set $ws1 "1:"
+set $ws2 "2:"
 set $ws3 "3"
 set $ws4 "4"
 set $ws5 "5"
@@ -139,7 +142,7 @@ set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
-set $ws10 "10:  GIMP"
+set $ws10 "10:"
 
 set $modeResize "resize"
 
@@ -277,15 +280,20 @@ bar {
 
         i3bar_command i3bar --transparency
         status_command i3blocks -c ~/.config/i3/i3blocks.conf
+        # mode hide
+        # TODO: use custom workspace_command in i3 4.23 https://i3wm.org/docs/i3bar-workspace-protocol.html#__examples
+        # workspace_command ~/.config/i3/i3bar_workspaces.sh
         position top
         tray_padding 2
         workspace_buttons yes
-        # workspace_min_width 40
+        workspace_min_width 30
         strip_workspace_numbers yes
         # binding mode is "resize", for example
         binding_mode_indicator yes
         # padding top[px] right[px] bottom[px] left[px]
-        padding 0 16 0 0
+        padding 4 16 0 0
+        # font pango:$fontFamily 20
+
 
         colors {
                 # background $gruvDrk
@@ -294,7 +302,7 @@ bar {
                 # separator $gruvDrk
 
                 #                  border     background   text
-                focused_workspace  $gruvDrk   $gruvDrk   $white 
+                focused_workspace  $gruvDrk   $yellowbrown $gruvDrk
                 inactive_workspace $gruvDrk   $gruvDrk   $darkgrey
 
                 # active = unfocused but displayed (e.g. multi-monitor) 
