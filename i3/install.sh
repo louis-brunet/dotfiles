@@ -31,6 +31,8 @@ else
     echo "✅ i3blocks already installed, skipping"
 fi 
 
-# Install graphical app arandr to generate xrandr commands for a multi-monitor setup
-sudo apt-get install -y arandr
+# arandr: GUI to generate xrandr commands for a multi-monitor setup
+# rofi: A window switcher, Application launcher and dmenu replacement. https://github.com/davatorium/rofi
+sudo apt-get install -y arandr rofi
+echo "✅ installed arandr and rofi for i3"
 
