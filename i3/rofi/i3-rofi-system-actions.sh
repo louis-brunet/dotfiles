@@ -24,8 +24,8 @@ function add_option() {
 # Fill options.
 # add_option_if_file "Toggle screens" "$HOME/.screenlayout/toggle-radeon.sh"
 # add_option_if_file "Rename workspace" "$HOME/bin/i3-workspace-rename.py"
-add_option "Shut down system" "systemctl poweroff"
-add_option "Restart system" "systemctl reboot"
+add_option "Shut down" "systemctl poweroff"
+add_option "Restart" "systemctl reboot"
 add_option "Sleep monitor" "xset dpms force suspend; sleep 0.1; xset dpms force suspend"
 add_option_if_file "Lock" "$HOME/bin/lock.sh"
 add_option "Suspend system" "systemctl suspend"
@@ -35,7 +35,7 @@ options_keys=$(printf '%s\n' "${options_order[@]}")  # Get keys as a string, sep
 options_len=$(echo -e "$options_keys"|wc -l)
 echo -e "$options_keys"
 
-launcher="rofi -matching fuzzy -l $options_len -dmenu -i -p 'System'"
+launcher="rofi -matching fuzzy -no-show-icons -l $options_len -dmenu -i -p 'System'"
 selection=$(echo -e "$options_keys" | eval "$launcher" | tr -d '\r\n')
 echo "$selection : ${options[$selection]}"
 
