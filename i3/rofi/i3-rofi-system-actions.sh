@@ -24,12 +24,12 @@ function add_option() {
 # Fill options.
 # add_option_if_file "Toggle screens" "$HOME/.screenlayout/toggle-radeon.sh"
 # add_option_if_file "Rename workspace" "$HOME/bin/i3-workspace-rename.py"
-add_option "Power-off system" "systemctl poweroff"
-add_option "Reboot system" "systemctl reboot"
+add_option "Shut down system" "systemctl poweroff"
+add_option "Restart system" "systemctl reboot"
 add_option "Sleep monitor" "xset dpms force suspend; sleep 0.1; xset dpms force suspend"
 add_option_if_file "Lock" "$HOME/bin/lock.sh"
 add_option "Suspend system" "systemctl suspend"
-add_option "Exit" "i3-msg exit"
+add_option "Exit i3" "i3-msg exit"
 # add_option "Hibernate" "systemctl hibernate"
 options_keys=$(printf '%s\n' "${options_order[@]}")  # Get keys as a string, seperated by newlines.
 options_len=$(echo -e "$options_keys"|wc -l)

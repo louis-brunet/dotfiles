@@ -13,47 +13,55 @@
     background:                  var(gruvbox-dark-bg0);
     scrollbar-handle:            var(border-color);
     alternate-normal-foreground: var(foreground);
-    gruvbox-dark-red-light:      rgba ( 251, 73, 52, 100 % );
     urgent-foreground:           var(background);
-    gruvbox-dark-fg0:            rgba ( 251, 241, 199, 100 % );
-    gruvbox-dark-bg3:            rgba ( 102, 92, 84, 100 % );
     alternate-urgent-foreground: var(urgent-foreground);
     selected-active-foreground:  var(active-foreground);
-    gruvbox-dark-red-dark:       rgba ( 204, 36, 29, 100 % );
     separatorcolor:              var(border-color);
     selected-normal-background:  var(gruvbox-dark-bg3);
     selected-urgent-background:  var(gruvbox-dark-red-light);
-    gruvbox-dark-fg1:            rgba ( 235, 219, 178, 100 % );
     scrollbar:                   true;
     alternate-active-background: var(active-background);
     active-background:           var(gruvbox-dark-yellow-dark);
-    gruvbox-dark-yellow-dark:    rgba ( 215, 153, 33, 100 % );
     normal-background:           var(background);
-    gruvbox-dark-yellow-light:   rgba ( 250, 189, 47, 100 % );
     background-color:            var(background);
-    gruvbox-dark-bg0-soft:       rgba ( 50, 48, 47, 100 % );
     border-color:                var(gruvbox-dark-gray);
     foreground:                  var(gruvbox-dark-fg1);
-    gruvbox-dark-gray:           rgba ( 168, 153, 132, 100 % );
     alternate-normal-background: var(gruvbox-dark-bg0-soft);
     urgent-background:           var(gruvbox-dark-red-dark);
-    gruvbox-dark-bg0:            rgba ( 40, 40, 40, 100 % );
     active-foreground:           var(background);
     selected-normal-foreground:  var(gruvbox-dark-fg0);
+    gruvbox-dark-red-light:      rgba ( 251, 73, 52, 100 % );
+    gruvbox-dark-red-dark:       rgba ( 204, 36, 29, 100 % );
+    gruvbox-dark-yellow-dark:    rgba ( 215, 153, 33, 100 % );
+    gruvbox-dark-yellow-light:   rgba ( 250, 189, 47, 100 % );
+    gruvbox-dark-gray:           rgba ( 168, 153, 132, 100 % );
+    gruvbox-dark-fg0:            rgba ( 251, 241, 199, 100 % );
+    gruvbox-dark-fg1:            rgba ( 235, 219, 178, 100 % );
+    gruvbox-dark-bg0-soft:       rgba ( 50, 48, 47, 100 % );
+    gruvbox-dark-bg0:            rgba ( 40, 40, 40, 100 % );
+    gruvbox-dark-bg3:            rgba ( 102, 92, 84, 100 % );
+    
+    border-radius-small: 4px;
+    border-radius-medium: 8px;
+    border-radius-large: 16px;
+
+    padding-large: 16px;
 }
 window {
-    padding:          2;
+    padding:          var(padding-large);
     background-color: var(background);
     border:           2;
+    border-radius: var(border-radius-large);
 }
 mainbox {
     padding: 0;
     border:  0;
+    spacing: 8px;
 }
 message {
     padding:      1px ;
     border-color: var(separatorcolor);
-    border:       2px 0px 0px ;
+    border:       2px 0px 2px ;
 }
 textbox {
     highlight:  var(highlight);
@@ -64,10 +72,11 @@ listview {
     scrollbar:    var(scrollbar);
     border-color: var(separatorcolor);
     spacing:      2px ;
-    border:       2px 0px 0px ;
+    border: 0;
+    // border:       2px 0px 0px ;
 }
 element {
-    padding: 2px ;
+    padding: 8px ;
     border:  0;
 }
 element normal.normal {
@@ -111,6 +120,7 @@ scrollbar {
     padding:      0;
     handle-width: 8px ;
     border:       0;
+    border-radius: 4px;
     handle-color: var(scrollbar-handle);
 }
 mode-switcher {
