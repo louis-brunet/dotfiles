@@ -32,10 +32,6 @@ exec --no-startup-id dex --autostart --environment i3
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
 
-# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
-# screen before suspend. Use loginctl lock-session to lock your screen.
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
@@ -146,9 +142,10 @@ set $ws10 "10:"
 
 set $modeResize "resize"
 
-# Assign programs to workspaces (to find class values, run `xprop` cmd, click on desired window, then read WM_CLASS(STRING) value)
+# Assign programs to workspaces (to find class values, run `xprop` cmd, click on desired window, then read WM_CLASS(_, STRING) value)
 assign [class="(?i)firefox"] $ws1
 # assign [class="(?i)gnome-terminal"] $ws2
+# assign [class="^(?i)KeePass2"]$ws9
 assign [class="^(?i)gimp-.*"]$ws10
 
 # switch to workspace
@@ -214,9 +211,6 @@ bindsym $mod+r mode $modeResize
 ##### Custom keymaps
 
 
-# Mod + escape to lock screen
-bindsym $mod+Escape exec i3lock -c 331133
-
 # Sreen brightness controls
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
@@ -265,6 +259,7 @@ set $yellowbrown	#e1b700
 set $cyan #00dede
 set $warm #ebdbb2
 set $gruvDrk  #1e1e1e
+set $gruvDrkLock  1e1e1e
 
 # define colors for windows:
 #class		            	border		bground		text		indicator	 child_border
@@ -312,6 +307,8 @@ bar {
         }
 }
 
+
+
 ########################
 # execute startup cmds #
 ########################
@@ -321,4 +318,17 @@ exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
 
 # compton window compositor 
 exec --no-startup-id compton -d
+
+# exec --no-startup-id xset dpms 0 0 0
+# exec --no-startup-id xset -dpms
+# exec --no-startup-id xset s off
+# exec --no-startup-id setterm -balnk 0
+
+# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
+# screen before suspend. Use loginctl lock-session to lock your screen.
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -c $gruvDrkLock
+
+# Mod + escape to lock screen
+# bindsym $mod+Escape exec i3lock -c $gruvDrkLock
+bindsym $mod+Escape exec ~/.config/i3/i3-rofi-system-actions.sh
 
