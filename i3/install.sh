@@ -19,21 +19,18 @@ else
     echo "✅ playerctl already installed, skipping"
 fi 
 
-# Install i3blocks for the i3 status bar
-if ! which i3blocks; then
-    sudo apt-get install -y i3blocks
-    i3blocks -V
-
-    echo "✅ installed i3blocks for media keys in i3"
-else
-    i3blocks -V
-
-    echo "✅ i3blocks already installed, skipping"
-fi 
-
 # arandr: GUI to generate xrandr commands for a multi-monitor setup
-# rofi: A window switcher, Application launcher and dmenu replacement. https://github.com/davatorium/rofi
 # compton: window compositor for transparency & other effects
-sudo apt-get install -y arandr compton pactl rofi 
+# i3blocks: status bar
+# pulseaudio-utils (command: pactl): Control a running PulseAudio sound server
+# polybar: status bar
+# rofi: A window switcher, Application launcher and dmenu replacement. https://github.com/davatorium/rofi
+sudo apt-get install -y \
+    arandr \
+    compton \
+    pulseaudio-utils \
+    polybar \
+    rofi 
+    # i3blocks \
 echo "✅ installed arandr, compton, pactl and rofi for i3"
 

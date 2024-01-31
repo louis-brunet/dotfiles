@@ -208,27 +208,6 @@ mode $modeResize {
 }
 bindsym $mod+r mode $modeResize
 
-##### Custom keymaps
-
-
-# Sreen brightness controls
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
-
-# Touchpad controls
-# bindsym XF86TouchpadToggle exec /some/path/to/toggletouchpad.sh # toggle touchpad
-
-
-
-# Send signal 11 to i3blocks to indicated Caps/Num lock pressed
-bindsym --release Caps_Lock exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
-bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
-
-
-# Monitor config generated with arandr GUI (`apt install arandr`)
-exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
-
-
 ###########################
 # window title and border #
 ###########################
@@ -270,42 +249,69 @@ client.urgent		    	$urgentred	$urgentred	$white		$yellowbrown $yellowbrown
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-bar {
-        # status_command i3status
+# bar {
+#         # status_command i3status
+#
+#         i3bar_command i3bar --transparency
+#         status_command i3blocks -c ~/.config/i3/i3blocks.conf
+#         # mode hide
+#         # TODO: use custom workspace_command in i3 4.23 https://i3wm.org/docs/i3bar-workspace-protocol.html#__examples
+#         # workspace_command ~/.config/i3/i3bar_workspaces.sh
+#         position top
+#         tray_padding 2
+#         workspace_buttons yes
+#         workspace_min_width 30
+#         strip_workspace_numbers yes
+#         # binding mode is "resize", for example
+#         binding_mode_indicator yes
+#         # padding top[px] right[px] bottom[px] left[px]
+#         padding 4 16 0 0
+#         # font pango:$fontFamily 20
+#
+#
+#         colors {
+#                 # background $gruvDrk
+#                 background "#00000000"
+#                 statusline $grey
+#                 # separator $gruvDrk
+#
+#                 #                  border     background   text
+#                 focused_workspace  $gruvDrk   $warm        $gruvDrk
+#                 inactive_workspace $gruvDrk   $gruvDrk     $darkgrey
+#
+#                 # active = unfocused but displayed (e.g. multi-monitor) 
+#                 active_workspace   $gruvDrk   $gruvDrk   $darkgrey
+#                 urgent_workspace   $urgentred $urgentred $white
+#                 # binding_mode uses settings from urgent_workspace by default
+#         }
+# }
 
-        i3bar_command i3bar --transparency
-        status_command i3blocks -c ~/.config/i3/i3blocks.conf
-        # mode hide
-        # TODO: use custom workspace_command in i3 4.23 https://i3wm.org/docs/i3bar-workspace-protocol.html#__examples
-        # workspace_command ~/.config/i3/i3bar_workspaces.sh
-        position top
-        tray_padding 2
-        workspace_buttons yes
-        workspace_min_width 30
-        strip_workspace_numbers yes
-        # binding mode is "resize", for example
-        binding_mode_indicator yes
-        # padding top[px] right[px] bottom[px] left[px]
-        padding 4 16 0 0
-        # font pango:$fontFamily 20
+##################
+# Custom keymaps #
+##################
 
 
-        colors {
-                # background $gruvDrk
-                background "#00000000"
-                statusline $grey
-                # separator $gruvDrk
+# Mod + escape to lock screen
+# bindsym $mod+Escape exec i3lock -c $gruvDrkLock
+bindsym $mod+Escape exec ~/.config/i3/i3-rofi-system-actions.sh
 
-                #                  border     background   text
-                focused_workspace  $gruvDrk   $yellowbrown $gruvDrk
-                inactive_workspace $gruvDrk   $gruvDrk   $darkgrey
+# Sreen brightness controls
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
 
-                # active = unfocused but displayed (e.g. multi-monitor) 
-                active_workspace   $gruvDrk   $gruvDrk   $darkgrey
-                urgent_workspace   $urgentred $urgentred $white
-                # binding_mode uses settings from urgent_workspace by default
-        }
-}
+# Touchpad controls
+# bindsym XF86TouchpadToggle exec /some/path/to/toggletouchpad.sh # toggle touchpad
+
+
+
+# Send signal 11 to i3blocks to indicated Caps/Num lock pressed
+bindsym --release Caps_Lock exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
+bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
+
+
+# Monitor config generated with arandr GUI (`apt install arandr`)
+exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+
 
 
 
@@ -326,9 +332,9 @@ exec --no-startup-id compton -d
 
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -c $gruvDrkLock
+# TODO: uncomment for password prompt on screen wake
+# exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -c $gruvDrkLock
 
-# Mod + escape to lock screen
-# bindsym $mod+Escape exec i3lock -c $gruvDrkLock
-bindsym $mod+Escape exec ~/.config/i3/i3-rofi-system-actions.sh
+# (Re)start polybar
+exec_always --no-startup-id ~/.config/polybar/launch.sh
 
