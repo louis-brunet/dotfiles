@@ -46,7 +46,7 @@ configuration {
 /*	click-to-exit: true;*/
 /*	max-history-size: 25;*/
 /*	combi-hide-mode-prefix: false;*/
-/*	combi-display-format: "{mode} {text}";*/
+	combi-display-format: "[<span weight='light' size='small'><i>{mode}</i></span>] {text}";
 /*	matching-negate-char: '-' /* unsupported */;*/
 /*	cache-dir: ;*/
 /*	window-thumbnail: false;*/

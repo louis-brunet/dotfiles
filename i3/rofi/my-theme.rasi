@@ -48,6 +48,18 @@
               |------------------------------------------------------------------------------------|
 */
 * {
+    gruvbox-dark-red-light:      rgba ( 251, 73, 52, 100 % );
+    gruvbox-dark-red-dark:       rgba ( 204, 36, 29, 100 % );
+    gruvbox-dark-yellow-dark:    rgba ( 215, 153, 33, 100 % );
+    gruvbox-dark-yellow-light:   rgba ( 250, 189, 47, 100 % );
+    gruvbox-dark-gray:           rgba ( 168, 153, 132, 100 % );
+    gruvbox-dark-fg0:            rgba ( 251, 241, 199, 100 % );
+    gruvbox-dark-fg1:            rgba ( 235, 219, 178, 100 % );
+    gruvbox-dark-fg-faded:       rgba ( 235, 219, 178, 30 % );
+    gruvbox-dark-bg0-soft:       rgba ( 50, 48, 47, 100 % );
+    gruvbox-dark-bg0:            rgba ( 40, 40, 40, 100 % );
+    gruvbox-dark-bg3:            rgba ( 102, 92, 84, 100 % );
+    
     highlight:                   bold italic ;
     scrollbar-handle:            var(border-color);
     separatorcolor:              var(border-color);
@@ -59,7 +71,7 @@
     normal-background:           var(background);
     active-background:           var(gruvbox-dark-yellow-dark);
     urgent-background:           var(gruvbox-dark-red-dark);
-    alternate-normal-background: var(gruvbox-dark-bg0-soft);
+    alternate-normal-background: var(normal-background);//var(gruvbox-dark-bg0-soft);
     alternate-active-background: var(active-background);
     alternate-urgent-background: var(urgent-background);
     selected-normal-background:  var(gruvbox-dark-bg3);
@@ -67,28 +79,17 @@
     selected-urgent-background:  var(gruvbox-dark-red-light);
 
     foreground:                  var(gruvbox-dark-fg1);
+    prompt-foreground:           var(gruvbox-dark-fg-faded);
     normal-foreground:           var(foreground);
     active-foreground:           var(background);
     urgent-foreground:           var(background);
-    alternate-normal-foreground: var(foreground);
+    alternate-normal-foreground: var(normal-foreground);
     alternate-active-foreground: var(active-foreground);
     alternate-urgent-foreground: var(urgent-foreground);
     selected-normal-foreground:  var(gruvbox-dark-fg0);
     selected-active-foreground:  var(active-foreground);
     selected-urgent-foreground:  var(urgent-foreground);
 
-    gruvbox-dark-red-light:      rgba ( 251, 73, 52, 100 % );
-    gruvbox-dark-red-dark:       rgba ( 204, 36, 29, 100 % );
-    gruvbox-dark-yellow-dark:    rgba ( 215, 153, 33, 100 % );
-    gruvbox-dark-yellow-light:   rgba ( 250, 189, 47, 100 % );
-    gruvbox-dark-gray:           rgba ( 168, 153, 132, 100 % );
-    gruvbox-dark-fg0:            rgba ( 251, 241, 199, 100 % );
-    gruvbox-dark-fg1:            rgba ( 235, 219, 178, 100 % );
-    gruvbox-dark-fg-inactive:    rgba ( 235, 219, 178, 50 % );
-    gruvbox-dark-bg0-soft:       rgba ( 50, 48, 47, 100 % );
-    gruvbox-dark-bg0:            rgba ( 40, 40, 40, 100 % );
-    gruvbox-dark-bg3:            rgba ( 102, 92, 84, 100 % );
-    
     border-radius-small: 4px;
     border-radius-medium: 8px;
     border-radius-large: 16px;
@@ -125,12 +126,13 @@ listview {
     scrollbar:    var(scrollbar);
     border-color: var(separatorcolor);
     spacing:      2px ;
-    border: 0;
-    // border:       2px 0px 0px ;
+    // border: 0;
+    border:       2px 0px 0px ;
 }
 element {
     padding: var(padding-element) ;
     border:  0;
+    border-radius: var(border-radius-small);
 }
 element normal.normal {
     background-color: var(normal-background);
@@ -196,7 +198,7 @@ entry {
 }
 prompt {
     spacing:    0;
-    text-color: var(normal-foreground);
+    text-color: var(prompt-foreground);
 }
 button {
     spacing:    0;
@@ -210,7 +212,7 @@ textbox-prompt-sep {
     margin:     0px 8px 0px 0px ;
     expand:     false;
     str:        ":";
-    text-color: var(normal-foreground);
+    text-color: var(prompt-foreground);
 }
 element-text {
     background-color: inherit;
