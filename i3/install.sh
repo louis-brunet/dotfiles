@@ -21,6 +21,7 @@ fi
 
 # arandr: GUI to generate xrandr commands for a multi-monitor setup
 # compton: window compositor for transparency & other effects
+# feh: background management
 # i3blocks: status bar
 # pulseaudio-utils (command: pactl): Control a running PulseAudio sound server
 # polybar: status bar
@@ -28,6 +29,7 @@ fi
 sudo apt-get install -y \
     arandr \
     compton \
+    feh \
     pulseaudio-utils \
     polybar \
     rofi 
