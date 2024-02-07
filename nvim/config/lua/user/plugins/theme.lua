@@ -12,6 +12,10 @@ local function attached_lsp_clients()
     return names_str
 end
 
+local function codeium_status()
+    return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
+end
+
 ---@type LazySpec
 return {
     {
@@ -94,7 +98,7 @@ return {
                         path = 3,
                     },
                 },
-                lualine_x = { attached_lsp_clients, 'filetype' },
+                lualine_x = { --[[codeium_status,--]] attached_lsp_clients, 'filetype' },
                 lualine_y = { 'location' },
                 lualine_z = {},
             },
