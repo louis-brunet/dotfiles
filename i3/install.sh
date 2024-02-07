@@ -20,6 +20,7 @@ else
 fi 
 
 # arandr: GUI to generate xrandr commands for a multi-monitor setup
+# brightnessctl: control screen brightness from the command-line
 # compton: window compositor for transparency & other effects
 # feh: background management
 # i3blocks: status bar
@@ -28,6 +29,7 @@ fi
 # rofi: A window switcher, Application launcher and dmenu replacement. https://github.com/davatorium/rofi
 sudo apt-get install -y \
     arandr \
+    brightnessctl \
     compton \
     feh \
     pulseaudio-utils \

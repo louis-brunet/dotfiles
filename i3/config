@@ -285,8 +285,10 @@ client.urgent		    	$urgentred	$urgentred	$white		$yellowbrown $yellowbrown
 bindsym $mod+Escape exec ~/.config/i3/i3-rofi-system-actions.sh
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%   # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%- # decrease screen brightness
+# bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
+# bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
 
 # Touchpad controls
 # bindsym XF86TouchpadToggle exec /some/path/to/toggletouchpad.sh # toggle touchpad
@@ -324,7 +326,7 @@ exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --r
 exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
 
 # compton window compositor 
-exec --no-startup-id compton -d
+exec --no-startup-id compton
 
 # exec --no-startup-id xset dpms 0 0 0
 # exec --no-startup-id xset -dpms
