@@ -18,7 +18,7 @@ set $terminal i3-sensible-terminal
 # is used in the bar {} block below.
 
 # use the nerd font installed in $DOTFILES/system/install.sh
-set $fontFamily MesloLGS NF Regular
+set $fontFamily MesloLGS NF
 set $fontSize 10
 font pango:$fontFamily $fontSize
 # font pango:monospace 8
@@ -26,17 +26,6 @@ font pango:$fontFamily $fontSize
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
-
-# Start XDG autostart .desktop files using dex. See also
-# https://wiki.archlinux.org/index.php/XDG_Autostart
-exec --no-startup-id dex --autostart --environment i3
-
-# The combination of xss-lock, nm-applet and pactl is a popular choice, so
-# they are included here as an example. Modify as you see fit.
-
-# NetworkManager is the most popular way to manage wireless networks on Linux,
-# and nm-applet is a desktop environment-independent system tray GUI for it.
-exec --no-startup-id nm-applet
 
 # Media player controls (Pulse Audio)
 
@@ -298,8 +287,8 @@ client.urgent		    	$urgentred	$urgentred	$white		$yellowbrown $yellowbrown
 bindsym $mod+Escape exec ~/.config/i3/i3-rofi-system-actions.sh
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%   # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%- # decrease screen brightness
 
 # Touchpad controls
 # bindsym XF86TouchpadToggle exec /some/path/to/toggletouchpad.sh # toggle touchpad
@@ -311,14 +300,13 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease
 # bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
 
 
-
-
-
 ########################
 # execute startup cmds #
 ########################
 
 # Monitor config generated with arandr GUI (`apt install arandr`)
+# exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
+
 # exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --off --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 
@@ -326,11 +314,27 @@ exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output Display
 # i3-msg move workspace to output left
 # i3-msg move workspace to output right
 
+# Start XDG autostart .desktop files using dex. See also
+# https://wiki.archlinux.org/index.php/XDG_Autostart
+exec --no-startup-id dex --autostart --environment i3
+
+# The combination of xss-lock, nm-applet and pactl is a popular choice, so
+# they are included here as an example. Modify as you see fit.
+
+# NetworkManager is the most popular way to manage wireless networks on Linux,
+# and nm-applet is a desktop environment-independent system tray GUI for it.
+exec --no-startup-id nm-applet
+
+
+# Monitor config generated with arandr GUI (`apt install arandr`)
+exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
+# exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+
 # background wallpaper 
 exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
 
 # compton window compositor 
-exec --no-startup-id compton -d
+exec --no-startup-id compton
 
 # exec --no-startup-id xset dpms 0 0 0
 # exec --no-startup-id xset -dpms

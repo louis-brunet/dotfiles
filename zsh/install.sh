@@ -3,7 +3,6 @@
 set -e
 
 # install zsh
-sudo apt update
 sudo apt install zsh -y
 echo "✅ installed zsh"
 zsh --version
