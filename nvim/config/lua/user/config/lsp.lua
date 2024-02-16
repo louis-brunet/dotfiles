@@ -3,7 +3,10 @@ local M = {}
 local function ts_organize_imports()
     local params = {
         command = "_typescript.organizeImports",
-        arguments = { vim.api.nvim_buf_get_name(0) },
+        arguments = {
+            vim.api.nvim_buf_get_name(0), -- organize for current buffer
+            { skipDestructiveCodeActions = false }, -- delete unused imports
+        },
         title = ""
     }
     vim.lsp.buf.execute_command(params)
