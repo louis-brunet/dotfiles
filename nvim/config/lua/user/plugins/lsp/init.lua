@@ -48,6 +48,7 @@ local M = {
                         settings = servers[server_name],
                         filetypes = (servers[server_name] or {}).filetypes,
                         init_options = (servers[server_name] or {}).init_options,
+                        commands = (servers[server_name] or {}).commands,
                     }
                 end,
             }
