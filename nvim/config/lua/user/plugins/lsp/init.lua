@@ -42,7 +42,7 @@ local M = {
 
             mason_lspconfig.setup_handlers {
                 function(server_name)
-                    local server_config = servers[server_name]
+                    local server_config = servers[server_name] or {}
 
                     local server_commands = server_config.commands
                     server_config.commands = nil
