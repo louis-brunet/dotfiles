@@ -42,12 +42,28 @@ local M = {
 
             mason_lspconfig.setup_handlers {
                 function(server_name)
+                    local server_config = servers[server_name]
+
+                    local server_commands = server_config.commands
+                    server_config.commands = nil
+
+                    local server_filetypes = server_config.filetypes
+                    server_config.filetypes = nil
+
+                    local server_init_options = server_config.init_options
+                    server_config.init_options = nil
+
+
                     require('lspconfig')[server_name].setup {
                         capabilities = capabilities,
                         on_attach = on_attach,
-                        settings = servers[server_name],
-                        filetypes = (servers[server_name] or {}).filetypes,
-                        init_options = (servers[server_name] or {}).init_options,
+                        settings = server_config,
+                        filetypes = server_filetypes,
+                        init_options = server_init_options,
+                        commands = server_commands,
+                        -- filetypes = (servers[server_name] or {}).filetypes,
+                        -- init_options = (servers[server_name] or {}).init_options,
+                        -- commands = (servers[server_name] or {}).commands,
                     }
                 end,
             }

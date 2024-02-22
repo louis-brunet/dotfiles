@@ -1,5 +1,18 @@
 local M = {}
 
+local function ts_organize_imports()
+    local params = {
+        command = "_typescript.organizeImports",
+        arguments = {
+            vim.api.nvim_buf_get_name(0), -- organize for current buffer
+            { skipDestructiveCodeActions = false }, -- delete unused imports
+        },
+        title = ""
+    }
+    vim.lsp.buf.execute_command(params)
+end
+
+
 M.servers = {
     -- clangd = {},
     -- gopls = {},
@@ -12,6 +25,15 @@ M.servers = {
                 quotePreference = "single",
             },
         },
+
+        -- maps to lspconfig's `commands` option
+        commands = {
+            OrganizeImports = {
+                ts_organize_imports,
+                description = "Organize Imports"
+            }
+        },
+
         settings = {
             typescript = {
                 format = {
