@@ -327,8 +327,8 @@ exec --no-startup-id nm-applet
 
 
 # Monitor config generated with arandr GUI (`apt install arandr`)
-exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
-# exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+# exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
+exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 
 # background wallpaper 
 exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
