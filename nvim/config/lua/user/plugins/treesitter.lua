@@ -57,18 +57,22 @@ local treesitter_opts = {
             goto_next_start = {
                 [']m'] = '@function.outer',
                 [']]'] = '@class.outer',
+                [']a'] = '@parameter.outer',
             },
             goto_next_end = {
                 [']M'] = '@function.outer',
                 [']['] = '@class.outer',
+                [']A'] = '@parameter.outer',
             },
             goto_previous_start = {
                 ['[m'] = '@function.outer',
                 ['[['] = '@class.outer',
+                ['[a'] = '@parameter.outer',
             },
             goto_previous_end = {
                 ['[M'] = '@function.outer',
                 ['[]'] = '@class.outer',
+                ['[A'] = '@parameter.outer',
             },
         },
         swap = {
