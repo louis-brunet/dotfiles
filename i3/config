@@ -12,6 +12,8 @@
 # Use super (windows) key as mod key
 set $mod Mod4
 
+set $terminal i3-sensible-terminal
+
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 
@@ -48,7 +50,7 @@ bindsym XF86AudioPrev exec --no-startup-id playerctl previous && $refresh_i3stat
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec $terminal
 
 # kill focused window
 bindsym $mod+Shift+A kill
@@ -206,7 +208,7 @@ default_border pixel 1
 
 # starting window gaps
 # gaps inner 8
-# gaps outer 16
+# gaps outer 8
 
 ######################################
 # color settings for bar and windows #
@@ -232,8 +234,8 @@ set $gruvDrkLock  1e1e1e
 # define colors for windows:
 #class		            	border		bground		text		indicator	 child_border
 client.focused		    	$gruvDrk	$gruvDrk	$white		$mediumgrey  $gruvDrk
-client.unfocused	    	$gruvDrk	$gruvDrk	$gruvDrk	$gruvDrk	 $gruvDrk
-client.focused_inactive		$gruvDrk	$gruvDrk	$gruvDrk	$gruvDrk	 $gruvDrk
+client.unfocused	    	$gruvDrk	$gruvDrk	$grey   	$gruvDrk	 $gruvDrk
+client.focused_inactive		$gruvDrk	$gruvDrk	$grey    	$gruvDrk	 $gruvDrk
 client.urgent		    	$urgentred	$urgentred	$white		$yellowbrown $yellowbrown
 
 # Start i3bar to display a workspace bar (plus the system information i3status
@@ -287,8 +289,6 @@ bindsym $mod+Escape exec ~/.config/i3/i3-rofi-system-actions.sh
 # Sreen brightness controls
 bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%   # increase screen brightness
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%- # decrease screen brightness
-# bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
-# bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
 
 # Touchpad controls
 # bindsym XF86TouchpadToggle exec /some/path/to/toggletouchpad.sh # toggle touchpad
@@ -296,15 +296,23 @@ bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%- # decr
 
 
 # Send signal 11 to i3blocks to indicated Caps/Num lock pressed
-bindsym --release Caps_Lock exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
-bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
-
+# bindsym --release Caps_Lock exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
+# bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
 
 
 ########################
 # execute startup cmds #
 ########################
 
+# Monitor config generated with arandr GUI (`apt install arandr`)
+# exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
+
+# exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --off --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+
+# to move workspace to other display (from terminal)
+# i3-msg move workspace to output left
+# i3-msg move workspace to output right
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
@@ -319,8 +327,8 @@ exec --no-startup-id nm-applet
 
 
 # Monitor config generated with arandr GUI (`apt install arandr`)
-exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
-# exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+# exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
+exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 
 # background wallpaper 
 exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
@@ -340,4 +348,7 @@ exec --no-startup-id compton
 
 # (Re)start polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
+
+exec --no-startup-id firefox
+exec --no-startup-id i3-msg 'workspace $ws2; exec $terminal; workspace $ws1'
 
