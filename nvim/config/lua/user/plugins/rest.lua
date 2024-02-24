@@ -5,7 +5,8 @@ return {
         { "nvim-lua/plenary.nvim" },
     },
     config = function()
-        require("rest-nvim").setup({
+        local rest_nvim = require('rest-nvim')
+        rest_nvim.setup({
             -- Open request results in a horizontal split
             result_split_horizontal = false,
 
@@ -69,5 +70,7 @@ return {
 
             search_back = true,
         })
+
+        vim.keymap.set('n', '<leader>rq', rest_nvim.run, { desc = '[R]estNvim re[q]uest' })
     end
 }
