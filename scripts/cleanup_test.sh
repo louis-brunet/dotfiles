@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rm -rf ~/.config/test/
+rm -r ~/.config/test/
 

@@ -54,6 +54,7 @@ M.servers = {
             },
         },
     },
+
     html = {},
     -- TODO: how to configure tailwind to attach to .pug files ?
     -- tailwindcss = {
