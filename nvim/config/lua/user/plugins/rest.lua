@@ -1,6 +1,6 @@
 ---@type LazySpec
 return {
-    "rest-nvim/rest.nvim",
+    "rest-nvim/rest.nvim", -- https://github.com/rest-nvim/rest.nvim
     dependencies = {
         { "nvim-lua/plenary.nvim" },
     },
@@ -24,7 +24,7 @@ return {
 
             -- Highlight request on run
             highlight = {
-                enabled = false,
+                enabled = true,
                 timeout = 150,
             },
 
@@ -34,7 +34,7 @@ return {
 
                 -- show the generated curl command in case you want to launch
                 -- the same request via the terminal (can be verbose)
-                show_curl_command = false,
+                show_curl_command = true,
 
                 show_http_info = true,
 
@@ -71,6 +71,11 @@ return {
             search_back = true,
         })
 
+        -- available keymaps (rhs of vim.keymap.set(mode, lhs, rhs, ...)):
+        --   <Plug>RestNvim         : run HTTP request under cursor (in .http file)
+        --   <Plug>RestNvimPreview  : preview underlying cURL command
+        --   <Plug>RestNvimLast     : rerun last HTTP request
         vim.keymap.set('n', '<leader>rq', rest_nvim.run, { desc = '[R]estNvim re[q]uest' })
+        vim.keymap.set('n', '<leader>rp', '<Plug>RestNvimPreview', { desc = '[R]estNvim [p]review' })
     end
 }
