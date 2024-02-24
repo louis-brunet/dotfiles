@@ -4,7 +4,7 @@
 # credit to ThePrimeagen
 # requires the command fzf
 
-set -x
+# set -x
 set -e
 
 if [[ $# -eq 1 ]]; then
