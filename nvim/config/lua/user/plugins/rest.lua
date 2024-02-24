@@ -75,6 +75,9 @@ return {
         --   <Plug>RestNvim         : run HTTP request under cursor (in .http file)
         --   <Plug>RestNvimPreview  : preview underlying cURL command
         --   <Plug>RestNvimLast     : rerun last HTTP request
+        -- TODO: only add these mappings for the http filetype (:h filetype)
+        -- maybe use autocmd on event FileType ?
+        -- Also, add {desc= '..', buffer = true } to not override global mappings
         vim.keymap.set('n', '<leader>rq', rest_nvim.run, { desc = '[R]estNvim re[q]uest' })
         vim.keymap.set('n', '<leader>rp', '<Plug>RestNvimPreview', { desc = '[R]estNvim [p]review' })
     end
