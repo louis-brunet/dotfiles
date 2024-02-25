@@ -54,6 +54,7 @@ local M = {
                     server_config.init_options = nil
 
 
+                    -- :h lspconfig-setup
                     require('lspconfig')[server_name].setup {
                         capabilities = capabilities,
                         on_attach = on_attach,
@@ -61,9 +62,12 @@ local M = {
                         filetypes = server_filetypes,
                         init_options = server_init_options,
                         commands = server_commands,
-                        -- filetypes = (servers[server_name] or {}).filetypes,
-                        -- init_options = (servers[server_name] or {}).init_options,
-                        -- commands = (servers[server_name] or {}).commands,
+                        -- root_dir = function(filename, bufnr) end, -- :h lspconfig-root-detection
+                        -- single_file_support = nil,
+                        -- autostart = true,
+                        -- cmd = 'foo -bar baz',
+                        -- handlers = {},
+                        -- on_new_config = function (new_config, new_root_dir) end,
                     }
                 end,
             }
