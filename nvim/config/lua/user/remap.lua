@@ -60,3 +60,9 @@ vim.keymap.set({"n", "v"}, "<leader>t", vim.cmd.TransparentToggle, { desc = "Tog
 -- A-Backspace to delele word backwards (C-BS is captured by tmux as C-H)
 vim.keymap.set("i", "<M-BS>", "<C-W>", { desc = "Delete word backwards" })
 
+-- Better indenting
+vim.keymap.set('v', '<', '<gv', { desc = 'Indent left' })
+vim.keymap.set('v', '>', '>gv', { desc = 'Indent right' })
+vim.keymap.set('n', '<', '<<_', { desc = 'Indent left' })
+vim.keymap.set('n', '>', '>>_', { desc = 'Indent right' })
+
