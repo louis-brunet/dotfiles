@@ -24,3 +24,4 @@
 [init]
 	defaultBranch = master
 
+# vi:ft=git_config:
