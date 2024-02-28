@@ -12,3 +12,6 @@ require('user.autocommands');
 -- key bindings
 require('user.remap');
 
+-- create new filetype associations
+require('user.detect-filetype')
+

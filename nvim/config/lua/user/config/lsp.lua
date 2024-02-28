@@ -141,6 +141,11 @@ M.servers = {
             }
         },
     },
+
+    -- docker_compose_language_service = {
+    --     -- default is 'yaml.docker-compose'
+    --     -- filetypes = { 'yaml.docker-compose' },
+    -- },
 }
 
 M.on_attach = function(client, bufnr)
