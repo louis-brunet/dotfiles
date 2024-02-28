@@ -4,9 +4,7 @@ local M = {
     {
         -- LSP Configuration & Plugins
         'neovim/nvim-lspconfig',
-        -- FIXME: this make `:e` necessary when entering nvim to edit a files
-        -- rather than a directory (i.e. `nvim some/file` rather than `nvim .`
-        event = 'VeryLazy',
+        event = 'BufReadPre',
         dependencies = {
             -- Automatically install LSPs to stdpath for neovim
             { 'williamboman/mason.nvim', config = true },
