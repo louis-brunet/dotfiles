@@ -29,7 +29,7 @@ vim.keymap.set("x", "<leader>p", [["_dP]], { desc = 'Delete and [P]aste without 
 vim.keymap.set({"n", "v"}, "<leader>y", [["+y]], { desc = 'Yank to system clipboard' })
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
-vim.keymap.set({"n", "v"}, "<leader>d", [["_d]], { desc = '[D]elete without yanking' })
+-- vim.keymap.set({"n", "v"}, "<leader>d", [["_d]], { desc = '[D]elete without yanking' })
 
 -- Alternate ways to get out of insert mode (<C-c>, ù)
 vim.keymap.set("i", "<C-c>", "<Esc>")
