@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+set -x 
+
+docker ps -a
+docker volume ls
+docker images
