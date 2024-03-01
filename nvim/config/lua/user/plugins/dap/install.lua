@@ -11,7 +11,7 @@ return {
             -- reasonable debug configurations
             automatic_installation = true,
 
-            -- You can provide additional configuration to the handlers,
+            -- additional configuration for the handlers,
             -- see mason-nvim-dap README for more information
             handlers = {},
 

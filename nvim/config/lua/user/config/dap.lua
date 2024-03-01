@@ -1,3 +1,4 @@
+---@class UserDapConfig
 local M = {}
 
 
@@ -46,6 +47,7 @@ local function config_javascript()
 end
 
 
+
 local icons = {
     Stopped             = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
     Breakpoint          = " ",
@@ -53,6 +55,7 @@ local icons = {
     BreakpointRejected  = { " ", "DiagnosticError" },
     LogPoint            = ".>",
 }
+
 
 
 ---@param config {args?:string[]|fun():string[]?}
@@ -69,8 +72,48 @@ local function get_args(config)
 end
 
 
+
+--- Commands used to lazy-load nvim-dap
+---@type string[]
+M.dap_cmd = {
+    'DapToggleBreakpoint', 'DapContinue', 'DapShowLog'
+}
+
+---@class DapUserCommand
+---@field name string
+---@field cmd fun(): nil
+---@field desc string
+
+---@type DapUserCommand[]
+local user_cmds = {
+    {
+        name = 'DapBreakpointsList',
+        cmd = function() require('dap').list_breakpoints(true) end,
+        desc = 'List breakpoints (quickfix)',
+    },
+    {
+        name = 'DapBreakpointsTelescope',
+        cmd = function()
+            require('dap').list_breakpoints(false)
+            require('telescope.builtin').quickfix()
+        end,
+        desc = 'List breakpoints (Telescope)',
+    },
+    {
+        name = 'DapBreakpointsClear',
+        cmd = function() require('dap').clear_breakpoints(); end,
+        desc = 'Clear breakpoints',
+    },
+}
+
+for _, user_cmd in ipairs(user_cmds) do
+    table.insert(M.dap_cmd, user_cmd.name)
+end
+
+
+
 -- config() for nvim-dap
-M.config_dap = function()
+function M.dap_config()
     vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
 
     for name, sign in pairs(icons) do
@@ -82,18 +125,18 @@ M.config_dap = function()
     end
 
 
-    vim.api.nvim_create_user_command('DapBreakpointsList', function()
-        require('dap').list_breakpoints(true);
-    end, { desc = 'Dap: List breakpoints (quickfix)' })
+    for _, user_cmd in ipairs(user_cmds) do
+        vim.api.nvim_create_user_command(user_cmd.name, user_cmd.cmd, { desc = 'DAP: ' .. user_cmd.desc })
+    end
 
-    vim.api.nvim_create_user_command('DapBreakpointsClear', function()
-        require('dap').clear_breakpoints();
-    end, { desc = 'Dap: Clear breakpoints' })
 
     config_javascript();
 end
 
--- keymaps used to lazy-load nvim-dap
+
+
+--- keymaps used to lazy-load nvim-dap
+---@type LazyKeysSpec[]
 M.dap_keys = {
     { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "DAP: [B]reakpoint Condition" },
     { "<leader>db", function() require("dap").toggle_breakpoint() end,                                    desc = "DAP: Toggle [b]reakpoint" },
@@ -114,13 +157,20 @@ M.dap_keys = {
     { "<leader>dw", function() require("dap.ui.widgets").hover() end,                                     desc = "DAP: [w]idgets" },
 }
 
+
+
+---@type LazyKeysSpec[]
 M.dapui_keys = {
-    { "<leader>du", function() require("dapui").toggle({}) end, desc = "DAP: Toggle [U]I" },
-    { "<leader>de", function() require("dapui").eval() end,     desc = "DAP: [E]val",     mode = { "n", "v" } },
+    { "<leader>du", function() require("dapui").toggle({}) end,             desc = "DAP: Toggle [u]i" },
+    { "<leader>dU", function() require("dapui").open({ reset = true }) end, desc = "DAP: Reset [U]I" },
+    { "<leader>de", function() require("dapui").eval() end,                 desc = "DAP: [e]val",     mode = { "n", "v" } },
 }
 
--- :h mason-nvim-dap.nvim-available-dap-adapters
--- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/source.lua
+
+
+--- :h mason-nvim-dap.nvim-available-dap-adapters
+--- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/source.lua
+---@type string[]
 M.mason_nvim_dap_ensure_installed = {
     'js',
 }

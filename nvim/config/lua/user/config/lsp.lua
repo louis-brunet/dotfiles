@@ -1,3 +1,4 @@
+---@class UserLspConfig
 local M = {}
 
 local function ts_organize_imports()
@@ -148,7 +149,7 @@ M.servers = {
     -- },
 }
 
-M.on_attach = function(client, bufnr)
+function M.on_attach(client, bufnr)
     local map = function(modes, keys, func, desc)
         if desc then
             desc = 'LSP: ' .. desc
