@@ -2,6 +2,10 @@
 [include]
   path = ~/.gitconfig.local
 
+[core]
+  excludesfile = ~/.gitignore
+  autocrlf = false
+
 [alias]
   co = checkout
   tree = log --graph --decorate --pretty=oneline --abbrev-commit
@@ -13,10 +17,6 @@
   status = auto
   branch = auto
   ui = true
-
-[core]
-  excludesfile = ~/.gitignore
-  autocrlf = false
 
 [push]
   # See `git help config` (search for push.default)
