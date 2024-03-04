@@ -6,7 +6,8 @@ set -e
 # ANSI_GREEN="\033[32m"
 # ANSI_YELLOW="\033[33m"
 ANSI_BLUE="\033[1;34m"
-ANSI_GRAY="\033[38;5;247m"
+ANSI_DARKGRAY="\033[38;5;241m"
+ANSI_GRAY="\033[38;5;246m"
 ANSI_RESET="\033[0m"
 
 
@@ -17,8 +18,24 @@ CMDS=(
     'network ls'
     'compose ls -a'
 )
+
 for cmd in "${CMDS[@]}"; do
-    echo -e "$ANSI_GRAY>$ANSI_RESET docker $ANSI_BLUE$cmd$ANSI_RESET$ANSI_GRAY"
-    docker $cmd
-    echo -e "$ANSI_RESET"
+    echo -e "$ANSI_GRAY>$ANSI_RESET docker $ANSI_BLUE$cmd$ANSI_RESET"
+
+    docker_output="$(docker $cmd)"
+    docker_table_header="$(echo "$docker_output" | head -n 1)"
+    docker_table_body="$(echo "$docker_output" | tail -n +2)"
+
+    echo -en "$ANSI_DARKGRAY"
+    echo "$docker_table_header"
+
+    echo -en "$ANSI_RESET"
+
+    if [ -n "$docker_table_body" ];then
+        echo -en "$ANSI_GRAY"
+        echo "$docker_table_body"
+        echo -en "$ANSI_RESET"
+    fi
+
+    echo
 done
