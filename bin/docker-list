@@ -10,9 +10,11 @@ ANSI_RESET="\033[0m"
 
 
 CMDS=(
-    'ps -a'
+    'container ls -a'
+    'image ls' # -a for intermediate images
     'volume ls'
-    'images'
+    'network ls'
+    'compose ls -a'
 )
 for cmd in "${CMDS[@]}"; do
     echo -e "> docker $ANSI_BLUE$cmd$ANSI_RESET"
