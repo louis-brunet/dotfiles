@@ -119,10 +119,12 @@ M.servers = {
 
             -- hint = { enable = true }, -- TODO: enable inlay hints in nvim >=0.10
 
+            runtime = { version = 'LuaJIT' },
+
             -- Make the server aware of Neovim runtime files
             workspace = {
                 checkThirdParty = false,
-                -- FIXME: undefined global `vim` in certain lua config files 
+                -- FIXME: undefined global `vim` in certain lua config files
                 -- (config/init.lua, config/after/ftplugin/*.lua, ...)
                 -- see this ?
                 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
@@ -138,8 +140,12 @@ M.servers = {
                 --
                 -- -- or pull in all of 'runtimepath'. NOTE: this is a lot slower:
                 --
-                -- -- library = vim.api.nvim_get_runtime_file("", true)
-            }
+                library = vim.api.nvim_get_runtime_file("", true)
+            },
+
+            completion = {
+                callSnippet = 'Replace',
+            },
         },
     },
 

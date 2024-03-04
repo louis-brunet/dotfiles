@@ -1,10 +1,20 @@
+--- [ Git related plugins ]
 ---@type LazySpec
 local M = {
-    -- Git related plugins
     {
         'tpope/vim-fugitive',
-        event = 'VeryLazy',
+
+        -- Load immediately to enable `nvim -c 'Git mergetool'`
+        lazy = false,
+
+        -- event = 'VeryLazy',
+
+        keys = {
+            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[G]it [m]erge[t]ool' },
+        },
     },
+
+    -- GitHub integration
     -- 'tpope/vim-rhubarb',
 
     {
@@ -20,21 +30,26 @@ local M = {
                 -- topdelete = { text = '‾' },
                 -- changedelete = { text = '~' },
             },
+
+            -- Executed when attaching to new git file
             on_attach = function(bufnr)
-                vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk,
-                    { buffer = bufnr, desc = '[G]it: [P]revious Hunk' })
-                vim.keymap.set('n', '[g', require('gitsigns').prev_hunk,
-                    { buffer = bufnr, desc = '[G]it: Previous Hunk' })
+                local function nmap(lhs, rhs, desc)
+                    vim.keymap.set('n', lhs, rhs, { buffer = bufnr, desc = desc })
+                end
 
-                vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk,
-                    { buffer = bufnr, desc = '[G]it: [N]ext Hunk' })
-                vim.keymap.set('n', ']g', require('gitsigns').next_hunk,
-                    { buffer = bufnr, desc = '[G]it: Next Hunk' })
+                -- Gitsigns mappings
+                nmap('<leader>gp', function() require('gitsigns').prev_hunk() end, '[G]it: [P]revious Hunk')
+                nmap('[g', function() require('gitsigns').prev_hunk() end, '[G]it: Previous Hunk')
 
-                vim.keymap.set('n', '<leader>gr', require('gitsigns').reset_hunk,
-                    { buffer = bufnr, desc = '[G]it: [R]eset Hunk' })
-                vim.keymap.set('n', '<leader>gh', require('gitsigns').preview_hunk_inline,
-                    { buffer = bufnr, desc = '[G]it: Preview [H]unk' })
+                nmap('<leader>gn', function() require('gitsigns').next_hunk() end, '[G]it: [N]ext Hunk')
+                nmap(']g', function() require('gitsigns').next_hunk() end, '[G]it: Next Hunk')
+
+                nmap('<leader>gr', function() require('gitsigns').reset_hunk() end, '[G]it: [R]eset Hunk')
+                nmap('<leader>gh', function() require('gitsigns').preview_hunk_inline() end, '[G]it: Preview [H]unk')
+
+
+                -- Other mappings only used in a git buffer
+                -- nmap(...)
             end,
         },
     },
