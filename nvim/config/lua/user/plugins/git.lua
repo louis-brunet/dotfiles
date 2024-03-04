@@ -10,7 +10,12 @@ local M = {
         -- event = 'VeryLazy',
 
         keys = {
-            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[G]it [m]erge[t]ool' },
+            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[g]it [m]erge[t]ool' },
+
+            -- assumes nvimdiff3 layout (LOCAL BASE REMOTE / MERGED), or (LOCAL MERGED REMOTE)
+            { '<leader>gmh', function() vim.cmd.diffget(vim.fn.tabpagebuflist()[1]) end, desc = '[g]it [m]erge diffget left (LOCAL) ' },
+            { '<leader>gmk', function() vim.cmd.diffget(vim.fn.tabpagebuflist()[2]) end, desc = '[g]it [m]erge diffget middle (BASE)' },
+            { '<leader>gml', function() vim.cmd.diffget(vim.fn.tabpagebuflist()[3]) end, desc = '[g]it [m]erge diffget right (REMOTE)' },
         },
     },
 
@@ -38,14 +43,14 @@ local M = {
                 end
 
                 -- Gitsigns mappings
-                nmap('<leader>gp', function() require('gitsigns').prev_hunk() end, '[G]it: [P]revious Hunk')
-                nmap('[g', function() require('gitsigns').prev_hunk() end, '[G]it: Previous Hunk')
+                nmap('<leader>ghp', function() require('gitsigns').prev_hunk() end, '[g]it: [h]unk [p]revious')
+                nmap('[g', function() require('gitsigns').prev_hunk() end, '[g]it: Previous Hunk')
 
-                nmap('<leader>gn', function() require('gitsigns').next_hunk() end, '[G]it: [N]ext Hunk')
-                nmap(']g', function() require('gitsigns').next_hunk() end, '[G]it: Next Hunk')
+                nmap('<leader>ghn', function() require('gitsigns').next_hunk() end, '[g]it: [h]unk [n]ext')
+                nmap(']g', function() require('gitsigns').next_hunk() end, '[g]it: Next Hunk')
 
-                nmap('<leader>gr', function() require('gitsigns').reset_hunk() end, '[G]it: [R]eset Hunk')
-                nmap('<leader>gh', function() require('gitsigns').preview_hunk_inline() end, '[G]it: Preview [H]unk')
+                nmap('<leader>ghr', function() require('gitsigns').reset_hunk() end, '[g]it: [h]unk [r]eset')
+                nmap('<leader>ghh', function() require('gitsigns').preview_hunk_inline() end, '[g]it: Preview [h]unk')
 
 
                 -- Other mappings only used in a git buffer

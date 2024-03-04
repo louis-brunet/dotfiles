@@ -15,12 +15,13 @@ local M = {
             require('which-key').register {
                 ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
                 ['<leader>d'] = { name = '[d]AP', _ = 'which_key_ignore' },
-                -- ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+                -- ['<leader>r'] = { name = '[r]ename', _ = 'which_key_ignore' },
                 ['<leader>s'] = { name = '[s]earch', _ = 'which_key_ignore' },
                 ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
 
                 ['<leader>g'] = { name = '[g]it', _ = 'which_key_ignore' },
                 ['<leader>gm'] = { name = '[m]erge', _ = 'which_key_ignore' },
+                ['<leader>gh'] = { name = '[h]unk', _ = 'which_key_ignore' },
             }
         end
     },
