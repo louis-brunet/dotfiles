@@ -5,6 +5,7 @@
 [alias]
         co = checkout
         tree = log --graph --decorate --pretty=oneline --abbrev-commit
+        last = log -n 1 HEAD --stat
 
 [color]
         diff = auto

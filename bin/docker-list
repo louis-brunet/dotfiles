@@ -1,7 +1,21 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-set -x 
+set -e
 
-docker ps -a
-docker volume ls
-docker images
+# ANSI_RED="\033[31m"
+# ANSI_GREEN="\033[32m"
+# ANSI_YELLOW="\033[33m"
+ANSI_BLUE="\033[34m"
+ANSI_RESET="\033[0m"
+
+
+CMDS=(
+    'ps -a'
+    'volume ls'
+    'images'
+)
+for cmd in "${CMDS[@]}"; do
+    echo -e "> docker $ANSI_BLUE$cmd$ANSI_RESET"
+    docker $cmd
+    echo
+done
