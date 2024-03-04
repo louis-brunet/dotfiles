@@ -20,7 +20,7 @@ CMDS=(
 )
 
 for cmd in "${CMDS[@]}"; do
-    echo -e "$ANSI_GRAY>$ANSI_RESET docker $ANSI_BLUE$cmd$ANSI_RESET"
+    echo -e "$ANSI_DARKGRAY>$ANSI_RESET docker $ANSI_BLUE$cmd$ANSI_RESET"
 
     docker_output="$(docker $cmd)"
     docker_table_header="$(echo "$docker_output" | head -n 1)"
