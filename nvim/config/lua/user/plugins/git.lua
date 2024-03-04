@@ -12,6 +12,10 @@ local M = {
         keys = {
             { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[g]it [m]erge[t]ool' },
 
+            -- TODO: diffget keybinds, the handlers should check 
+            --  1. how many buffers ?
+            --  2. which layout ? (why different in desktop ~/code/test/mergeconflict vs neoxia ~/code/test/merge*_nobase ?)
+            --
             -- assumes nvimdiff3 layout (LOCAL BASE REMOTE / MERGED), or (LOCAL MERGED REMOTE)
             { '<leader>gmh', function() vim.cmd.diffget(vim.fn.tabpagebuflist()[1]) end, desc = '[g]it [m]erge diffget left (LOCAL) ' },
             { '<leader>gmk', function() vim.cmd.diffget(vim.fn.tabpagebuflist()[2]) end, desc = '[g]it [m]erge diffget middle (BASE)' },
