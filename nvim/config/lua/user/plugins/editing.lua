@@ -136,7 +136,11 @@ local M = {
     -- highlight and search for todo comments like TODO, HACK, BUG, FIXME, WARN ...
     {
         'folke/todo-comments.nvim',
+
+        event = 'VeryLazy',
+
         dependencies = { 'nvim-lua/plenary.nvim' },
+
         -- :h todo-comments.nvim.txt
         opts = {},
 
