@@ -34,4 +34,10 @@
   keepBackup = false
   # prompt = true
 
+[mergetool.fugitive]
+  cmd = nvim -c 'Gvdiffsplit!' "$MERGED"
+
+[diff]
+  tool = nvimdiff
+
 # vi:ft=git_config:
