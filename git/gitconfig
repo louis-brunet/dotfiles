@@ -1,28 +1,37 @@
 # Local/private config goes in the include
 [include]
-        path = ~/.gitconfig.local
+  path = ~/.gitconfig.local
 
 [alias]
-        co = checkout
-        tree = log --graph --decorate --pretty=oneline --abbrev-commit
-        last = log -n 1 HEAD --stat
+  co = checkout
+  tree = log --graph --decorate --pretty=oneline --abbrev-commit
+  last = log -n 1 --decorate --stat HEAD
+  mt = mergetool
 
 [color]
-        diff = auto
-        status = auto
-        branch = auto
-        ui = true
+  diff = auto
+  status = auto
+  branch = auto
+  ui = true
 
 [core]
-        excludesfile = ~/.gitignore
-        autocrlf = false
+  excludesfile = ~/.gitignore
+  autocrlf = false
 
 [push]
-        # See `git help config` (search for push.default)
-        # for more information on different options of the below setting.
-        default = simple
+  # See `git help config` (search for push.default)
+  # for more information on different options of the below setting.
+  default = simple
 
 [init]
-	defaultBranch = master
+  defaultBranch = master
+
+[merge]
+  tool = nvimdiff
+  conflictstyle = diff3
+
+[mergetool]
+  keepBackup = false
+  # prompt = true
 
 # vi:ft=git_config:
