@@ -13,55 +13,11 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
--- TODO: find better way to shift character-wise visual selection left/right
---
--- vim.keymap.set("v", "H", function ()
---     -- leave visual mode to update '< and '>
---     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', false, true, true), 'nx', false)
---
---     local visual_start = vim.fn.getpos("'<")
---     local visual_end = vim.fn.getpos("'>")
---
---     local visual_start_buf = visual_start[1]
---     local visual_end_buf = visual_end[1]
---     if visual_start_buf ~= visual_end_buf then
---         return
---     end
---
---     local visual_start_lnum = visual_start[2]
---     local visual_end_lnum = visual_end[2]
---     if visual_start_lnum ~= visual_end_lnum then
---         return
---     end
---
---     local visual_start_col = visual_start[3]
---     local visual_end_col = visual_end[3]
---     -- colums start at 1, can't move left
---     if visual_start_col == 1 then
---         return
---     end
---
---
---     local line_content = vim.api.nvim_get_current_line()
---     -- off by one ?
---     local selection_content = line_content:sub(visual_start_col, visual_end_col)
---
---     local prefix = line_content:sub(1, visual_start_col - 1)
---     local suffix = line_content:sub(visual_end_col + 1)
---
---     local moved_char = prefix:sub(visual_start_col - 1, visual_start_col - 1)
---     prefix = prefix:sub(1, prefix:len() - 1)
---     local new_line_content = prefix .. selection_content .. moved_char .. suffix
---     vim.api.nvim_set_current_line(new_line_content)
---     -- print('visual_start_col:' .. visual_start_col .. ';  visual_end_col:' .. visual_end_col .. ';  selection_content: ' .. selection_content .. ';  prefix: ' .. prefix .. ';  suffix: ' .. suffix .. ';  new_line_content' .. new_line_content)
---     -- assert(false)
--- end, { desc = "Move selection left" })
-
 -- TODO: "move left/right" keybind that won't mess with "" (unnamed register for pastes)
 vim.keymap.set("v", "H", "dhP`[v`]", { desc = "Move selection left" })
-vim.keymap.set("v", "L", "dp`[v`]", { desc = "Move selection right" })
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+vim.keymap.set("v", "L", "dp`[v`]", { desc = "Move selection right" })
 
 vim.keymap.set("n", "J", "mzJ`z", { desc = "[J]oin lines" })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half page [D]own" })
