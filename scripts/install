@@ -23,7 +23,7 @@ sudo apt update
 sudo apt install -y git curl gcc
 
 # find the installers and run them iteratively
-find . -maxdepth 2 -name install.sh -not -path './scripts/*' -not -path '*.git*' | while read installer
+find . -maxdepth 2 -name 'install.sh' -not -path './scripts/*' -not -path '*.git*' | while read installer
 do 
     info "Installing '$installer'"
     if [ -x "$installer" ]; then

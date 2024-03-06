@@ -1,7 +1,7 @@
 # install node and npm with nvm
 set -e 
 
-if [ ! $(which nvm) ]; then
+if ! which nvm >/dev/null; then
     XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config} PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash'
 
     # load nvm for current terminal session
@@ -13,7 +13,7 @@ if [ ! $(which nvm) ]; then
     echo "✅ installed nvm (run exec zsh)"
 fi
 
-if [ ! $(which node) ]; then
+if ! which node >/dev/null; then
     nvm install --lts
     nvm use --lts
 
