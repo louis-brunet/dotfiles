@@ -10,9 +10,9 @@ local M = {
         -- event = 'VeryLazy',
 
         keys = {
-            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[g]it [m]erge[t]ool' },
+            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end,                  desc = '[g]it [m]erge[t]ool' },
 
-            -- TODO: diffget keybinds, the handlers should check 
+            -- TODO: more generic diffget keybinds, the handlers should check:
             --  1. how many buffers ?
             --  2. which layout ? (why different in desktop ~/code/test/mergeconflict vs neoxia ~/code/test/merge*_nobase ?)
             --

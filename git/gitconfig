@@ -33,9 +33,15 @@
 [init]
   defaultBranch = master
 
-[merge]
+[diff]
   tool = nvimdiff
+
+[difftool]
+  prompt = false
+
+[merge]
   conflictstyle = diff3
+  tool = nvim-custom
 
 [mergetool]
   keepBackup = false
@@ -44,7 +50,10 @@
 [mergetool.fugitive]
   cmd = nvim -c 'Gvdiffsplit!' "$MERGED"
 
-[diff]
-  tool = nvimdiff
+[mergetool.nvim-custom]
+  # NOTE: use :cquit to exit 1
+  trustExitCode = true
+  # force layout even if no base
+  cmd = nvim -d "$MERGED" "$LOCAL" "$BASE" "$REMOTE" -c 'wincmd J'
 
-# vi:ft=git_config:
+# vim:ft=git_config:
