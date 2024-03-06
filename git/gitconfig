@@ -7,21 +7,28 @@
   autocrlf = false
 
 [alias]
-  co = checkout
-  tree = log --graph --decorate --pretty=oneline --abbrev-commit
+  log-format-oneline = log --format=format:'%C(blue)%h%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset) %C(dim white)%ar%C(reset) %C(dim white)- %an%C(reset)'
+  l = log-format-oneline --graph --all
   last = log -n 1 --decorate --stat HEAD
+
+  co = checkout
   mt = mergetool
+  unstage = reset HEAD --
+  alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
+
+[push]
+# See `git help config` (search for push.default)
+# for more information on different options of the below setting.
+  default = simple
+
+# [format]
+#   pretty = format:%C(blue)%h%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset)\n%C(dim white)%ad%C(reset)\n%C(dim white)%an%C(reset)\n\n\t%s\n%b
 
 [color]
   diff = auto
   status = auto
   branch = auto
   ui = true
-
-[push]
-  # See `git help config` (search for push.default)
-  # for more information on different options of the below setting.
-  default = simple
 
 [init]
   defaultBranch = master
