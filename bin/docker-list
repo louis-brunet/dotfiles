@@ -20,22 +20,15 @@ CMDS=(
 )
 
 for cmd in "${CMDS[@]}"; do
-    echo -e "$ANSI_DARKGRAY>$ANSI_RESET docker $ANSI_BLUE$cmd$ANSI_RESET"
+    printf "$ANSI_DARKGRAY>$ANSI_RESET docker $ANSI_BLUE%s$ANSI_RESET\n" "$cmd"
 
     docker_output="$(docker $cmd)"
     docker_table_header="$(echo "$docker_output" | head -n 1)"
     docker_table_body="$(echo "$docker_output" | tail -n +2)"
 
-    echo -en "$ANSI_DARKGRAY"
-    echo "$docker_table_header"
-
-    echo -en "$ANSI_RESET"
-
     if [ -n "$docker_table_body" ];then
-        echo -en "$ANSI_GRAY"
-        echo "$docker_table_body"
-        echo -en "$ANSI_RESET"
+        printf "$ANSI_DARKGRAY%s$ANSI_RESET\n" "$docker_table_header"
+        printf "$ANSI_GRAY%s$ANSI_RESET\n" "$docker_table_body"
+        echo
     fi
-
-    echo
 done
