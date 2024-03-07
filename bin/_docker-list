@@ -1,0 +1,19 @@
+#compdef docker-list
+
+local no_color_desc="Don't add color to docker output"
+local docker_desc="Change docker command prefix (default: docker)"
+local help_desc="Show usage help and exit"
+
+local -a subcmds
+subcmds=(
+    "-h:$help_desc"
+    "--help:$help_desc"
+    "help:$help_desc"
+
+    "--no-color:$no_color_desc"
+
+    "--docker:<executable> -- $docker_desc"
+)
+_describe 'command' subcmds
+
+
