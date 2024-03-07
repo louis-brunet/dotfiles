@@ -13,12 +13,12 @@ return {
                 filters = {
                     git_ignored = false,
                 },
-                tab = {
-                    sync = {
-                        open = true,
-                        close = true,
-                    },
-                },
+                -- tab = {
+                --     sync = {
+                --         open = true,
+                --         close = true,
+                --     },
+                -- },
                 view = {
                     width = 25,
                 },

@@ -10,6 +10,8 @@ local M = {
         -- event = 'VeryLazy',
 
         keys = {
+            -- { '<leader>g<Space>', ':Git<Space>',                                              desc = 'Start Fugitive command (:Git )' },
+            { '<leader>gg',  ':Git<CR>',                                                 desc = 'Git status (fugitive)' },
             { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end,                  desc = '[g]it [m]erge[t]ool' },
 
             -- TODO: more generic diffget keybinds, the handlers should check:
@@ -54,7 +56,8 @@ local M = {
                 nmap(']g', function() require('gitsigns').next_hunk() end, '[g]it: Next Hunk')
 
                 nmap('<leader>ghr', function() require('gitsigns').reset_hunk() end, '[g]it: [h]unk [r]eset')
-                nmap('<leader>ghh', function() require('gitsigns').preview_hunk_inline() end, '[g]it: Preview [h]unk')
+                nmap('<leader>ghd', function() require('gitsigns').preview_hunk_inline() end,
+                    '[g]it: Preview [h]unk [d]iff')
 
 
                 -- Other mappings only used in a git buffer

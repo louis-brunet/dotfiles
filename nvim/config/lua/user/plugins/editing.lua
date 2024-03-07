@@ -9,15 +9,17 @@ local M = {
         event = 'VeryLazy',
         opts = {},
         config = function(_, opts)
-            require('which-key').setup(opts)
+            local wk = require('which-key')
+            wk.setup(opts)
 
             -- Document existing key chains
-            require('which-key').register {
+            wk.register {
                 ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
                 ['<leader>d'] = { name = '[d]ebug', _ = 'which_key_ignore' },
                 ['<leader>r'] = { name = '[r]est-nvim', _ = 'which_key_ignore' },
                 ['<leader>s'] = { name = '[s]earch', _ = 'which_key_ignore' },
                 ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
+                ['<leader>H'] = { name = '[H]arpoon', _ = 'which_key_ignore' },
 
                 ['<leader>g'] = { name = '[g]it', _ = 'which_key_ignore' },
                 ['<leader>gm'] = { name = '[m]erge', _ = 'which_key_ignore' },

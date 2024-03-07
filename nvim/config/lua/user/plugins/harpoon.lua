@@ -1,12 +1,39 @@
+---@type HarpoonToggleOptions
+local harpoon_ui_config = {
+    -- border? any this value is directly passed to nvim_open_win
+    -- title? string this value is directly passed to nvim_open_win
+    -- ui_fallback_width? number used if we can't get the current window
+
+    -- this value is directly passed to nvim_open_win
+    title_pos = 'center',
+
+    -- this is the ratio of the editor window to use
+    ui_width_ratio = 0.9,
+
+    -- number this is the max width the window can be
+    ui_max_width = 69,
+}
+
+
 ---@type LazySpec
 return {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
-    ---@type HarpoonPartialConfigItem
+    ---@type HarpoonPartialConfig
     opts = {
-        menu = {
-            width = vim.api.nvim_win_get_width(0) - 4,
-        },
+        -- settings = {
+        --     -- key
+        --     -- save_on_toggle
+        --     -- sync_on_ui_close
+        -- },
+
+        -- ---@type HarpoonPartialConfigItem
+        -- default = {
+        -- },
+
+        -- ---@type HarpoonPartialConfigItem
+        -- my_custom_list = {
+        -- },
     },
     keys = {
         {
@@ -23,7 +50,8 @@ return {
             end,
             desc = "Harpoon next file",
         },
-        { "<leader>Hp",
+        {
+            "<leader>Hp",
             function()
                 require("harpoon"):list():prev({ ui_nav_wrap = true })
             end,
@@ -33,18 +61,7 @@ return {
             "<leader>h",
             function()
                 local harpoon = require("harpoon")
-                harpoon.ui:toggle_quick_menu(harpoon:list(), {
-                    -- border? any this value is directly passed to nvim_open_win
-                    -- title_pos? any this value is directly passed to nvim_open_win
-                    -- title? string this value is directly passed to nvim_open_win
-                    -- ui_fallback_width? number used if we can't get the current window
-
-                    -- this is the ratio of the editor window to use
-                    ui_width_ratio = 0.9,
-
-                    -- number this is the max width the window can be
-                    ui_max_width = 69,
-                })
+                harpoon.ui:toggle_quick_menu(harpoon:list(), harpoon_ui_config)
             end,
             desc = "Harpoon quick menu",
         },
@@ -84,4 +101,28 @@ return {
             desc = "Harpoon to file 5",
         },
     },
+
+    ---@param opts HarpoonPartialConfig
+    config = function(_, opts)
+        local harpoon = require('harpoon')
+        local harpoon_builtins = require('harpoon.extensions').builtins
+
+        harpoon:setup(opts)
+        harpoon:extend(harpoon_builtins.navigate_with_number())
+        -- harpoon:extend({
+        --     UI_CREATE = function(cx)
+        --         -- vim.keymap.set("n", "<C-v>", function()
+        --         --     harpoon.ui:select_menu_item({ vsplit = true })
+        --         -- end, { buffer = cx.bufnr })
+        --         --
+        --         -- vim.keymap.set("n", "<C-x>", function()
+        --         --     harpoon.ui:select_menu_item({ split = true })
+        --         -- end, { buffer = cx.bufnr })
+        --         --
+        --         -- vim.keymap.set("n", "<C-t>", function()
+        --         --     harpoon.ui:select_menu_item({ tabedit = true })
+        --         -- end, { buffer = cx.bufnr })
+        --     end,
+        -- })
+    end
 }
