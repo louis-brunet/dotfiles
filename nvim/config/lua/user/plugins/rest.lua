@@ -5,11 +5,11 @@ return {
         { "nvim-lua/plenary.nvim" },
     },
 
-    ft = { 'http' },
+    -- ft = { 'http' },
 
     keys = {
-        { '<leader>rq', function() require('rest-nvim').run() end, buffer = true, desc = '[R]estNvim re[q]uest' },
-        { '<leader>rp', '<Plug>RestNvimPreview',                   buffer = true, desc = '[R]estNvim [p]review' },
+        { '<leader>rq', function() require('rest-nvim').run() end, buffer = true, desc = '[r]est-nvim re[q]uest' },
+        { '<leader>rp', '<Plug>RestNvimPreview',                   buffer = true, desc = '[r]est-nvim [p]review' },
     },
 
     opts = {
@@ -85,12 +85,6 @@ return {
         --   <Plug>RestNvimLast     : rerun last HTTP request
 
         local rest_nvim = require('rest-nvim')
-        local wk = require('which-key')
-
-        wk.register({
-            ['<leader>r'] = { name = '+[r]est-nvim', _ = 'which_key_ignore' },
-        })
-
         rest_nvim.setup(opts)
     end,
 }
