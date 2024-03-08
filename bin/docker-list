@@ -45,7 +45,8 @@ has_argument() {
 }
 
 opt_no_color=""
-opt_docker_bin="docker"
+opt_docker_bin=docker
+# opt_docker_bin="$(type -P docker)"
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -94,7 +95,7 @@ else
     unset ANSI_DARKGRAY
 fi
 
-if [[ ! -x "$opt_docker_bin" ]]; then
+if [[ ! -x "$(type -P "$opt_docker_bin")" ]]; then
     fail "could not find executable docker binary '$opt_docker_bin'"
 fi
 
