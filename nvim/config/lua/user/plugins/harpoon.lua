@@ -50,6 +50,13 @@ return {
             end,
             desc = "Harpoon next file",
         },
+        -- {
+        --     "<C-Shift-n>",
+        --     function()
+        --         require("harpoon"):list():next({ ui_nav_wrap = true })
+        --     end,
+        --     desc = "Harpoon next file",
+        -- },
         {
             "<leader>Hp",
             function()
@@ -57,6 +64,13 @@ return {
             end,
             desc = "Harpoon previous file",
         },
+        -- {
+        --     "<C-Shift-p>",
+        --     function()
+        --         require("harpoon"):list():prev({ ui_nav_wrap = true })
+        --     end,
+        --     desc = "Harpoon previous file",
+        -- },
         {
             "<leader>h",
             function()

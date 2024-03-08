@@ -156,7 +156,9 @@ M.servers = {
             -- default filetypes
             'sh',
         },
-    }
+    },
+
+    jsonls = {},
 
     -- docker_compose_language_service = {
     --     -- default is 'yaml.docker-compose'
