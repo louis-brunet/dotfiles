@@ -5,6 +5,7 @@ vim.filetype.add({
     },
     extension = {
         tfvars = 'terraform',
+        http = 'http', -- TODO: why is this sometimes necessary ?
     },
 })
 

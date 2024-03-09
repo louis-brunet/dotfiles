@@ -98,15 +98,23 @@ local M = {
         --     { '<leader>c',  '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = '[C]omment toggle linewise' },
         -- },
         config = function(_, opts)
-            require('Comment').setup(opts)
+            local comment = require('Comment')
+            local comment_filetype = require('Comment.ft')
+
+            comment.setup(opts)
 
             -- add commentstring for pug templating engine
-            require('Comment.ft').set('pug', '// %s')
+            comment_filetype.set('pug', '// %s')
+            comment_filetype.set('git_config', '# %s')
 
-            vim.keymap.set('n', '<leader>cc', '<Plug>(comment_toggle_linewise_current)',
-                { desc = '[C]omment toggle linewise' })
-            vim.keymap.set('v', '<leader>c', '<Plug>(comment_toggle_linewise_visual)',
-                { desc = '[C]omment toggle linewise' })
+            vim.keymap.set(
+                'n', '<leader>cc', '<Plug>(comment_toggle_linewise_current)',
+                { desc = '[C]omment toggle linewise' }
+            )
+            vim.keymap.set(
+                'v', '<leader>c', '<Plug>(comment_toggle_linewise_visual)',
+                { desc = '[C]omment toggle linewise' }
+            )
         end
     },
 
@@ -150,7 +158,7 @@ local M = {
         opts = {},
 
         keys = {
-            { "<leader>st", function() vim.cmd.TodoTelescope() end, desc = "[S]earch [T]odos" },
+            { "<leader>st", ":TodoTelescope", desc = "[S]earch [T]odos" },
         },
 
         cmd = { 'TodoQuickfix', 'TodoTelescope' },

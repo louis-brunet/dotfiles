@@ -9,8 +9,10 @@ local treesitter_opts = {
 
     highlight = {
         enable = true,
-        -- disable highlighting because of treesitter errors (TODO: re-enable ?)
-        disable = { 'html' },
+        -- disable highlighting in case of treesitter errors
+        disable = {
+            -- 'html', // TODO: check if need to disable again
+        },
     },
 
     indent = { enable = true },
@@ -103,10 +105,12 @@ return {
         main = 'nvim-treesitter.configs',
         opts = treesitter_opts,
         config = function (_, opts)
-            vim.treesitter.language.register('html', 'ejs')
+            require("nvim-treesitter.configs").setup(opts)
+
             -- local ft_to_parser = require"nvim-treesitter.parsers".filetype_to_parsername
             -- ft_to_parser.ejs = "html"
-            require("nvim-treesitter.configs").setup(opts)
+            vim.treesitter.language.register('html', 'ejs')
+            -- vim.treesitter.language.register('http', 'httpResult')
         end
     },
 }
