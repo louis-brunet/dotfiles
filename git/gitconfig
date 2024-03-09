@@ -49,6 +49,7 @@
 
 [mergetool.fugitive]
   cmd = nvim -c 'Gvdiffsplit!' "$MERGED"
+  trustExitCode = true
 
 [mergetool.nvim-custom]
   # NOTE: use :cquit to exit 1
