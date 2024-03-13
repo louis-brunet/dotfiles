@@ -99,7 +99,13 @@ return {
             vim.keymap.set('n', '<leader>gs', telescope_builtin.git_status, { desc = 'Search [G]it [S]tatus' })
             vim.keymap.set('n', '<leader>gb', telescope_builtin.git_branches,
                 { desc = 'Search [G]it [B]ranches' })
-            vim.keymap.set('n', '<leader>sf', telescope_builtin.find_files, { desc = '[S]earch [F]iles' })
+            vim.keymap.set('n', '<leader>sf', function()
+                telescope_builtin.find_files({
+                    hidden = true,
+                    no_ignore = true,
+                    -- no_ignore_parent = true,
+                })
+            end, { desc = '[S]earch [F]iles' })
             vim.keymap.set('n', '<leader>sh', telescope_builtin.help_tags, { desc = '[S]earch [H]elp' })
             vim.keymap.set('n', '<leader>sw', telescope_builtin.grep_string,
                 { desc = '[S]earch current [W]ord' })
