@@ -42,6 +42,9 @@ local M = {
                 function(server_name)
                     local server_config = servers[server_name] or {}
 
+                    local server_cmd = server_config.cmd
+                    server_config.cmd = nil
+
                     local server_commands = server_config.commands
                     server_config.commands = nil
 
@@ -63,7 +66,7 @@ local M = {
                         -- root_dir = function(filename, bufnr) end, -- :h lspconfig-root-detection
                         -- single_file_support = nil,
                         -- autostart = true,
-                        -- cmd = 'foo -bar baz',
+                        cmd = server_cmd,
                         -- handlers = {},
                         -- on_new_config = function (new_config, new_root_dir) end,
                     }

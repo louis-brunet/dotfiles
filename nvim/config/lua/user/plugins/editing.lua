@@ -158,7 +158,7 @@ local M = {
         opts = {},
 
         keys = {
-            { "<leader>st", ":TodoTelescope", desc = "[S]earch [T]odos" },
+            { "<leader>st", ":TodoTelescope<CR>", desc = "[S]earch [T]odos" },
         },
 
         cmd = { 'TodoQuickfix', 'TodoTelescope' },

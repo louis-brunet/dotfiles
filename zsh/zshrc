@@ -82,6 +82,7 @@ plugins=(
     git
     # npm
     nvm
+    rust
 
     # custom plugins (added in $ZSH_CUSTOM/plugins)
     zsh-autosuggestions

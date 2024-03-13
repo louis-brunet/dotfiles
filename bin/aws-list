@@ -32,6 +32,7 @@ for cmd in "${CMDS[@]}"; do
     printf "$header_color>$reset_color ${cmd_color}$AWS_BIN$reset_color $cmd_subcommand_color%s$reset_color\n" "$cmd"
 
     printf "$body_color"
+    # pipe to cat to avoid `less` output (TODO: is there a cli flag for this ?)
     $AWS_BIN $cmd | cat
     printf "$reset_color"
 done

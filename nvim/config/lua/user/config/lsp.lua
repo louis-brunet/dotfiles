@@ -71,18 +71,31 @@ M.servers = {
     -- },
 
     rust_analyzer = {
+
+        -- maps to lspconfig's `cmd` option
+        -- cmd = { '/home/louis/.cargo/bin/rust-analyzer' },
+
         ["rust-analyzer"] = {
+            diagnostics = {
+                enable = true,
+                -- experimental = { enable = true },
+            },
             cargo = {
-                allFeatures = true,
-                loadOutDirsFromCheck = true,
-                runBuildScripts = true,
+                features = 'all',
+                buildScripts = {
+                    enable = true,
+                },
+                -- allFeatures = true,
+                -- loadOutDirsFromCheck = true,
+                -- runBuildScripts = true,
             },
             -- Add clippy lints for Rust.
-            checkOnSave = {
-                allFeatures = true,
-                command = "clippy",
-                extraArgs = { "--no-deps", "-A", "clippy::needless_return" },
-            },
+            -- checkOnSave = {
+            --     allFeatures = true,
+            --     command = "clippy",
+            --     extraArgs = { "--no-deps" }, --, "-A", "clippy::needless_return" },
+            -- },
+            checkOnSave = true,
             procMacro = {
                 enable = true,
                 ignored = {
@@ -91,11 +104,12 @@ M.servers = {
                     ["async-recursion"] = { "async_recursion" },
                 },
             },
-            -- check = {
-            --     -- command = "clippy",
-            --     overrideCommand = { "cargo", "clippy", "--workspace", "--message-format=json", "--all-targets", "--",
-            --         "-A", "clippy::needless_return", },
-            -- },
+            check = {
+                command = "clippy",
+                extraArgs = { "--no-deps" },
+                -- overrideCommand = { "cargo", "clippy", "--workspace", "--message-format=json", "--all-targets", "--",
+                --     "-A", "clippy::needless_return", },
+            },
         },
     },
 
