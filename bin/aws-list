@@ -3,35 +3,41 @@
 set -e
 
 CMDS=(
-    'rds describe-db-clusters --query 'DBClusters[].[DBClusterIdentifier]' --output text'
-    'rds describe-db-instances --query 'DBInstances[].[DBInstanceIdentifier]' --output text'
-    'ec2 describe-vpcs --query 'Vpcs[].[VpcId]' --output text'
-    's3api list-buckets --query 'Buckets[].Name' --output text'
-    'apigatewayv2 get-apis --query 'Items[].Name' --output text'
-    'lambda list-functions --query 'Functions[].FunctionName' --output text'
+    'rds describe-db-clusters --query DBClusters[].[DBClusterIdentifier] --output text'
+    'rds describe-db-instances --query DBInstances[].[DBInstanceIdentifier] --output text'
+    'ec2 describe-vpcs --query Vpcs[].[VpcId] --output text'
+    'ec2 describe-subnets --query Subnets[].[SubnetId,VpcId,AvailabilityZone] --output text'
+    's3api list-buckets --query Buckets[].Name --output text'
+    'apigatewayv2 get-apis --query Items[].Name --output text'
+    'lambda list-functions --query Functions[].FunctionName --output text'
 )
 
-ANSI_RED="\033[31m"
-# ANSI_GREEN="\033[32m"
-# ANSI_YELLOW="\033[33m"
-ANSI_BLUE="\033[1;34m"
-ANSI_DARKGRAY="\033[38;5;241m"
-ANSI_GRAY="\033[38;5;246m"
-ANSI_RESET="\033[0m"
-
-cmd_color=""
-cmd_subcommand_color=$ANSI_BLUE
-header_color=$ANSI_DARKGRAY
-body_color=$ANSI_GRAY
-
-reset_color=$ANSI_RESET
-
-
 AWS_BIN=aws
-for cmd in "${CMDS[@]}"; do
-    printf "$header_color>$reset_color ${cmd_color}$AWS_BIN$reset_color $cmd_subcommand_color%s$reset_color\n" "$cmd"
 
-    printf "$body_color"
-    $AWS_BIN $cmd | cat
-    printf "$reset_color"
-done
+if [ -x "$(which cmd-list)" ]; then
+    cmd-list run "$AWS_BIN" -- "${CMDS[@]}"
+else
+    ANSI_RED="\033[31m"
+    # ANSI_GREEN="\033[32m"
+    # ANSI_YELLOW="\033[33m"
+    ANSI_BLUE="\033[1;34m"
+    ANSI_DARKGRAY="\033[38;5;241m"
+    ANSI_GRAY="\033[38;5;246m"
+    ANSI_RESET="\033[0m"
+
+    cmd_color=""
+    cmd_subcommand_color=$ANSI_BLUE
+    header_color=$ANSI_DARKGRAY
+    body_color=$ANSI_GRAY
+
+    reset_color=$ANSI_RESET
+
+
+    for cmd in "${CMDS[@]}"; do
+        printf "$header_color>$reset_color ${cmd_color}$AWS_BIN$reset_color $cmd_subcommand_color%s$reset_color\n" "$cmd"
+
+        printf "$body_color"
+        $AWS_BIN $cmd | cat
+        printf "$reset_color"
+    done
+fi
