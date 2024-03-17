@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  ollama:
+    # TODO: update version
+    image: 'ollama/ollama:0.1.29'
+    restart: 'no'
+    # restart: 'unless-stopped'
+    volumes:
+      - './volumes/ollama:/root/.ollama:cached'
+    ports:
+      - '11434:11434'
