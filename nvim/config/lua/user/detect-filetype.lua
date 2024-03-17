@@ -7,5 +7,8 @@ vim.filetype.add({
         tfvars = 'terraform',
         http = 'http', -- TODO: why is this sometimes necessary ?
     },
+    pattern = {
+        ['.*%.component%.html'] = "angular.html",
+    },
 })
 

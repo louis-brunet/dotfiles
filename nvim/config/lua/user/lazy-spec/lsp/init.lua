@@ -17,7 +17,7 @@ local M = {
             'folke/neodev.nvim',
 
             -- LSP dependencies in lua/user/plugins/lsp/*.lua (except init.lua)
-            { import = 'user.plugins.lsp' },
+            { import = 'user.lazy-spec.lsp' },
         },
         config = function(_, _)
             -- Setup neovim lua configuration

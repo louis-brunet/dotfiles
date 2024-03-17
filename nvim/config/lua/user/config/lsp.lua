@@ -19,6 +19,12 @@ M.servers = {
     -- gopls = {},
     -- pyright = {},
     tsserver = {
+        -- filetypes = {
+        --     'angular.html',
+        --     -- defaults
+        --     'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx'
+        -- },
+
         -- maps to lspconfig's `init_options` (!= `settings`)
         init_options = {
             hostInfo = "neovim",
@@ -57,7 +63,12 @@ M.servers = {
         },
     },
 
-    html = {},
+    html = {
+        filetypes = {
+            'angular.html',
+            'html', 'templ',
+        },
+    },
     -- TODO: how to configure tailwind to attach to .pug files ?
     -- tailwindcss = {
     --     filetypes = {'html', 'css', 'javascript', 'typescript', 'tsx', 'pug'},
@@ -178,6 +189,13 @@ M.servers = {
     --     -- default is 'yaml.docker-compose'
     --     -- filetypes = { 'yaml.docker-compose' },
     -- },
+    angularls = {
+        filetypes = {
+            'angular.html',
+            -- defaults
+            'typescript', 'html', 'typescriptreact', 'typescript.tsx'
+        },
+    },
 }
 
 function M.on_attach(client, bufnr)
@@ -238,15 +256,17 @@ function M.on_attach(client, bufnr)
         }
     end
 
-    local function trigger_highlight(callback)
-        if client.supports_method('textDocument/documentHighlight') then
-            return highlight_augroup_opts(callback)
-        end
+    -- local function trigger_highlight(callback)
+    --     if client.supports_method('textDocument/documentHighlight') then
+    --         return highlight_augroup_opts(callback)
+    --     end
+    -- end
+    if client.supports_method('textDocument/documentHighlight') then
+        vim.api.nvim_create_autocmd("CursorHold", highlight_augroup_opts(vim.lsp.buf.document_highlight))
+        vim.api.nvim_create_autocmd("CursorHoldI", highlight_augroup_opts(vim.lsp.buf.document_highlight))
+        vim.api.nvim_create_autocmd("CursorMoved", highlight_augroup_opts(vim.lsp.buf.clear_references))
+        vim.api.nvim_create_autocmd("CursorMovedI", highlight_augroup_opts(vim.lsp.buf.clear_references))
     end
-    vim.api.nvim_create_autocmd("CursorHold", trigger_highlight(vim.lsp.buf.document_highlight))
-    vim.api.nvim_create_autocmd("CursorHoldI", trigger_highlight(vim.lsp.buf.document_highlight))
-    vim.api.nvim_create_autocmd("CursorMoved", trigger_highlight(vim.lsp.buf.clear_references))
-    vim.api.nvim_create_autocmd("CursorMovedI", trigger_highlight(vim.lsp.buf.clear_references))
 end
 
 return M

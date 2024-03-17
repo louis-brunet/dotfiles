@@ -27,7 +27,7 @@ vim.opt.rtp:prepend(lazypath)
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
     -- load plugins from lua/user/plugins
-    { import = 'user.plugins' },
+    { import = 'user.lazy-spec' },
 }, {})
 
 require('user')

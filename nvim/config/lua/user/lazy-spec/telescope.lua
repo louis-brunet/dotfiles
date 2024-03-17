@@ -60,10 +60,12 @@ return {
                     -- see `:h telescope.defaults.layout_config`
                     layout_config = {
                         horizontal = {
-                            width = 0.9
+                            width = 0.95,
+                            height = 0.95,
                         },
                         vertical = {
-                            width = 0.9
+                            width = 0.95,
+                            height = 0.95,
                         }
                     },
                     mappings = {
@@ -80,6 +82,7 @@ return {
 
             -- Enable telescope extension for ui-select (lua/user/plugins/telescope-ui-select.nvim)
             pcall(telescope.load_extension, 'ui-select')
+            -- pcall(telescope.load_extension, 'ollouma')
 
             -- See `:help telescope.builtin`
             vim.keymap.set('n', '<leader>?', telescope_builtin.oldfiles,
