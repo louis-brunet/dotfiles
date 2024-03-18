@@ -7,6 +7,7 @@ local M = {}
 
 ---@param plugins? OlloumaDevReloadablePlugin[]
 function M.reload_plugins(plugins)
+    require('ollouma.util.ui'):close()
     plugins = plugins or { 'ollouma', 'telescope.nvim' }
 
     for _, plugin in ipairs(plugins) do

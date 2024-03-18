@@ -23,15 +23,22 @@
 ---@field on_select fun(current_model: string): nil
 
 
+-- ---@class OlloumaSubcommandConfig
+-- ---@field run fun(): nil
+---@alias OlloumaSubcommand fun(): nil
+
+
 ---@class OlloumaConfig
 ---@field chat OlloumaChatConfig
 ---@field api OlloumaApiConfig
 ---@field model_actions OlloumaModelActionConfig[]
+---@field user_command_subcommands table<string, OlloumaSubcommand>
 
 ---@class OlloumaPartialConfig
 ---@field chat? OlloumaPartialChatConfig
 ---@field api? OlloumaPartialApiConfig
 ---@field model_actions? OlloumaModelActionConfig[]
+---@field user_command_subcommands? table<string, OlloumaSubcommand>
 
 
 ---@class OlloumaConfigModule
@@ -60,15 +67,16 @@ function M.default_config()
                     local Generate = require('ollouma.generate')
                     local config = require('ollouma').config
                     local ui = require('ollouma.util.ui')
+                    local util = require('ollouma.util')
 
                     ui:start(model)
 
                     vim.api.nvim_buf_create_user_command(ui.state.prompt.buffer, "OlloumaSend", function()
                         local prompt = vim.api.nvim_buf_get_lines(ui.state.prompt.buffer, 0, -1, false)
 
-                        vim.api.nvim_buf_set_lines(ui.state.output.buffer, -1, -1, false, { '', '<!-- ## Prompt ##' })
-                        vim.api.nvim_buf_set_lines(ui.state.output.buffer, -1, -1, false, prompt)
-                        vim.api.nvim_buf_set_lines(ui.state.output.buffer, -1, -1, false, { '-->', '' })
+                        util.buf_append_lines(ui.state.output.buffer, { '', '<!------ Prompt ------' })
+                        util.buf_append_lines(ui.state.output.buffer, prompt)
+                        util.buf_append_lines(ui.state.output.buffer, { '--------------------->', '' })
 
                         Generate.generate(
                         ---@type OlloumaGenerateOptions
@@ -77,20 +85,40 @@ function M.default_config()
                                 prompt = vim.fn.join(prompt, '\n'),
                                 api_url = config.api.generate_url,
                                 on_response = function(partial_response)
-                                    local last_line = vim.api.nvim_buf_get_lines(ui.state.output.buffer, -2, -1, false)[1]
-                                    local concatenated = (last_line or "") .. (partial_response or "")
-                                    local new_lines = vim.split(concatenated, '\n', { plain = true })
+                                    util.buf_append_string(ui.state.output.buffer, partial_response)
 
-                                    vim.api.nvim_buf_set_lines(
-                                        ui.state.output.buffer, -2, -1, false,
-                                        new_lines
-                                    )
+                                    local output_cursor = vim.api.nvim_win_get_cursor(ui.state.output.window)
+
+                                    local last_line_idx = vim.api.nvim_buf_line_count(ui.state.output.buffer)
+                                    if output_cursor[1] == last_line_idx - 1 then
+                                        local last_line = vim.api.nvim_buf_get_lines(ui.state.output.buffer, -2, -1, false)
+                                        local last_column_idx = math.max(0, #last_line - 1)
+                                        vim.api.nvim_win_set_cursor(ui.state.output.window, {last_line_idx, last_column_idx})
+                                    end
                                 end
                             }
                         )
                     end, {})
                 end
             },
+        },
+
+        user_command_subcommands = {
+            select = function()
+                require('ollouma').select()
+            end,
+
+            last = function()
+                require('ollouma').last_model_action()
+            end,
+
+            empty = function()
+                require('ollouma.util.ui'):empty_buffers()
+            end,
+
+            close = function()
+                require('ollouma.util.ui'):close()
+            end,
         },
     }
 end

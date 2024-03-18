@@ -1,11 +1,49 @@
+---@class OlloumaState
+---@field last_action? { model: string, model_action: OlloumaModelActionConfig }
+
 ---@class Ollouma
 ---@field config OlloumaConfig
+---@field _state OlloumaState
 local M = {}
 
----@param opts? OlloumaPartialConfig
-function M.setup(opts)
+---@param partial_config? OlloumaPartialConfig
+function M.setup(partial_config)
     local Config = require('ollouma.config')
-    M.config = Config.extend_config(M.config, opts)
+
+    M.config = Config.extend_config(M.config, partial_config)
+    M._state = {}
+
+    local subcommands = M.config.user_command_subcommands or {}
+    ---@type string[]
+    local subcommand_names = vim.tbl_keys(subcommands)
+
+    vim.api.nvim_create_user_command('Ollouma',
+        function(cmd_opts)
+            local arg = cmd_opts.fargs[1]
+            if not arg then
+                require('ollouma').select()
+            else
+                local subcommand = subcommands[arg]
+                if not subcommand then
+                    return
+                end
+                subcommand()
+            end
+        end,
+        {
+            nargs = '?',
+            complete = function(ArgLead, CmdLine, CursorPos)
+                return vim.tbl_filter(
+                ---@param name string
+                    function(name)
+                        local match = name:match('^' .. ArgLead)
+                        return not not match
+                    end,
+                    subcommand_names
+                )
+            end,
+        }
+    )
 end
 
 -- ---@param model? string
@@ -37,8 +75,29 @@ function M.select_model_action(model)
 
         ---@param item OlloumaModelActionConfig
         ---@param _ integer index
-        function(item, _) if item then item.on_select(model) end end
+        function(item, _)
+            if item then
+                M._state.last_action = { model = model, model_action = item }
+
+                local ok, err = pcall(item.on_select, model)
+                if not ok then
+                    vim.notify('Could not call model action: ' .. err, vim.log.levels.WARN)
+                end
+            end
+        end
     )
+end
+
+function M.last_model_action()
+    local action = M._state.last_action
+    if action then
+        local ok, err = pcall(action.model_action.on_select, action.model)
+        if not ok then
+            vim.notify('Could not call model action: ' .. err, vim.log.levels.WARN)
+        end
+    else
+        vim.notify('Last model action not found', vim.log.levels.WARN)
+    end
 end
 
 function M.select()
