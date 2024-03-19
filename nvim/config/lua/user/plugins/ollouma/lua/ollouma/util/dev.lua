@@ -7,12 +7,13 @@ local M = {}
 
 ---@param plugins? OlloumaDevReloadablePlugin[]
 function M.reload_plugins(plugins)
-    require('ollouma.util.ui'):close()
     plugins = plugins or { 'ollouma', 'telescope.nvim' }
+    local log = require('ollouma.util.log')
+    require('ollouma.util.ui'):close()
 
     for _, plugin in ipairs(plugins) do
         vim.cmd('Lazy reload ' .. plugin)
-        vim.notify('Reloaded plugin ' .. plugin, vim.log.levels.INFO)
+        log.info('Reloaded plugin ' .. plugin)
     end
 
 end

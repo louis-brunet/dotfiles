@@ -79,12 +79,7 @@ local function on_stdout(_, data)
 end
 
 function M.start(opts)
-    if not opts then
-        error('missing opts')
-    end
-    -- if not opts or not opts.model or not opts.system_prompt then
-    --     -- error("expected two options (model, system_prompt), got " .. vim.inspect(opts))
-    -- end
+    vim.validate({ opts = { opts, 'table' } })
 
     -- local config = require'ollouma'.config
     -- TODO: use `vim.system or ollouma.util.system`

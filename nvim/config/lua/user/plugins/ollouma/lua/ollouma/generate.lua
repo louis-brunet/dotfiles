@@ -3,6 +3,7 @@
 ---@field prompt string|nil
 ---@field api_url string
 ---@field on_response fun(partial_response: string): nil
+---@field on_response_end fun(): nil
 
 ---@class OlloumaGenerateResponseLine
 ---@field response string
@@ -20,25 +21,30 @@ local M = {}
 
 
 ---@param opts OlloumaGenerateOptions
+---@return fun(): nil close function to call when generation should be halted
 function M.generate(opts)
     vim.validate({
         model = { opts.model, 'string' },
         prompt = { opts.prompt, { 'string', 'nil' } },
         api_url = { opts.api_url, 'string' },
         on_response = { opts.on_response, 'function' },
+        on_response_end = { opts.on_response_end, 'function' },
     })
 
+    local api = require('ollouma.util.api-client')
+    local log = require('ollouma.util.log')
     local prompt = opts.prompt
+
     if not prompt or #prompt == 0 then
         prompt = vim.fn.input({ prompt = 'Prompt [' .. opts.model .. ']: ', text = "n" })
 
         if not prompt or #prompt == 0 then
-            return
+            log.warn('empty prompt, aborting')
+            return function() end
         end
     end
 
-    local api = require('ollouma.util.api-client')
-    api.stream_response(
+    local api_close_generation = api.stream_response(
         opts.api_url,
 
         { model = opts.model, prompt = prompt },
@@ -46,17 +52,22 @@ function M.generate(opts)
         ---@param response OlloumaGenerateResponseChunkDto
         function(response)
             if response.done then
-                -- TODO: any cleanup ?
+                if opts.on_response_end then
+                    vim.schedule(opts.on_response_end)
+                end
+                -- TODO: any cleanup/final actions ?
                 return
             end
 
-            -- if response.response then
             vim.schedule(function()
                 opts.on_response(response.response)
             end)
-            -- end
         end
     )
+
+    return function()
+        api_close_generation()
+    end
 end
 
 return M

@@ -17,10 +17,11 @@ end
 function M.select_model(url, on_select)
     vim.validate({ on_select = { on_select, 'function' } })
 
+    local log = require('ollouma.util.log')
     local models = M.list_models(url)
 
     if not models then
-        vim.notify('ollouma: no models found, cannot select', vim.log.levels.INFO)
+        log.info('no models found, cannot select')
 
         return
     end
@@ -36,6 +37,11 @@ function M.select_model(url, on_select)
         },
 
         function(item, _)
+            if not item then
+                log.warn('no model selected, aborting')
+                return
+            end
+
             on_select(item)
         end
     )

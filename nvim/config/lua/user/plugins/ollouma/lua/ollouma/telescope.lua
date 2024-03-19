@@ -6,9 +6,6 @@
 -- ---@class OlloumaDevAction
 -- ---@field name string
 -- ---@field on_select fun(): nil
---
--- ---@class OlloumaModelAction
--- ---@field model_name string
 
 ---@class OlloumaTelescopeModule
 local M = {}

@@ -8,7 +8,7 @@
     'louis-brunet/ollouma.nvim'
 
     dependencies = {
-        -- TODO: document dependencies
+        -- TODO: document dependencies (lua and system)
     },
 
     opts = {

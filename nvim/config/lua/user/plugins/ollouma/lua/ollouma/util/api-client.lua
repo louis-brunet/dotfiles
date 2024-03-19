@@ -81,7 +81,7 @@ function M.stream_response(url, json_body, on_response_chunk)
         url = { url, 'string' },
     })
 
-    M.post(
+    local child = M.post_stream(
         url,
         json_body,
         function(_, stdout_data)
@@ -112,10 +112,13 @@ function M.stream_response(url, json_body, on_response_chunk)
             end
         end
     )
+
+    return function()
+        child:kill(9)
+    end
 end
 
 ---@param url string
--- ---@param callback fun(models: string[]): nil
 function M.find_all_models(url)
     local models_result = M.get_sync(url)
 
@@ -172,7 +175,7 @@ end
 ---@param json_body JsonData
 ---@param on_stdout false|nil|fun(err?: string, data?: string): nil
 ---@param on_exit fun(out: vim.SystemCompleted): nil
-function M.post(url, json_body, on_stdout, on_exit)
+function M.post_stream(url, json_body, on_stdout, on_exit)
     return system.run(
         {
             'curl',

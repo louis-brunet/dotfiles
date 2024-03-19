@@ -10,6 +10,6 @@ return require("telescope").register_extension {
         -- models = require('ollouma.telescope').models,
         --
         -- :Telescope ollouma
-        ollouma = require('ollouma.telescope').generate,
+        -- ollouma = require('ollouma.telescope').select,
     },
 }
