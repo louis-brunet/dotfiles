@@ -86,6 +86,7 @@ plugins=(
 
     # custom plugins (added in $ZSH_CUSTOM/plugins)
     zsh-autosuggestions
+    zsh-yarn-completions
 )
 
 ### Custom plugin configuration
