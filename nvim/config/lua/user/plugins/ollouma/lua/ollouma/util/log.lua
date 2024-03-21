@@ -1,8 +1,15 @@
+local M = {
+    --- :h vim.log.levels
+    level = vim.log.levels.INFO
+}
+
 local function log(vim_level, ...)
+    if M.level > vim_level then
+        return
+    end
+
     vim.notify('[ollouma]: ' .. vim.fn.join({ ... }, ' '), vim_level)
 end
-
-local M = {}
 
 function M.error(...)
     log(vim.log.levels.ERROR, ...)

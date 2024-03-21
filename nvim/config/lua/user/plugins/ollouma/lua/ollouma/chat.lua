@@ -1,11 +1,11 @@
----@class OlloumaChatJobOptions
----@field command string
----@field args string[]
-
----@class OlloumaChatStartOptions
----@field model string
----@field system_prompt string
----@field job OlloumaChatJobOptions
+-- ---@class OlloumaChatJobOptions
+-- ---@field command string
+-- ---@field args string[]
+--
+-- ---@class OlloumaChatStartOptions
+-- ---@field model string
+-- ---@field system_prompt string
+-- ---@field job OlloumaChatJobOptions
 
 ---@class OlloumaChatModule
 local M = {}
@@ -79,7 +79,9 @@ local function on_stdout(_, data)
 end
 
 function M.start(opts)
-    vim.validate({ opts = { opts, 'table' } })
+    -- vim.validate({ opts = { opts, 'table' } })
+
+
 
     -- local config = require'ollouma'.config
     -- TODO: use `vim.system or ollouma.util.system`

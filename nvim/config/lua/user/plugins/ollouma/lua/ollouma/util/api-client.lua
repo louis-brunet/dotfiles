@@ -19,23 +19,11 @@
 ---@field on_response_chunk? fun(response: OlloumaResponseChunkDto): nil
 -- ---@field on_exit? fun(completed: vim.SystemCompleted): nil
 
----@class JsonValidatorValidResult
----@field valid true
-
----@class JsonValidatorInvalidResult
----@field valid false
----@field error string
-
----@alias JsonValidatorResult JsonValidatorValidResult | JsonValidatorInvalidResult
--- ---@class JsonValidatorResult
--- ---@field valid boolean
--- ---@field error? string
-
 ---@alias NullableJsonData (JsonData|nil)
 ---@alias JsonData string|integer|float|boolean|(NullableJsonData)[]|table<string, NullableJsonData>
 
 
--- vim.system added in neovim 0.10
+-- vim.system added in neovim 0.10 (nightly as of writing this)
 local system = vim.system or require('ollouma.util.system')
 
 ---@param response_body JsonData

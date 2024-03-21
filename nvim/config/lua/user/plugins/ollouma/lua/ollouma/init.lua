@@ -26,7 +26,8 @@ function M.setup(partial_config)
                     return
                 end
 
-                local ui = require('ollouma.util.ui')
+                -- TODO: not only generate ui ?
+                local ui = require('ollouma.generate.ui')
                 if ui:are_buffers_valid() then
                     ui:open_windows()
                 else
@@ -40,6 +41,7 @@ function M.setup(partial_config)
                 subcommand()
             end
         end,
+
         {
             nargs = '?',
             complete = function(ArgLead, CmdLine, CursorPos)

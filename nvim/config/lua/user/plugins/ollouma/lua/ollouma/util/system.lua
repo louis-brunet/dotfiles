@@ -1,6 +1,5 @@
 --- TODO: This is a copy of the system.lua file from the neovim source code.
 --- https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_system.lua
----
 --- If any coredev sees this and feels i am breaking any license, please let me
 --- know and i'll move over to plenary, just didn't want to legacy apis
 --

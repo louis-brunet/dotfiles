@@ -51,7 +51,7 @@ function M.default_config()
     return {
         chat = {
             model = 'mistral',
-            system_prompt = '', -- TODO: chat, system prompt
+            system_prompt = '', -- TODO: chat + system prompt
         },
 
         api = {
@@ -64,83 +64,95 @@ function M.default_config()
             {
                 name = 'Generate',
                 on_select = function(model)
-                    local Generate = require('ollouma.generate')
-                    local config = require('ollouma').config
-                    local ui = require('ollouma.util.ui')
-                    -- local util = require('ollouma.util')
-
-                    ui:start(model, {
-                        commands = {
-                            OlloumaSend = {
-                                rhs = function()
-                                    local prompt = ui:get_prompt()
-
-                                    ui:output_write_lines({ '', '<!------ Prompt ------' })
-                                    ui:output_write_lines(prompt)
-                                    ui:output_write_lines({ '--------------------->', '' })
-
-                                    ---@type OlloumaGenerateOptions
-                                    local generate_opts = {
-                                        model = model,
-                                        prompt = vim.fn.join(prompt, '\n'),
-                                        api_url = config.api.generate_url,
-                                        on_response = function(partial_response)
-                                            ui:output_write(partial_response)
-
-                                            if not ui.state.output.window or not vim.api.nvim_win_is_valid(ui.state.output.window) then
-                                                return
-                                            end
-
-                                            -- if cursor is on second to last line, then
-                                            -- move it to the last line
-                                            local output_cursor = vim.api.nvim_win_get_cursor(ui.state.output.window)
-                                            local last_line_idx = vim.api.nvim_buf_line_count(ui.state.output.buffer)
-
-                                            if output_cursor[1] == last_line_idx - 1 then
-                                                local last_line = vim.api.nvim_buf_get_lines(
-                                                    ui.state.output.buffer,
-                                                    -2, -1, false
-                                                )
-                                                local last_column_idx = math.max(0, #last_line - 1)
-
-                                                vim.api.nvim_win_set_cursor(
-                                                    ui.state.output.window,
-                                                    { last_line_idx, last_column_idx }
-                                                )
-                                            end
-                                        end,
-                                        on_response_end = function()
-                                            vim.api.nvim_buf_del_user_command(ui.state.prompt.buffer, 'OlloumaGenStop')
-                                            vim.api.nvim_buf_del_user_command(ui.state.output.buffer, 'OlloumaGenStop')
-                                        end
-                                    }
-                                    local stop_generation = Generate.generate(generate_opts)
-
-                                    local function stop()
-                                        stop_generation()
-                                        generate_opts.on_response_end()
-                                    end
-
-                                    vim.api.nvim_buf_create_user_command(
-                                        ui.state.prompt.buffer,
-                                        "OlloumaGenStop",
-                                        stop,
-                                        {}
-                                    )
-                                    vim.api.nvim_buf_create_user_command(
-                                        ui.state.output.buffer,
-                                        "OlloumaGenStop",
-                                        stop,
-                                        {}
-                                    )
-                                end,
-                                opts = {},
-                            },
-                        },
-                    })
-
-                    -- vim.api.nvim_buf_create_user_command(ui.state.prompt.buffer, "OlloumaSend", function()
-                    -- end, {})
+                    require('ollouma.generate').start_generate_ui(model)
+                    -- ---@type OlloumaGenerateUi
+                    -- local ui = require('ollouma.generate.ui')
+                    --
+                    -- ---@type OlloumaGenerateModule
+                    -- local Generate = require('ollouma.generate')
+                    --
+                    -- ---@type OlloumaConfig
+                    -- local config = require('ollouma').config
+                    -- require('ollouma.generate').start_generate_ui(model)
+                    --
+                    -- local ui = require('ollouma.generate.ui')
+                    -- -- local util = require('ollouma.util')
+                    --
+                    -- ui:start(model, {
+                    --     commands = {
+                    --         OlloumaSend = {
+                    --             rhs = function()
+                    --                 local prompt = ui:get_prompt()
+                    --
+                    --                 ui:output_write_lines({ '', '<!------ Prompt ------' })
+                    --                 ui:output_write_lines(prompt)
+                    --                 ui:output_write_lines({ '--------------------->', '' })
+                    --
+                    --                 ---@type OlloumaGenerateOptions
+                    --                 local generate_opts = {
+                    --                     model = model,
+                    --                     prompt = vim.fn.join(prompt, '\n'),
+                    --                     api_url = config.api.generate_url,
+                    --                     on_response = function(partial_response)
+                    --                         ui:output_write(partial_response)
+                    --
+                    --                         if not ui.state.output.window or not vim.api.nvim_win_is_valid(ui.state.output.window) then
+                    --                             return
+                    --                         end
+                    --
+                    --                         -- if cursor is on second to last line, then
+                    --                         -- move it to the last line
+                    --                         local output_cursor = vim.api.nvim_win_get_cursor(ui.state.output.window)
+                    --                         local last_line_idx = vim.api.nvim_buf_line_count(ui.state.output.buffer)
+                    --
+                    --                         if output_cursor[1] == last_line_idx - 1 then
+                    --                             local last_line = vim.api.nvim_buf_get_lines(
+                    --                                 ui.state.output.buffer,
+                    --                                 -2, -1, false
+                    --                             )
+                    --                             local last_column_idx = math.max(0, #last_line - 1)
+                    --
+                    --                             vim.api.nvim_win_set_cursor(
+                    --                                 ui.state.output.window,
+                    --                                 { last_line_idx, last_column_idx }
+                    --                             )
+                    --                         end
+                    --                     end,
+                    --                     on_response_end = function()
+                    --                         vim.api.nvim_buf_del_user_command(ui.state.prompt.buffer, 'OlloumaGenStop')
+                    --                         vim.api.nvim_buf_del_user_command(ui.state.output.buffer, 'OlloumaGenStop')
+                    --                     end
+                    --                 }
+                    --                 local stop_generation = Generate.start_generation(generate_opts)
+                    --
+                    --                 local function stop()
+                    --                     stop_generation()
+                    --                     generate_opts.on_response_end()
+                    --                 end
+                    --
+                    --                 vim.api.nvim_buf_create_user_command(
+                    --                     ui.state.prompt.buffer,
+                    --                     'OlloumaGenStop',
+                    --                     stop,
+                    --                     {}
+                    --                 )
+                    --                 vim.api.nvim_buf_create_user_command(
+                    --                     ui.state.output.buffer,
+                    --                     'OlloumaGenStop',
+                    --                     stop,
+                    --                     {}
+                    --                 )
+                    --             end,
+                    --             opts = {},
+                    --         },
+                    --     },
+                    --
+                    --     winbar_items = {
+                    --         { label = 'Send', function_name = 'v:lua._G._ollouma_winbar_send' },
+                    --         { label = 'Empty', function_name = 'v:lua._G._ollouma_winbar_reset' },
+                    --         { label = 'Close', function_name = 'v:lua._G._ollouma_winbar_close' },
+                    --     },
+                    -- })
                 end
             },
         },
@@ -155,11 +167,11 @@ function M.default_config()
             end,
 
             empty = function()
-                require('ollouma.util.ui'):empty_buffers()
+                require('ollouma.generate.ui'):empty_buffers()
             end,
 
             close = function()
-                require('ollouma.util.ui'):close()
+                require('ollouma.generate.ui'):close()
             end,
         },
     }
