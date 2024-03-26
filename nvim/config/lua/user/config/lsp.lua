@@ -149,23 +149,20 @@ M.servers = {
             -- Make the server aware of Neovim runtime files
             workspace = {
                 checkThirdParty = false,
-                -- FIXME: undefined global `vim` in certain lua config files
-                -- (config/init.lua, config/after/ftplugin/*.lua, ...)
-                -- see this ?
                 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
                 --
-                -- library = {
-                --     vim.env.VIMRUNTIME
-                --
-                --     -- Depending on the usage, you might want to add additional paths here.
-                --     -- E.g.: For using `vim.*` functions, add vim.env.VIMRUNTIME/lua.
-                --     -- "${3rd}/luv/library"
-                --     -- "${3rd}/busted/library",
-                -- }
+                library = {
+                    vim.env.VIMRUNTIME
+
+                    -- Depending on the usage, you might want to add additional paths here.
+                    -- E.g.: For using `vim.*` functions, add vim.env.VIMRUNTIME/lua.
+                    -- "${3rd}/luv/library"
+                    -- "${3rd}/busted/library",
+                }
                 --
                 -- -- or pull in all of 'runtimepath'. NOTE: this is a lot slower:
                 --
-                library = vim.api.nvim_get_runtime_file("", true)
+                -- library = vim.api.nvim_get_runtime_file("", true)
             },
 
             completion = {

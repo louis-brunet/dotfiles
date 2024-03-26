@@ -1,14 +1,15 @@
 ---@type LazySpec
 local M = {
     {
-        dir = '/home/louis/code/dotfiles/nvim/config/lua/user/plugins/ollouma',
+        -- TODO: change to louis-brunet/ollouma.nvim
+        dir = '/home/louis/code/ollouma.nvim',
 
         event = 'VeryLazy',
 
         keys = {
             { "<leader>ot", ":Telescope ollouma ", desc = "[o]llouma: [t]elescope" },
             { "<leader>or", function() require('ollouma.util.dev').reload_plugins() end, desc = "[o]llouma: [r]eload" },
-
+            { "<leader>oo", function() require('ollouma').start() end, desc = "[o]llouma" },
         },
 
         dependencies = {

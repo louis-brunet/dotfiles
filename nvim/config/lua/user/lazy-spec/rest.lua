@@ -20,12 +20,10 @@ return {
         dependencies = {
             'nvim-treesitter/nvim-treesitter',
             {
-                'vhyrro/luarocks.nvim',
-
-                config = function(_, opts)
-                    require('luarocks').setup(opts)
-                end,
-            },
+                "vhyrro/luarocks.nvim",
+                priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
+                config = true,
+            }
         },
 
         ft = { 'http' },
