@@ -8,8 +8,10 @@ local M = {
 
         keys = {
             { "<leader>ot", ":Telescope ollouma ", desc = "[o]llouma: [t]elescope" },
-            { "<leader>or", function() require('ollouma.util.dev').reload_plugins() end, desc = "[o]llouma: [r]eload" },
-            { "<leader>oo", function() require('ollouma').start() end, desc = "[o]llouma" },
+            { "<leader>or", function() require('ollouma').resume_session() end, desc = "[o]llouma: [r]esume session" },
+            { "<leader>oe", function() require('ollouma').exit_session() end, desc = "[o]llouma: [e]xit session" },
+            { "<leader>oo", ':Ollouma select_action<CR>', desc = "[o]llouma select action" },
+            { "<leader>o", ':Ollouma select_action<CR>', desc = "[o]llouma", mode = 'x' },
         },
 
         dependencies = {
@@ -26,6 +28,7 @@ local M = {
 
         ---@type OlloumaPartialConfig
         opts = {
+            model = 'mistral',
             -- model_actions = {
             --     {
             --         name = 'test from lazy spec',
