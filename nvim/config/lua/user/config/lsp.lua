@@ -180,7 +180,20 @@ M.servers = {
         },
     },
 
-    jsonls = {},
+    jsonls = {
+        json = {
+            schemas = {
+                {
+                    fileMatch = "tsconfig*.json",
+                    url = "https://json.schemastore.org/tsconfig"
+                },
+                -- {
+                --     fileMatch = "nest-cli.json",
+                --     url = "https://json.schemastore.org/nest-cli"
+                -- },
+            }
+        }
+    },
 
     -- docker_compose_language_service = {
     --     -- default is 'yaml.docker-compose'
