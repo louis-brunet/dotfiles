@@ -100,15 +100,25 @@ return {
 
             vim.keymap.set('n', '<leader>gf', telescope_builtin.git_files, { desc = 'Search [G]it [F]iles' })
             vim.keymap.set('n', '<leader>gs', telescope_builtin.git_status, { desc = 'Search [G]it [S]tatus' })
-            vim.keymap.set('n', '<leader>gb', telescope_builtin.git_branches,
-                { desc = 'Search [G]it [B]ranches' })
+            vim.keymap.set('n', '<leader>gb', telescope_builtin.git_branches, { desc = 'Search [G]it [B]ranches' })
+            vim.keymap.set('n', '<leader>gc', telescope_builtin.git_commits, { desc = 'Search [G]it [c]ommits' })
+            vim.keymap.set('n', '<leader>gC', telescope_builtin.git_bcommits, { desc = 'Search [G]it [C]ommits for current buffer' })
+
             vim.keymap.set('n', '<leader>sf', function()
                 telescope_builtin.find_files({
                     hidden = true,
-                    no_ignore = true,
-                    -- no_ignore_parent = true,
+                    no_ignore = false,
+                    no_ignore_parent = false,
                 })
-            end, { desc = '[S]earch [F]iles' })
+            end, { desc = '[S]earch [f]iles' })
+            vim.keymap.set('n', '<leader>sF', function()
+                telescope_builtin.find_files({
+                    hidden = true,
+                    no_ignore = true,
+                    no_ignore_parent = true,
+                })
+            end, { desc = '[S]earch [F]iles (no ignore)' })
+
             vim.keymap.set('n', '<leader>sh', telescope_builtin.help_tags, { desc = '[S]earch [H]elp' })
             vim.keymap.set('n', '<leader>sw', telescope_builtin.grep_string,
                 { desc = '[S]earch current [W]ord' })
