@@ -4,9 +4,11 @@ return {
     {
         'nvim-telescope/telescope.nvim',
         branch = '0.1.x',
-        -- Loading Telescope on VeryLazy does not handle keymaps pressed before
+
+        -- NOTE: Loading Telescope on VeryLazy does not handle keymaps pressed before
         -- nvim was initialized (e.g. `$ nvim<Enter><Space>sf` in terminal)
         -- event = 'VeryLazy',
+
         dependencies = {
             'nvim-lua/plenary.nvim',
             'nvim-telescope/telescope-ui-select.nvim',
@@ -24,6 +26,7 @@ return {
                 end,
             },
         },
+
         config = function()
             -- [[ Configure Telescope ]]
             -- See `:help telescope` and `:help telescope.setup()`
@@ -85,18 +88,9 @@ return {
             -- pcall(telescope.load_extension, 'ollouma')
 
             -- See `:help telescope.builtin`
-            vim.keymap.set('n', '<leader>?', telescope_builtin.oldfiles,
-                { desc = '[?] Find recently opened files' })
-            vim.keymap.set('n', '<leader><space>', telescope_builtin.buffers,
-                { desc = '[ ] Find existing buffers' })
-            vim.keymap.set('n', '<leader>/', function()
-                -- You can pass additional configuration to telescope to change theme, layout, etc.
-                telescope_builtin.current_buffer_fuzzy_find(telescope_themes.get_dropdown {
-                    layout_config = { width = 90 },
-                    -- winblend = 10,
-                    -- previewer = false,
-                })
-            end, { desc = '[/] Fuzzily search in current buffer' })
+            vim.keymap.set('n', '<leader>?', telescope_builtin.oldfiles, { desc = '[?] Find recently opened files' })
+            vim.keymap.set('n', '<leader><space>', telescope_builtin.buffers, { desc = '[ ] Find existing buffers' })
+            vim.keymap.set('n', '<leader>/', telescope_builtin.current_buffer_fuzzy_find, { desc = '[/] Fuzzily search in current buffer' })
 
             vim.keymap.set('n', '<leader>gf', telescope_builtin.git_files, { desc = 'Search [G]it [F]iles' })
             vim.keymap.set('n', '<leader>gs', telescope_builtin.git_status, { desc = 'Search [G]it [S]tatus' })
@@ -106,7 +100,7 @@ return {
 
             vim.keymap.set('n', '<leader>sf', function()
                 telescope_builtin.find_files({
-                    hidden = true,
+                    hidden = false,
                     no_ignore = false,
                     no_ignore_parent = false,
                 })

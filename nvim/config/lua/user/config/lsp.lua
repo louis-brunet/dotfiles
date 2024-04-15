@@ -229,12 +229,21 @@ function M.on_attach(client, bufnr)
     nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
     nmap('<A-Enter>', vim.lsp.buf.code_action, 'Code Action')
 
-    nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-    nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-    nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-    nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-    nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-    nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+
+    local telescope_lsp_options = {
+        layout_strategy = 'vertical',
+        -- layout_config = {
+        -- },
+        fname_width = 70,
+    }
+
+
+    nmap('gd', function() require('telescope.builtin').lsp_definitions(telescope_lsp_options) end, '[G]oto [D]efinition')
+    nmap('gr', function() require('telescope.builtin').lsp_references(telescope_lsp_options) end, '[G]oto [R]eferences')
+    nmap('gI', function() require('telescope.builtin').lsp_implementations(telescope_lsp_options) end, '[G]oto [I]mplementation')
+    nmap('<leader>D', function() require('telescope.builtin').lsp_type_definitions(telescope_lsp_options) end, 'Type [D]efinition')
+    nmap('<leader>ds', function() require('telescope.builtin').lsp_document_symbols(telescope_lsp_options) end, '[D]ocument [S]ymbols')
+    nmap('<leader>ws', function() require('telescope.builtin').lsp_dynamic_workspace_symbols(telescope_lsp_options) end, '[W]orkspace [S]ymbols')
 
     -- See `:help K` for why this keymap
     nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
