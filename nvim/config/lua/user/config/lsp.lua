@@ -187,6 +187,10 @@ M.servers = {
                     fileMatch = "tsconfig*.json",
                     url = "https://json.schemastore.org/tsconfig"
                 },
+                {
+                    fileMatch = "package.json",
+                    url = "https://json.schemastore.org/package.json"
+                },
                 -- {
                 --     fileMatch = "nest-cli.json",
                 --     url = "https://json.schemastore.org/nest-cli"
