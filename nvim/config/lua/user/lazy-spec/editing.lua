@@ -158,10 +158,20 @@ local M = {
         opts = {},
 
         keys = {
-            { "<leader>st", ":TodoTelescope<CR>", desc = "[S]earch [T]odos" },
+            { "<leader>st", ":TodoTelescope<CR>", desc = "[s]earch [t]odos" },
         },
 
         cmd = { 'TodoQuickfix', 'TodoTelescope' },
+    },
+
+    {
+        'mbbill/undotree',
+
+        cmd = { 'UndotreeToggle' },
+
+        keys = {
+            {'<leader>u', vim.cmd.UndotreeToggle, desc = '[u]ndotree toggle'},
+        },
     },
 }
 
