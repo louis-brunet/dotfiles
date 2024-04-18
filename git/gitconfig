@@ -11,6 +11,7 @@
   l = log-format-oneline --graph --all
   last = log -n 1 --decorate --stat HEAD
 
+  sw = switch
   co = checkout
   mt = mergetool
   unstage = reset HEAD --
