@@ -1,46 +1,86 @@
+-- It is strongly advised to eagerly disable netrw, due to race conditions at
+-- vim startup.
+-- Set the following at the very beginning of your `init.lua` / `init.vim`:
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 ---@type LazySpec
 return {
     {
         'nvim-tree/nvim-tree.lua',
+
         dependencies = {
             'nvim-tree/nvim-web-devicons',
         },
-        -- highlights are defined in the onedark config
-        config = function()
-            vim.g.loaded_netrw = 1
-            vim.g.loaded_netrwPlugin = 1
-            require('nvim-tree').setup({
-                filters = {
-                    git_ignored = false,
+
+        opts = {
+            --- Keeps the cursor on the first letter of the filename when moving in the tree.
+            hijack_cursor = true,
+
+            select_prompts = true,
+
+            -- diagnostics = {
+            --     enable = true
+            -- },
+
+            filters = {
+                git_ignored = false,
+            },
+
+            -- tab = {
+            --     sync = {
+            --         open = true,
+            --         close = true,
+            --     },
+            -- },
+
+            modified = {
+                enable = true,
+            },
+
+            view = {
+                width = {
+                    min = 20,
+                    max = 40,    -- -1 for unbounded
+                    padding = 1, -- to the right
                 },
-                -- tab = {
-                --     sync = {
-                --         open = true,
-                --         close = true,
-                --     },
+                -- float = {
+                --     enable = true,
                 -- },
-                view = {
-                    width = 25,
+            },
+
+            renderer = {
+                add_trailing = true,
+                group_empty = true,
+                full_name = true, -- use floating window if long file name overflows
+                special_files = {
+                    'package.json',
+
+                    -- defaults
+                    'Cargo.toml', 'Makefile', 'README.md', 'readme.md',
                 },
-                renderer = {
-                    group_empty = true,
-                    add_trailing = true,
-                    indent_markers = {
-                        enable = true,
+                indent_markers = {
+                    enable = true,
+                },
+                icons = {
+                    show = {
+                        folder_arrow = false,
                     },
-                    icons = {
-                        show = {
-                            folder_arrow = false,
-                        },
-                        glyphs = {
-                            -- folder = {
-                            --     -- arrow_closed = '▶',
-                            --     -- arrow_open = '▼',
-                            -- },
-                        },
+                    glyphs = {
+                        modified = '+',
+                        -- folder = {
+                        --     -- arrow_closed = '▶',
+                        --     -- arrow_open = '▼',
+                        -- },
                     },
                 },
-            })
+            },
+        },
+
+        -- highlights are defined in the colorscheme config (./theme.lua)
+        config = function(_, opts)
+            require('nvim-tree').setup(opts)
+
             vim.keymap.set('n', '<C-n>', ':NvimTreeFindFileToggle<CR>', {
                 silent = true,
                 desc = 'nvim-tree: toggle sidebar',

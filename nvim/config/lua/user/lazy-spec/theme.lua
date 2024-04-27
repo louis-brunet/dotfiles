@@ -83,42 +83,46 @@ return {
             },
             specs = {
                 all = {
+                    -- Built-in spec keys
                     git = {
                         changed = 'cyan',
                     },
 
+                    -- Custom spec keys
                     treesitter_context = {
                         bg = 'black',
-                        bottom_sp = 'black.bright',
+                        bottom_sp = 'gray',
                         bottom_style = 'underline',
                     },
                     nvim_tree = {
                         bg = 'none',
-                        indent_marker_fg = '#31353f',
+                        indent_marker_fg = 'neutral.muted',
+                        -- modified_fg = 'gray.bright',
                     },
                     cursor_line = {
-                        number_fg = '#ccbb44',
+                        number_fg = 'yellow.bright',
                         number_style = 'bold',
                     },
                 },
             },
             groups = {
                 all = {
-                    TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
-                    TreesitterContext = { bg = 'treesitter_context.bg' },
-                    NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
-                    NvimTreeNormal = { bg = 'nvim_tree.bg' },
+                    CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
+                    LspSignatureActiveParameter = { style = 'bold,underline' },
                     NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
+                    NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
+                    -- NvimTreeModifiedIcon = { fg = 'nvim_tree.modified_fg' },
+                    NvimTreeNormal = { bg = 'nvim_tree.bg' },
                     NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
                     TabLineSel = { bg = '#31353f', fg = '#999999' },
                     TabLine = { bg = '#31353f', fg = '#555555' },
-                    CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
+                    TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
+                    TreesitterContext = { bg = 'treesitter_context.bg' },
                     -- DiagnosticVirtualTextError = { bg = 'none' },
                     -- DiagnosticVirtualTextWarn = { bg = 'none' },
                     -- DiagnosticVirtualTextInfo = { bg = 'none' },
                     -- DiagnosticVirtualTextHint = { bg = 'none' },
                     -- DiagnosticVirtualTextOk = { bg = 'none' },
-                    LspSignatureActiveParameter = { style = 'bold,underline' },
                 },
             },
         },
