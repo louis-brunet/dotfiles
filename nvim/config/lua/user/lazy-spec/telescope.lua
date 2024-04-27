@@ -33,14 +33,47 @@ return {
             local telescope = require 'telescope'
             local telescope_themes = require 'telescope.themes'
             local telescope_builtin = require 'telescope.builtin'
+            local telescope_layout_strategies = require 'telescope.pickers.layout_strategies'
 
-            telescope.setup {
+            local custom_layout_strategy = 'horizontal_merged'
+            local default_layout_config = {
+                width = 0.95,
+                height = 0.95,
+                prompt_position = 'top',
+            }
+            local border_chars_box = { '─', '│', '─', '│', '┌', '┐', '┘', '└' }
+            local border_chars_merge_top = { '─', '│', '─', '│', '├', '┤', '┘', '└' }
+
+            telescope_layout_strategies[custom_layout_strategy] =
+                function(picker, max_columns, max_lines, layout_config)
+                    local layout = telescope_layout_strategies.horizontal(picker, max_columns, max_lines, layout_config)
+
+                    layout.prompt.title = ''
+                    layout.prompt.borderchars = border_chars_box
+
+                    layout.results.title = ''
+                    layout.results.borderchars = border_chars_merge_top
+                    layout.results.line = layout.results.line - 1
+                    layout.results.height = layout.results.height + 1
+
+                    layout.preview.title = ''
+                    layout.preview.borderchars = border_chars_box
+
+                    return layout
+                end
+
+            telescope.setup({
                 extensions = {
                     ["ui-select"] = {
                         telescope_themes.get_cursor {
                             layout_config = {
                                 height = 12,
                             },
+                            borderchars = {
+                                prompt = border_chars_box,
+                                preview = border_chars_box,
+                                results = border_chars_merge_top,
+                            }
                             -- even more opts
                         }
 
@@ -59,17 +92,23 @@ return {
                         -- }
                     },
                 },
+
                 defaults = {
+                    layout_strategy = custom_layout_strategy,
+                    -- border = false,
+                    sorting_strategy = 'ascending',
+                    path_display = {
+                        -- shorten = {
+                        --     len = 1,
+                        --     exclude = { -2, -1 },
+                        -- },
+                        truncate = true,
+                    },
                     -- see `:h telescope.defaults.layout_config`
                     layout_config = {
-                        horizontal = {
-                            width = 0.95,
-                            height = 0.95,
-                        },
-                        vertical = {
-                            width = 0.95,
-                            height = 0.95,
-                        }
+                        [custom_layout_strategy] = default_layout_config,
+                        horizontal = default_layout_config,
+                        vertical = default_layout_config,
                     },
                     mappings = {
                         -- i = {
@@ -78,7 +117,7 @@ return {
                         -- },
                     },
                 },
-            }
+            })
 
             -- Enable telescope fzf native, if installed
             pcall(telescope.load_extension, 'fzf')
@@ -90,13 +129,15 @@ return {
             -- See `:help telescope.builtin`
             vim.keymap.set('n', '<leader>?', telescope_builtin.oldfiles, { desc = '[?] Find recently opened files' })
             vim.keymap.set('n', '<leader><space>', telescope_builtin.buffers, { desc = '[ ] Find existing buffers' })
-            vim.keymap.set('n', '<leader>/', telescope_builtin.current_buffer_fuzzy_find, { desc = '[/] Fuzzily search in current buffer' })
+            vim.keymap.set('n', '<leader>/', telescope_builtin.current_buffer_fuzzy_find,
+                { desc = '[/] Fuzzily search in current buffer' })
 
             vim.keymap.set('n', '<leader>gf', telescope_builtin.git_files, { desc = 'Search [G]it [F]iles' })
             vim.keymap.set('n', '<leader>gs', telescope_builtin.git_status, { desc = 'Search [G]it [S]tatus' })
             vim.keymap.set('n', '<leader>gb', telescope_builtin.git_branches, { desc = 'Search [G]it [B]ranches' })
             vim.keymap.set('n', '<leader>gc', telescope_builtin.git_commits, { desc = 'Search [G]it [c]ommits' })
-            vim.keymap.set('n', '<leader>gC', telescope_builtin.git_bcommits, { desc = 'Search [G]it [C]ommits for current buffer' })
+            vim.keymap.set('n', '<leader>gC', telescope_builtin.git_bcommits,
+                { desc = 'Search [G]it [C]ommits for current buffer' })
 
             vim.keymap.set('n', '<leader>sf', function()
                 telescope_builtin.find_files({

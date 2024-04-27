@@ -85,8 +85,9 @@ return {
                 all = {
                     -- Built-in spec keys
                     git = {
-                        -- changed = 'blue.bright',
+                        changed = 'blue.bright',
                     },
+                    -- syntax = {}, diag = {}, diag_bg = {}, diff = {},
 
                     -- Custom spec keys
                     cursor_line = {
@@ -95,6 +96,10 @@ return {
                     },
                     fugitive = {
                         header_fg = 'gray.bright',
+                    },
+                    lsp = {
+                        document_highlight_read_bg = 'accent.subtle',
+                        document_highlight_write_bg = 'accent.subtle',
                     },
                     nvim_tree = {
                         bg = 'none',
@@ -114,6 +119,9 @@ return {
                     fugitiveHeader = { fg = 'fugitive.header_fg' },
                     fugitiveStagedHeading = { fg = 'git.add' },
                     fugitiveUnstagedHeading = { fg = 'git.changed' },
+                    LspReferenceText = { bg = 'lsp.document_highlight_read_bg' },
+                    LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
+                    LspReferenceWrite = { bg = 'lsp.document_highlight_write_bg', style = 'italic' },
                     LspSignatureActiveParameter = { style = 'bold,underline' },
                     NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
                     NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
@@ -136,6 +144,7 @@ return {
             require('github-theme').setup(opts)
             vim.cmd.colorscheme(colorscheme_name);
 
+            -- FIXME: wrong highlights sometimes (cursor line, column line, indent markers, ...)
             vim.api.nvim_create_user_command('TransparentToggle', function()
                 local is_transparent = require('github-theme.config').options.transparent
                 -- require('github-theme').setup({
