@@ -15,7 +15,7 @@ return {
 
         opts = {
             --- Keeps the cursor on the first letter of the filename when moving in the tree.
-            hijack_cursor = true,
+            -- hijack_cursor = true,
 
             select_prompts = true,
 
@@ -39,9 +39,10 @@ return {
             },
 
             view = {
+                -- side = 'right',
                 width = {
                     min = 20,
-                    max = 40,    -- -1 for unbounded
+                    max = 50,    -- -1 for unbounded
                     padding = 1, -- to the right
                 },
                 -- float = {
@@ -51,17 +52,24 @@ return {
 
             renderer = {
                 add_trailing = true,
+
                 group_empty = true,
-                full_name = true, -- use floating window if long file name overflows
+
+                -- use floating window if long file name overflows
+                -- NOTE: does not work when view.side is 'right'
+                full_name = true,
+
                 special_files = {
                     'package.json',
 
                     -- defaults
                     'Cargo.toml', 'Makefile', 'README.md', 'readme.md',
                 },
+
                 indent_markers = {
                     enable = true,
                 },
+
                 icons = {
                     show = {
                         folder_arrow = false,

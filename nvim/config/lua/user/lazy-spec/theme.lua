@@ -85,29 +85,35 @@ return {
                 all = {
                     -- Built-in spec keys
                     git = {
-                        changed = 'cyan',
+                        -- changed = 'blue.bright',
                     },
 
                     -- Custom spec keys
-                    treesitter_context = {
-                        bg = 'black',
-                        bottom_sp = 'gray',
-                        bottom_style = 'underline',
+                    cursor_line = {
+                        number_fg = 'yellow.bright',
+                        number_style = 'bold',
+                    },
+                    fugitive = {
+                        header_fg = 'gray.bright',
                     },
                     nvim_tree = {
                         bg = 'none',
                         indent_marker_fg = 'neutral.muted',
                         -- modified_fg = 'gray.bright',
                     },
-                    cursor_line = {
-                        number_fg = 'yellow.bright',
-                        number_style = 'bold',
+                    treesitter_context = {
+                        bg = 'black',
+                        bottom_sp = 'gray',
+                        bottom_style = 'underline',
                     },
                 },
             },
             groups = {
                 all = {
                     CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
+                    fugitiveHeader = { fg = 'fugitive.header_fg' },
+                    fugitiveStagedHeading = { fg = 'git.add' },
+                    fugitiveUnstagedHeading = { fg = 'git.changed' },
                     LspSignatureActiveParameter = { style = 'bold,underline' },
                     NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
                     NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
