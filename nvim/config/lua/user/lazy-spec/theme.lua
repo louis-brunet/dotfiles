@@ -16,6 +16,7 @@ local function codeium_status()
     return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
 end
 
+-- local colorscheme_name = 'github_light'
 local colorscheme_name = 'github_dark_dimmed'
 
 ---@type LazySpec
@@ -107,7 +108,7 @@ return {
                         -- modified_fg = 'gray.bright',
                     },
                     treesitter_context = {
-                        bg = 'black',
+                        -- bg = 'bg',
                         bottom_sp = 'gray',
                         bottom_style = 'underline',
                     },
@@ -123,15 +124,17 @@ return {
                     LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
                     LspReferenceWrite = { bg = 'lsp.document_highlight_write_bg', style = 'italic' },
                     LspSignatureActiveParameter = { style = 'bold,underline' },
-                    NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
                     NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
                     -- NvimTreeModifiedIcon = { fg = 'nvim_tree.modified_fg' },
+                    NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
                     NvimTreeNormal = { bg = 'nvim_tree.bg' },
                     NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
                     TabLineSel = { bg = '#31353f', fg = '#999999' },
                     TabLine = { bg = '#31353f', fg = '#555555' },
+                    TelescopeNormal = { bg = 'bg2' },
+                    -- TelescopePreviewNormal = { bg = 'bg1' },
+                    -- TreesitterContext = { bg = 'none' },
                     TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
-                    TreesitterContext = { bg = 'treesitter_context.bg' },
                     -- DiagnosticVirtualTextError = { bg = 'none' },
                     -- DiagnosticVirtualTextWarn = { bg = 'none' },
                     -- DiagnosticVirtualTextInfo = { bg = 'none' },
@@ -167,15 +170,15 @@ return {
             options = {
                 -- icons_enabled = false,
                 theme = colorscheme_name,
-                component_separators = '', -- '|',
-                section_separators = '',
+                -- component_separators = '', -- '|',
+                -- section_separators = '',
             },
             sections = {
                 lualine_a = {
-                    function()
-                        -- `:h mode()`: non-zero first arg for more than 1st char
-                        return vim.api.nvim_call_function("mode", { 1 })
-                    end,
+                    -- function()
+                    --     -- `:h mode()`: non-zero first arg for more than 1st char
+                    --     return vim.api.nvim_call_function("mode", { 1 })
+                    -- end,
                     -- {
                     --     'mode',
                     --     fmt = function(str)
@@ -186,18 +189,30 @@ return {
                     --         return str:sub(1, 1):lower()
                     --     end,
                     -- },
+                    -- 'branch',
                 },
-                lualine_b = { 'diagnostics' },
+                lualine_b = {
+                    'diagnostics',
+                },
                 -- lualine_b = { 'branch', 'diff', 'diagnostics' },
                 lualine_c = {
                     {
                         'filename',
                         path = 3,
                     },
+                    -- {
+                    --     'diff',
+                    --     -- colored = false,
+                    -- },
                 },
-                lualine_x = { --[[codeium_status,--]] attached_lsp_clients, 'filetype' },
+                lualine_x = {
+                    -- codeium_status,
+                    attached_lsp_clients,
+                    'filetype',
+                },
                 lualine_y = { 'location' },
-                lualine_z = {},
+                lualine_z = {
+                },
             },
             tabline = {
                 -- lualine_a = { 'tabs' },
