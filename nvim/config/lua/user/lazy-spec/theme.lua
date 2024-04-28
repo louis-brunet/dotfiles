@@ -71,24 +71,50 @@ return {
         opts = {
             options = {
                 transparent = false,
+
                 darken = {
                     sidebars = {
                         enabled = false,
                     },
                 },
+
+                modules_default = false,
+
+                modules = {
+                    diagnostic = {
+                        -- background = true,
+                        enable = true
+                    },
+                    lsp_semantic_tokens = true,
+                    native_lsp = {
+                        background = true,
+                        enable = true
+                    },
+                    treesitter = true
+
+                },
+
+                styles = {
+                    -- comments = 'italic',
+                },
             },
+
             palettes = {
                 all = {
                 },
                 -- github_dark = {},
             },
+
             specs = {
                 all = {
                     -- Built-in spec keys
                     git = {
                         changed = 'blue.bright',
                     },
-                    -- syntax = {}, diag = {}, diag_bg = {}, diff = {},
+                    syntax = {
+                        string = 'green.bright',
+                    },
+                    -- diag = {}, diag_bg = {}, diff = {},
 
                     -- Custom spec keys
                     cursor_line = {
@@ -97,6 +123,7 @@ return {
                     },
                     fugitive = {
                         header_fg = 'gray.bright',
+                        hash_fg = 'gray.bright',
                     },
                     lsp = {
                         document_highlight_read_bg = 'accent.subtle',
@@ -114,9 +141,11 @@ return {
                     },
                 },
             },
+
             groups = {
                 all = {
                     CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
+                    fugitiveHash = { fg = 'fugitive.hash_fg' },
                     fugitiveHeader = { fg = 'fugitive.header_fg' },
                     fugitiveStagedHeading = { fg = 'git.add' },
                     fugitiveUnstagedHeading = { fg = 'git.changed' },
@@ -135,7 +164,7 @@ return {
                     -- TelescopePreviewNormal = { bg = 'bg1' },
                     -- TreesitterContext = { bg = 'none' },
                     -- TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
-                    -- DiagnosticVirtualTextError = { bg = 'none' },
+                    -- DiagnosticVirtualTextError = { bg = 'palette.danger.muted', fg ='palette.danger.fg' },
                     -- DiagnosticVirtualTextWarn = { bg = 'none' },
                     -- DiagnosticVirtualTextInfo = { bg = 'none' },
                     -- DiagnosticVirtualTextHint = { bg = 'none' },
