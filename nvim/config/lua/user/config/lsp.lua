@@ -30,6 +30,15 @@ M.servers = {
             hostInfo = "neovim",
             preferences = {
                 quotePreference = "single",
+
+                includeInlayParameterNameHints = 'all', -- 'none' | 'literals' | 'all';
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true;
+                includeInlayVariableTypeHints = true;
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true;
+                includeInlayPropertyDeclarationTypeHints = true;
+                includeInlayFunctionLikeReturnTypeHints = true;
+                includeInlayEnumMemberValueHints = true;
             },
         },
 
@@ -212,6 +221,8 @@ M.servers = {
     },
 }
 
+---@param client vim.lsp.Client
+---@param bufnr integer
 function M.on_attach(client, bufnr)
     local map = function(modes, keys, func, desc)
         if desc then
@@ -278,17 +289,20 @@ function M.on_attach(client, bufnr)
             buffer = bufnr,
         }
     end
-
-    -- local function trigger_highlight(callback)
-    --     if client.supports_method('textDocument/documentHighlight') then
-    --         return highlight_augroup_opts(callback)
-    --     end
-    -- end
     if client.supports_method('textDocument/documentHighlight') then
-        vim.api.nvim_create_autocmd("CursorHold", highlight_augroup_opts(vim.lsp.buf.document_highlight))
-        vim.api.nvim_create_autocmd("CursorHoldI", highlight_augroup_opts(vim.lsp.buf.document_highlight))
-        vim.api.nvim_create_autocmd("CursorMoved", highlight_augroup_opts(vim.lsp.buf.clear_references))
-        vim.api.nvim_create_autocmd("CursorMovedI", highlight_augroup_opts(vim.lsp.buf.clear_references))
+        vim.api.nvim_create_autocmd('CursorHold', highlight_augroup_opts(vim.lsp.buf.document_highlight))
+        vim.api.nvim_create_autocmd('CursorHoldI', highlight_augroup_opts(vim.lsp.buf.document_highlight))
+        vim.api.nvim_create_autocmd('CursorMoved', highlight_augroup_opts(vim.lsp.buf.clear_references))
+        vim.api.nvim_create_autocmd('CursorMovedI', highlight_augroup_opts(vim.lsp.buf.clear_references))
+    end
+
+
+    -- Enable inlay hints
+    -- if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+    if client.supports_method('textDocument/inlayHint') then
+        if type(vim.lsp.inlay_hint.enable) == 'function' then
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+        end
     end
 end
 

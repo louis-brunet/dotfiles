@@ -112,7 +112,7 @@ return {
                         changed = 'blue.bright',
                     },
                     syntax = {
-                        string = 'green.bright',
+                        -- string = 'green.bright',
                     },
                     -- diag = {}, diag_bg = {}, diff = {},
 
