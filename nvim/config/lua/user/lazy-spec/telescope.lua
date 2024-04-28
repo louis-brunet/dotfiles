@@ -132,12 +132,12 @@ return {
             vim.keymap.set('n', '<leader>/', telescope_builtin.current_buffer_fuzzy_find,
                 { desc = '[/] Fuzzily search in current buffer' })
 
-            vim.keymap.set('n', '<leader>gf', telescope_builtin.git_files, { desc = 'Search [G]it [F]iles' })
-            vim.keymap.set('n', '<leader>gs', telescope_builtin.git_status, { desc = 'Search [G]it [S]tatus' })
-            vim.keymap.set('n', '<leader>gb', telescope_builtin.git_branches, { desc = 'Search [G]it [B]ranches' })
-            vim.keymap.set('n', '<leader>gc', telescope_builtin.git_commits, { desc = 'Search [G]it [c]ommits' })
+            vim.keymap.set('n', '<leader>gf', telescope_builtin.git_files, { desc = 'Search [g]it [f]iles' })
+            vim.keymap.set('n', '<leader>gs', telescope_builtin.git_status, { desc = 'Search [g]it [s]tatus' })
+            vim.keymap.set('n', '<leader>gb', telescope_builtin.git_branches, { desc = 'Search [g]it [b]ranches' })
+            vim.keymap.set('n', '<leader>gc', telescope_builtin.git_commits, { desc = 'Search [g]it [c]ommits' })
             vim.keymap.set('n', '<leader>gC', telescope_builtin.git_bcommits,
-                { desc = 'Search [G]it [C]ommits for current buffer' })
+                { desc = 'Search [g]it [C]ommits for current buffer' })
 
             vim.keymap.set('n', '<leader>sf', function()
                 telescope_builtin.find_files({
@@ -145,22 +145,22 @@ return {
                     no_ignore = false,
                     no_ignore_parent = false,
                 })
-            end, { desc = '[S]earch [f]iles' })
+            end, { desc = '[s]earch [f]iles' })
             vim.keymap.set('n', '<leader>sF', function()
                 telescope_builtin.find_files({
                     hidden = true,
                     no_ignore = true,
                     no_ignore_parent = true,
                 })
-            end, { desc = '[S]earch [F]iles (no ignore)' })
+            end, { desc = '[s]earch [F]iles (no ignore)' })
 
-            vim.keymap.set('n', '<leader>sh', telescope_builtin.help_tags, { desc = '[S]earch [H]elp' })
+            vim.keymap.set('n', '<leader>sh', telescope_builtin.help_tags, { desc = '[s]earch [h]elp' })
             vim.keymap.set('n', '<leader>sw', telescope_builtin.grep_string,
-                { desc = '[S]earch current [W]ord' })
-            vim.keymap.set('n', '<leader>sg', telescope_builtin.live_grep, { desc = '[S]earch by [G]rep' })
+                { desc = '[s]earch current [w]ord' })
+            vim.keymap.set('n', '<leader>sg', telescope_builtin.live_grep, { desc = '[s]earch by [g]rep' })
             vim.keymap.set('n', '<leader>sd', telescope_builtin.diagnostics,
-                { desc = '[S]earch [D]iagnostics' })
-            vim.keymap.set('n', '<leader>sr', telescope_builtin.resume, { desc = '[S]earch [R]esume' })
+                { desc = '[s]earch [d]iagnostics' })
+            vim.keymap.set('n', '<leader>sr', telescope_builtin.resume, { desc = '[s]earch [r]esume' })
         end
     },
 }
