@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 # https://github.com/ThePrimeagen/.dotfiles/blob/master/bin/.local/scripts/tmux-sessionizer
 # 
 # credit to ThePrimeagen
@@ -6,6 +6,15 @@
 
 # set -x
 set -e
+
+if ! which tmux; then
+    echo '[tmux-sessionizer] tmux: not found'
+    exit 1
+fi
+
+start_tmux() {
+    TERM=tmux-256color tmux -u $@
+}
 
 if [[ $# -eq 1 ]]; then
     selected=$1
@@ -27,7 +36,7 @@ tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
     # not in tmux, tmux not running
-    tmux new-session -s "$selected_name" -c "$selected"
+    start_tmux new-session -s "$selected_name" -c "$selected"
     exit 0
 fi
 
@@ -35,15 +44,15 @@ fi
 
 if ! tmux has-session -t="$selected_name" 2> /dev/null; then
     # requested session not yet created
-    tmux new-session -ds "$selected_name" -c "$selected"
+    start_tmux new-session -ds "$selected_name" -c "$selected"
 fi
 
 if [[ -z $TMUX ]]; then
     # not in tmux, but tmux is running
-    tmux attach -t "$selected_name"
+    start_tmux attach -t "$selected_name"
 else
     # inside tmux
-    tmux switch-client -t "$selected_name"
+    start_tmux switch-client -t "$selected_name"
 fi
 
 # vi:ft=sh
