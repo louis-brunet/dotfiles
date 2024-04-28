@@ -134,7 +134,7 @@ return {
                     TelescopeNormal = { bg = 'bg2' },
                     -- TelescopePreviewNormal = { bg = 'bg1' },
                     -- TreesitterContext = { bg = 'none' },
-                    TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
+                    -- TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
                     -- DiagnosticVirtualTextError = { bg = 'none' },
                     -- DiagnosticVirtualTextWarn = { bg = 'none' },
                     -- DiagnosticVirtualTextInfo = { bg = 'none' },
@@ -150,13 +150,11 @@ return {
             -- FIXME: wrong highlights sometimes (cursor line, column line, indent markers, ...)
             vim.api.nvim_create_user_command('TransparentToggle', function()
                 local is_transparent = require('github-theme.config').options.transparent
-                -- require('github-theme').setup({
                 require('github-theme').setup({
                     options = {
                         transparent = not is_transparent,
                     },
                 })
-
                 vim.cmd.colorscheme(colorscheme_name)
             end, { desc = "Toggle transparent background" })
         end
