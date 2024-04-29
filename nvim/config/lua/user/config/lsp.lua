@@ -1,18 +1,125 @@
----@class UserLspConfig
-local M = {}
+---@param bufnr integer|nil
+---@return vim.lsp.Client|nil
+local function get_typescript_lsp_client(bufnr)
+    if bufnr == nil then
+        bufnr = vim.api.nvim_get_current_buf()
+    end
 
-local function ts_organize_imports()
-    local params = {
-        command = "_typescript.organizeImports",
-        arguments = {
-            vim.api.nvim_buf_get_name(0),           -- organize for current buffer
-            { skipDestructiveCodeActions = false }, -- delete unused imports
-        },
-        title = ""
-    }
-    vim.lsp.buf.execute_command(params)
+    local client_filter = { bufnr = bufnr }
+    local clients = {}
+    if type(vim.lsp.get_clients) == 'function' then
+        clients = vim.lsp.get_clients(client_filter)
+    else
+        clients = vim.lsp.get_active_clients(client_filter)
+    end
+
+    ---@cast clients vim.lsp.Client[]
+
+    for _, client in ipairs(clients) do
+        if client.name == 'tsserver' then
+            return client
+        end
+    end
+
+    vim.notify('[get_typescript_lsp_client] no active tsserver found', vim.log.levels.WARN)
+
+    return nil
 end
 
+
+local LSP_METHODS = {
+    execute_command = 'workspace/executeCommand',
+    definition = 'textDocument/definition'
+}
+local LSP_WORKSPACE_COMMANDS = {
+    organize_imports = '_typescript.organizeImports',
+    go_to_source_definition = '_typescript.goToSourceDefinition',
+}
+
+local typescript_commands = {
+    ---@param bufnr integer|nil
+    organize_imports = function(bufnr)
+        if bufnr == nil then
+            bufnr = 0
+        end
+
+        local params = {
+            command = LSP_WORKSPACE_COMMANDS.organize_imports,
+            arguments = {
+                vim.api.nvim_buf_get_name(bufnr),       -- organize for current buffer
+                { skipDestructiveCodeActions = false }, -- delete unused imports
+            },
+            title = ""
+        }
+        vim.lsp.buf.execute_command(params)
+    end,
+
+    -- TODO: _typescript.goToSourceDefinition integration
+    ---@param opts { winnr: integer|nil, use_fallback: boolean|nil}|nil
+    go_to_source_definition = function(opts)
+        opts = opts or {}
+        if opts.winnr == nil then
+            opts.winnr = vim.api.nvim_get_current_win()
+        end
+        if opts.use_fallback == nil then
+            opts.use_fallback = true
+        end
+        local bufnr = vim.api.nvim_win_get_buf(opts.winnr)
+
+        local client = get_typescript_lsp_client()
+        if not client then
+            vim.notify('[go_to_source_definition] ts LSP client not found', vim.log.levels.WARN)
+            return false
+        end
+
+        local positional_params = vim.lsp.util.make_position_params(opts.winnr, client.offset_encoding)
+        -- vim.notify('TODO: integrate _typescript.goToSourceDefinition', vim.log.levels.ERROR)
+        -- error('TODO')
+
+        local execute_command_params = {
+            command = LSP_WORKSPACE_COMMANDS.go_to_source_definition,
+            arguments = {
+                positional_params.textDocument.uri,
+                positional_params.position,
+            },
+        }
+        local function execute_callback(...)
+            local args = {...}
+            local handler = client.handlers[LSP_METHODS.definition] or vim.lsp.handlers[LSP_METHODS.definition]
+            if not handler then
+                print("[go_to_source_definition] failed to go to source definition: could not resolve definition handler")
+                return
+            end
+
+            local res = args[2] or ({})
+            if vim.tbl_isempty(res) then
+                if opts.use_fallback == true then
+                    return client.request(LSP_METHODS.definition, positional_params, handler, bufnr)
+                end
+                print("[go_to_source_definition] failed to go to source definition: no source definitions found")
+                return
+            end
+            handler(unpack(args))
+        end
+
+        client.request('workspace/executeCommand', execute_command_params, execute_callback)
+
+        -- local ok, res = pcall(vim.lsp.buf.execute_command, execute_comand_params)
+        -- vim.lsp.buf.execute_command(execute_command_params)
+
+        -- if not ok then
+        --     error('TODO error handling')
+        -- -- else
+        -- --     vim.notify('[go_to_source_definition] no error')
+        -- end
+
+        -- return ok
+
+    end,
+}
+
+---@class UserLspConfig
+local M = {}
 
 M.servers = {
     -- clangd = {},
@@ -33,25 +140,29 @@ M.servers = {
 
                 includeInlayParameterNameHints = 'all', -- 'none' | 'literals' | 'all';
                 includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true;
-                includeInlayVariableTypeHints = true;
-                includeInlayVariableTypeHintsWhenTypeMatchesName = true;
-                includeInlayPropertyDeclarationTypeHints = true;
-                includeInlayFunctionLikeReturnTypeHints = true;
-                includeInlayEnumMemberValueHints = true;
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
             },
         },
 
         -- maps to lspconfig's `commands` option
         commands = {
-            OrganizeImports = {
-                ts_organize_imports,
-                description = "Organize Imports"
+            TypescriptOrganizeImports = {
+                typescript_commands.organize_imports,
+                description = "Organize imports"
+            },
+            -- _typescript.goToSourceDefinition integration
+            TypescriptGoToSourceDefinition = {
+                typescript_commands.go_to_source_definition,
+                description = "Go to source definition"
             }
         },
 
         settings = {
-            -- TODO: enable inlay hints in nvim >= 0.10
             typescript = {
                 -- format = {
                 --     indentSize = vim.o.shiftwidth,
@@ -151,7 +262,7 @@ M.servers = {
         Lua = {
             telemetry = { enable = false },
 
-            -- hint = { enable = true }, -- TODO: enable inlay hints in nvim >=0.10
+            hint = { enable = true }, -- TODO: enable inlay hints in nvim >=0.10
 
             runtime = { version = 'LuaJIT' },
 
@@ -255,10 +366,14 @@ function M.on_attach(client, bufnr)
 
     nmap('gd', function() require('telescope.builtin').lsp_definitions(telescope_lsp_options) end, '[G]oto [D]efinition')
     nmap('gr', function() require('telescope.builtin').lsp_references(telescope_lsp_options) end, '[G]oto [R]eferences')
-    nmap('gI', function() require('telescope.builtin').lsp_implementations(telescope_lsp_options) end, '[G]oto [I]mplementation')
-    nmap('<leader>D', function() require('telescope.builtin').lsp_type_definitions(telescope_lsp_options) end, 'Type [D]efinition')
-    nmap('<leader>ds', function() require('telescope.builtin').lsp_document_symbols(telescope_lsp_options) end, '[D]ocument [S]ymbols')
-    nmap('<leader>ws', function() require('telescope.builtin').lsp_dynamic_workspace_symbols(telescope_lsp_options) end, '[W]orkspace [S]ymbols')
+    nmap('gI', function() require('telescope.builtin').lsp_implementations(telescope_lsp_options) end,
+        '[G]oto [I]mplementation')
+    nmap('<leader>D', function() require('telescope.builtin').lsp_type_definitions(telescope_lsp_options) end,
+        'Type [D]efinition')
+    nmap('<leader>ds', function() require('telescope.builtin').lsp_document_symbols(telescope_lsp_options) end,
+        '[D]ocument [S]ymbols')
+    nmap('<leader>ws', function() require('telescope.builtin').lsp_dynamic_workspace_symbols(telescope_lsp_options) end,
+        '[W]orkspace [S]ymbols')
 
     -- See `:help K` for why this keymap
     nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -300,7 +415,7 @@ function M.on_attach(client, bufnr)
     -- Enable inlay hints
     -- if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
     if client.supports_method('textDocument/inlayHint') then
-        if type(vim.lsp.inlay_hint.enable) == 'function' then
+        if vim.lsp.inlay_hint and type(vim.lsp.inlay_hint.enable) == 'function' then
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
     end
