@@ -11,7 +11,7 @@ local treesitter_opts = {
         enable = true,
         -- disable highlighting in case of treesitter errors
         disable = {
-            -- 'html', // TODO: check if need to disable again
+            -- 'html',
         },
     },
 

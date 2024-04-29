@@ -48,7 +48,7 @@ return {
                 function(picker, max_columns, max_lines, layout_config)
                     local layout = telescope_layout_strategies.horizontal(picker, max_columns, max_lines, layout_config)
 
-                    layout.prompt.title = ''
+                    -- layout.prompt.title = ''
                     layout.prompt.borderchars = border_chars_box
 
                     layout.results.title = ''
@@ -56,7 +56,7 @@ return {
                     layout.results.line = layout.results.line - 1
                     layout.results.height = layout.results.height + 1
 
-                    layout.preview.title = ''
+                    -- layout.preview.title = ''
                     layout.preview.borderchars = border_chars_box
 
                     return layout
@@ -124,7 +124,10 @@ return {
 
             -- Enable telescope extension for ui-select (lua/user/plugins/telescope-ui-select.nvim)
             pcall(telescope.load_extension, 'ui-select')
+
             -- pcall(telescope.load_extension, 'ollouma')
+
+            pcall(telescope.load_extension, 'notify')
 
             -- See `:help telescope.builtin`
             vim.keymap.set('n', '<leader>?', telescope_builtin.oldfiles, { desc = '[?] Find recently opened files' })

@@ -1,14 +1,23 @@
 local function attached_lsp_clients()
+    local client_filter = { bufnr = vim.api.nvim_get_current_buf() }
+
+    local clients
+    if vim.lsp.get_clients then
+        clients = vim.lsp.get_clients(client_filter)
+    else
+        -- vim.lsp.get_active_clients is deprecated in nvim 0.10
+        clients = vim.lsp.get_active_clients(client_filter)
+    end
+    ---@cast clients vim.lsp.Client[]
+
     local names_str = ''
-    for _, client in ipairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
+
+    for _, client in ipairs(clients) do
         if client.name ~= '' then
-            if names_str == '' then
-                names_str = client.name
-            else
-                names_str = names_str .. ' ' .. client.name
-            end
+            names_str = names_str .. client.name .. ' '
         end
     end
+
     return names_str
 end
 
@@ -16,7 +25,6 @@ local function codeium_status()
     return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
 end
 
--- local colorscheme_name = 'github_light'
 local colorscheme_name = 'github_dark_dimmed'
 
 ---@type LazySpec
@@ -109,7 +117,7 @@ return {
                 all = {
                     -- Built-in spec keys
                     git = {
-                        changed = 'blue.bright',
+                        -- changed = 'blue.bright',
                     },
                     syntax = {
                         -- string = 'green.bright',
@@ -117,15 +125,24 @@ return {
                     -- diag = {}, diag_bg = {}, diff = {},
 
                     -- Custom spec keys
+                    color_column = {
+                        bg = 'neutral.subtle',
+                    },
                     cursor_line = {
+                        bg = 'neutral.subtle',
                         number_fg = 'yellow.bright',
                         number_style = 'bold',
+                    },
+                    elevated = {
+                        bg = 'canvas.overlay',
                     },
                     fugitive = {
                         header_fg = 'gray.bright',
                         hash_fg = 'gray.bright',
                     },
                     lsp = {
+                        inlay_hint_bg = 'none',
+                        inlay_hint_style = 'italic',
                         document_highlight_read_bg = 'accent.subtle',
                         document_highlight_write_bg = 'accent.subtle',
                     },
@@ -144,15 +161,20 @@ return {
 
             groups = {
                 all = {
+                    ColorColumn = { bg = 'color_column.bg' },
+                    CursorLine = { bg = 'cursor_line.bg' },
                     CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
                     fugitiveHash = { fg = 'fugitive.hash_fg' },
                     fugitiveHeader = { fg = 'fugitive.header_fg' },
                     fugitiveStagedHeading = { fg = 'git.add' },
                     fugitiveUnstagedHeading = { fg = 'git.changed' },
+                    LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'lsp.inlay_hint_style' },
                     LspReferenceText = { bg = 'lsp.document_highlight_read_bg' },
                     LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
                     LspReferenceWrite = { bg = 'lsp.document_highlight_write_bg', style = 'italic' },
                     LspSignatureActiveParameter = { style = 'bold,underline' },
+                    FloatBorder = { fg = 'palette.accent.muted', bg = 'elevated.bg' },
+                    NormalFloat = { bg = 'elevated.bg' },
                     NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
                     -- NvimTreeModifiedIcon = { fg = 'nvim_tree.modified_fg' },
                     NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
@@ -160,7 +182,8 @@ return {
                     NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
                     TabLineSel = { bg = '#31353f', fg = '#999999' },
                     TabLine = { bg = '#31353f', fg = '#555555' },
-                    TelescopeNormal = { bg = 'bg2' },
+                    TelescopeNormal = { bg = 'elevated.bg' },
+                    WhichKeyFloat = { bg = 'elevated.bg' },
                     -- TelescopePreviewNormal = { bg = 'bg1' },
                     -- TreesitterContext = { bg = 'none' },
                     -- TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
@@ -179,11 +202,9 @@ return {
             -- FIXME: wrong highlights sometimes (cursor line, column line, indent markers, ...)
             vim.api.nvim_create_user_command('TransparentToggle', function()
                 local is_transparent = require('github-theme.config').options.transparent
-                require('github-theme').setup({
-                    options = {
-                        transparent = not is_transparent,
-                    },
-                })
+                opts.options.transparent = not is_transparent
+                require('github-theme').setup(opts)
+
                 vim.cmd.colorscheme(colorscheme_name)
             end, { desc = "Toggle transparent background" })
         end

@@ -41,7 +41,7 @@ local M = {
         event = 'BufReadPre',
         dependencies = {
             -- Automatically install LSPs to stdpath for neovim
-            { 'williamboman/mason.nvim', config = true --[[ TODO:? , cmd = 'Mason' ]] },
+            { 'williamboman/mason.nvim', config = true },
             'williamboman/mason-lspconfig.nvim',
 
             -- Useful status updates for LSP
