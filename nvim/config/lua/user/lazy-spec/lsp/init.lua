@@ -40,10 +40,6 @@ local M = {
         'neovim/nvim-lspconfig',
         event = 'BufReadPre',
         dependencies = {
-            -- Automatically install LSPs to stdpath for neovim
-            { 'williamboman/mason.nvim', config = true },
-            'williamboman/mason-lspconfig.nvim',
-
             -- Useful status updates for LSP
             { 'j-hui/fidget.nvim',       tag = 'legacy',                              opts = {} },
 
@@ -65,47 +61,48 @@ local M = {
             local mason_lspconfig = require 'mason-lspconfig'
 
             local user_config = require('user.config.lsp')
-            local servers = user_config.servers
-            local on_attach = user_config.on_attach
+            local servers = user_config.lspconfig_servers
+            local common_on_attach = user_config.on_attach
 
-            mason_lspconfig.setup {
+            mason_lspconfig.setup({
                 ensure_installed = vim.tbl_keys(servers),
-            }
+            })
 
-            mason_lspconfig.setup_handlers {
+            mason_lspconfig.setup_handlers({
                 function(server_name)
+                    ---@class UserLspServerConfig
+                    ---@field cmd string[]|nil
+                    ---@field filetypes string[]|nil
+                    ---@field init_options table<string, string|table|boolean>|nil
+                    ---@field on_attach nil|fun(client: vim.lsp.Client, bufnr: integer):nil
+                    ---@field settings table<string, string|table|boolean>|nil
                     local server_config = servers[server_name] or {}
 
-                    local server_cmd = server_config.cmd
-                    server_config.cmd = nil
+                    local server_on_attach = function(client, bufnr)
+                        common_on_attach(client, bufnr)
 
-                    local server_commands = server_config.commands
-                    server_config.commands = nil
-
-                    local server_filetypes = server_config.filetypes
-                    server_config.filetypes = nil
-
-                    local server_init_options = server_config.init_options
-                    server_config.init_options = nil
-
+                        if type(server_config.on_attach) == 'function' then
+                            server_config.on_attach(client, bufnr)
+                        end
+                    end
 
                     -- :h lspconfig-setup
                     require('lspconfig')[server_name].setup {
                         capabilities = capabilities,
-                        on_attach = on_attach,
-                        settings = server_config,
-                        filetypes = server_filetypes,
-                        init_options = server_init_options,
-                        commands = server_commands,
+                        on_attach = server_on_attach,
+                        settings = server_config.settings,
+                        filetypes = server_config.filetypes,
+                        init_options = server_config.init_options,
+                        -- commands = server_config.commands, NOTE: commands is deprecated
                         -- root_dir = function(filename, bufnr) end, -- :h lspconfig-root-detection
                         -- single_file_support = nil,
                         -- autostart = true,
-                        cmd = server_cmd,
+                        cmd = server_config.cmd,
                         -- handlers = {},
                         -- on_new_config = function (new_config, new_root_dir) end,
                     }
                 end,
-            }
+            })
         end
     },
 }

@@ -171,7 +171,7 @@ local M = {
         cmd = { 'UndotreeToggle' },
 
         keys = {
-            {'<leader>u', vim.cmd.UndotreeToggle, desc = '[u]ndotree toggle'},
+            { '<leader>u', vim.cmd.UndotreeToggle, desc = '[u]ndotree toggle' },
         },
     },
 }

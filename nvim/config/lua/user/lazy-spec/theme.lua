@@ -1,14 +1,5 @@
-local function attached_lsp_clients()
-    local client_filter = { bufnr = vim.api.nvim_get_current_buf() }
-
-    local clients
-    if vim.lsp.get_clients then
-        clients = vim.lsp.get_clients(client_filter)
-    else
-        -- vim.lsp.get_active_clients is deprecated in nvim 0.10
-        clients = vim.lsp.get_active_clients(client_filter)
-    end
-    ---@cast clients vim.lsp.Client[]
+local function attached_lsp_clients_str()
+    local clients = require('user.utils.lsp').get_buffer_lsp_clients()
 
     local names_str = ''
 
@@ -74,6 +65,33 @@ return {
     -- },
     {
         'projekt0n/github-nvim-theme',
+        dependencies = {
+            {
+                -- Add indentation guides even on blank lines
+                'lukas-reineke/indent-blankline.nvim',
+                opts = {},
+
+                -- -- See `:help indent_blankline.txt`
+                -- -- event = 'VeryLazy',
+                -- main = 'ibl',
+                -- opts = {
+                --     indent = {
+                --         char = '▏',
+                --         -- char = '┊',
+                --     },
+                --     scope = {
+                --         enabled = true,
+                --     },
+                --     -- whitespace = {
+                --     --     remove_blankline_trail = true,
+                --     -- },
+                -- },
+                -- dependencies = {
+                --     'nvim-treesitter/nvim-treesitter',
+                -- },
+            }
+        },
+
         lazy = false,
         priority = 1000,
         opts = {
@@ -89,17 +107,28 @@ return {
                 modules_default = false,
 
                 modules = {
+                    cmp = true,
+                    dapui = true,
+                    figet = true,
+                    fzf = true,
+                    gitsigns = true,
+                    indent_blankline = true,
+                    lsp_semantic_tokens = true,
+                    lsp_trouble = true,
+                    notify = true,
+                    nvimtree = true,
+                    telescope = true,
+                    treesitter = true,
+                    treesitter_context = true,
+                    whichkey = true,
                     diagnostic = {
                         -- background = true,
                         enable = true
                     },
-                    lsp_semantic_tokens = true,
                     native_lsp = {
                         background = true,
                         enable = true
                     },
-                    treesitter = true
-
                 },
 
                 styles = {
@@ -120,6 +149,13 @@ return {
                         -- changed = 'blue.bright',
                     },
                     syntax = {
+                        -- ibl = {
+                        --     indent = {
+                        --         char = {
+                        --             'red',
+                        --         }
+                        --     }
+                        -- },
                         -- string = 'green.bright',
                     },
                     -- diag = {}, diag_bg = {}, diff = {},
@@ -168,6 +204,8 @@ return {
                     fugitiveHeader = { fg = 'fugitive.header_fg' },
                     fugitiveStagedHeading = { fg = 'git.add' },
                     fugitiveUnstagedHeading = { fg = 'git.changed' },
+                    IblIndent = { fg = 'palette.neutral.subtle' },
+                    IblScope = { fg = 'palette.accent.muted' },
                     LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'lsp.inlay_hint_style' },
                     LspReferenceText = { bg = 'lsp.document_highlight_read_bg' },
                     LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
@@ -255,7 +293,7 @@ return {
                 },
                 lualine_x = {
                     -- codeium_status,
-                    attached_lsp_clients,
+                    attached_lsp_clients_str,
                     'filetype',
                 },
                 lualine_y = { 'location' },
