@@ -32,7 +32,7 @@ local decoration_color=$bright_black
 
 config_general_style() {
     typeset -g POWERLEVEL9K_BACKGROUND=           # transparent background
-    typeset -g POWERLEVEL9K_DIR_BACKGROUND=$decoration_color
+    # typeset -g POWERLEVEL9K_DIR_BACKGROUND=$decoration_color
     typeset -g POWERLEVEL9K_DIR_FOREGROUND=$blue
     typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=$bright_blue
     # typeset -g POWERLEVEL9K_VCS_BACKGROUND=
@@ -40,13 +40,13 @@ config_general_style() {
     # typeset -g POWERLEVEL9K_TIME_BACKGROUND=
 
 
-    typeset -g POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL='\uE0B6' # '🮊' # '🮉' # '▐' #'\uE0B6'
-    typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='\uE0B4'
-    typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
-    typeset -g POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
     # typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR=''
     typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR=''
-    # typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='\uE0B4'
+    # typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='\uE0B4 '
+    # typeset -g POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL='\uE0B6' # '🮊' # '🮉' # '▐' #'\uE0B6'
+    # typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='\uE0B4'
+    typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+    typeset -g POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
 
 
     # Add an empty line before each prompt.
@@ -112,7 +112,7 @@ config_segment_layout() {
     typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       newline
       # =========================[ Line #1 ]=========================
-      # os_icon                 # os identifier
+      os_icon                 # os identifier
       dir                     # current directory
       vcs                     # git status
       # =========================[ Line #2 ]=========================
