@@ -112,7 +112,7 @@ config_segment_layout() {
     typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       newline
       # =========================[ Line #1 ]=========================
-      os_icon                 # os identifier
+      # os_icon                 # os identifier
       dir                     # current directory
       vcs                     # git status
       # =========================[ Line #2 ]=========================
