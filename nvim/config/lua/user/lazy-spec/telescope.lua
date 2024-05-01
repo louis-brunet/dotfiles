@@ -45,22 +45,28 @@ return {
             local border_chars_merge_top = { '─', '│', '─', '│', '├', '┤', '┘', '└' }
 
             telescope_layout_strategies[custom_layout_strategy] =
-                function(picker, max_columns, max_lines, layout_config)
-                    local layout = telescope_layout_strategies.horizontal(picker, max_columns, max_lines, layout_config)
+            function(picker, max_columns, max_lines, layout_config)
+                local layout = telescope_layout_strategies.horizontal(picker, max_columns, max_lines, layout_config)
 
+                if layout.prompt then
                     -- layout.prompt.title = ''
                     layout.prompt.borderchars = border_chars_box
+                end
 
+                if layout.results then
                     layout.results.title = ''
                     layout.results.borderchars = border_chars_merge_top
                     layout.results.line = layout.results.line - 1
                     layout.results.height = layout.results.height + 1
+                end
 
+                if layout.preview then
                     -- layout.preview.title = ''
                     layout.preview.borderchars = border_chars_box
-
-                    return layout
                 end
+
+                return layout
+            end
 
             telescope.setup({
                 extensions = {
