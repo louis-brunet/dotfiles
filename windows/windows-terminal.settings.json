@@ -1,0 +1,61 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+    "profiles": 
+    {
+        "defaults": 
+        {
+            "bellStyle": "taskbar",
+            "colorScheme": "GitHub Dark Dimmed",
+            "cursorShape": "filledBox",
+            "experimental.retroTerminalEffect": false,
+            "font": 
+            {
+                "face": "MesloLGS NF",
+                "size": 11.0
+            },
+            "intenseTextStyle": "all",
+            "opacity": 94,
+            "padding": "0",
+            "useAcrylic": false,
+            "useAtlasEngine": true
+        },
+        "list": 
+        [
+            {
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl"
+            }
+        ]
+    },
+    "schemes": 
+    [
+        {
+            "background": "#22272E",
+            "black": "#22272E",
+            "blue": "#539BF5",
+            "brightBlack": "#2D333B",
+            "brightBlue": "#6CB6FF",
+            "brightCyan": "#B3F0FF",
+            "brightGreen": "#6BC46D",
+            "brightPurple": "#DCBDFB",
+            "brightRed": "#FF938A",
+            "brightWhite": "#C1D3E6",
+            "brightYellow": "#DAAA3F",
+            "cursorColor": "#ADBAC7",
+            "cyan": "#76E3EA",
+            "foreground": "#ADBAC7",
+            "green": "#57AB5A",
+            "name": "GitHub Dark Dimmed",
+            "purple": "#B083F0",
+            "red": "#F47067",
+            "selectionBackground": "#3E5E87",
+            "white": "#909DAB",
+            "yellow": "#C69026"
+        }
+    ]
+}
+

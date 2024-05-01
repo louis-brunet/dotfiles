@@ -1,63 +1,284 @@
----@class UserLspConfig
-local M = {}
+local LSP_METHODS = {
+    execute_command = 'workspace/executeCommand',
+    definition = 'textDocument/definition',
+    document_highlight = 'textDocument/documentHighlight',
+    inlay_hint = 'textDocument/inlayHint',
+}
 
-local function ts_organize_imports()
-    local params = {
-        command = "_typescript.organizeImports",
-        arguments = {
-            vim.api.nvim_buf_get_name(0),           -- organize for current buffer
-            { skipDestructiveCodeActions = false }, -- delete unused imports
-        },
-        title = ""
-    }
-    vim.lsp.buf.execute_command(params)
+local LSP_WORKSPACE_COMMANDS = {
+    organize_imports = '_typescript.organizeImports',
+    go_to_source_definition = '_typescript.goToSourceDefinition',
+}
+
+
+---@param bufnr integer|nil
+---@return vim.lsp.Client|nil
+local function get_typescript_lsp_client(bufnr)
+    local clients = require('user.utils.lsp').get_buffer_lsp_clients({ bufnr = bufnr })
+
+    for _, client in ipairs(clients) do
+        if client.name == 'tsserver' then
+            return client
+        end
+    end
+
+    vim.notify('[get_typescript_lsp_client] no active tsserver found', vim.log.levels.WARN)
+
+    return nil
 end
 
 
-M.servers = {
+local typescript_commands = {
+    ---@param opts { bufnr: integer|nil, client: vim.lsp.Client|nil, delete_unused: boolean|nil }|nil
+    organize_imports = function(opts)
+        opts = opts or {}
+        local bufnr = opts.bufnr or 0
+        local skipDestructiveCodeActions = not opts.delete_unused
+
+        local client = opts.client or get_typescript_lsp_client(bufnr)
+        if not client then
+            vim.notify('ts LSP client not found for buffer ' .. bufnr, vim.log.levels.WARN,
+                { title = LSP_WORKSPACE_COMMANDS.organize_imports })
+            return false
+        end
+
+        local execute_command_params = {
+            command = LSP_WORKSPACE_COMMANDS.organize_imports,
+            arguments = {
+                vim.api.nvim_buf_get_name(bufnr),
+                { skipDestructiveCodeActions = skipDestructiveCodeActions }, -- delete unused imports
+            },
+        }
+
+        local function execute_command_callback(...)
+            vim.notify('imports organized', vim.log.levels.INFO, { title = LSP_WORKSPACE_COMMANDS.organize_imports })
+        end
+
+        client.request(LSP_METHODS.execute_command, execute_command_params, execute_command_callback)
+        return true
+    end,
+
+    -- _typescript.goToSourceDefinition integration
+    ---@param opts { client: vim.lsp.Client|nil, winnr: integer|nil, use_fallback: boolean|nil }|nil
+    go_to_source_definition = function(opts)
+        opts = opts or {}
+        if opts.winnr == nil then
+            opts.winnr = vim.api.nvim_get_current_win()
+        end
+        if opts.use_fallback == nil then
+            opts.use_fallback = true
+        end
+        local bufnr = vim.api.nvim_win_get_buf(opts.winnr)
+
+        local client = opts.client or get_typescript_lsp_client()
+        if not client then
+            vim.notify('ts LSP client not found', vim.log.levels.WARN,
+                { title = LSP_WORKSPACE_COMMANDS.go_to_source_definition })
+            return false
+        end
+
+        local positional_params = vim.lsp.util.make_position_params(opts.winnr, client.offset_encoding)
+        local execute_command_params = {
+            command = LSP_WORKSPACE_COMMANDS.go_to_source_definition,
+            arguments = {
+                positional_params.textDocument.uri,
+                positional_params.position,
+            },
+        }
+        local function execute_callback(...)
+            local args = { ... }
+            local handler = client.handlers[LSP_METHODS.definition] or vim.lsp.handlers[LSP_METHODS.definition]
+            if not handler then
+                vim.notify('failed to go to source definition: could not resolve definition handler',
+                    vim.log.levels.ERROR, { title = LSP_WORKSPACE_COMMANDS.go_to_source_definition })
+                return
+            end
+
+            local res = args[2] or ({})
+            if vim.tbl_isempty(res) then
+                if opts.use_fallback == true then
+                    return client.request(LSP_METHODS.definition, positional_params, handler, bufnr)
+                end
+                vim.notify('failed to go to source definition: no source definitions found', vim.log.levels.WARN,
+                    { title = LSP_WORKSPACE_COMMANDS.go_to_source_definition })
+                return
+            end
+
+            handler(unpack(args))
+        end
+
+        client.request(LSP_METHODS.execute_command, execute_command_params, execute_callback)
+        return true
+    end,
+}
+
+---@class UserLspConfig
+local M = {}
+
+---@type { [string]: UserLspServerConfig }
+M.lspconfig_servers = {
     -- clangd = {},
     -- gopls = {},
     -- pyright = {},
     tsserver = {
+        -- filetypes = {
+        --     'angular.html',
+        --     -- defaults
+        --     'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx'
+        -- },
+
         -- maps to lspconfig's `init_options` (!= `settings`)
         init_options = {
             hostInfo = "neovim",
             preferences = {
                 quotePreference = "single",
+
+                includeInlayParameterNameHints = 'literals', -- 'none' | 'literals' | 'all';
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
             },
         },
 
-        -- maps to lspconfig's `commands` option
-        commands = {
-            OrganizeImports = {
-                ts_organize_imports,
-                description = "Organize Imports"
-            }
-        },
+        -- NOTE: deprecated
+        -- -- maps to lspconfig's `commands` option
+        -- commands = {
+        --     TypescriptOrganizeImports = {
+        --         typescript_commands.organize_imports,
+        --         description = "Organize imports"
+        --     },
+        --     -- _typescript.goToSourceDefinition integration
+        --     TypescriptGoToSourceDefinition = {
+        --         typescript_commands.go_to_source_definition,
+        --         description = "Go to source definition"
+        --     }
+        -- },
 
         settings = {
-            -- TODO: enable inlay hints in nvim >= 0.10
-            typescript = {
-                -- format = {
-                --     indentSize = vim.o.shiftwidth,
-                --     convertTabsToSpaces = vim.o.expandtab,
-                --     tabSize = vim.o.tabstop,
-                -- },
-            },
-            javascript = {
-                -- format = {
-                --     indentSize = vim.o.shiftwidth,
-                --     convertTabsToSpaces = vim.o.expandtab,
-                --     tabSize = vim.o.tabstop,
-                -- },
-            },
-            completions = {
-                completeFunctionCalls = true,
+            settings = {
+                typescript = {
+                    -- format = {
+                    --     indentSize = vim.o.shiftwidth,
+                    --     convertTabsToSpaces = vim.o.expandtab,
+                    --     tabSize = vim.o.tabstop,
+                    -- },
+                },
+                javascript = {
+                    -- format = {
+                    --     indentSize = vim.o.shiftwidth,
+                    --     convertTabsToSpaces = vim.o.expandtab,
+                    --     tabSize = vim.o.tabstop,
+                    -- },
+                },
+                completions = {
+                    completeFunctionCalls = true,
+                },
             },
         },
+
+        on_attach = function(client, bufnr)
+            ---@class UserTypescriptCommand
+            ---@field command_name string
+            ---@field keymap string|nil
+            ---@field action string|function
+            ---@field description string|nil
+
+            ---@type UserTypescriptCommand[]
+            local ts_commands = {
+                {
+                    command_name = 'TypescriptOrganizeImports',
+                    action = function()
+                        typescript_commands.organize_imports({ bufnr = bufnr, delete_unused = true })
+                    end,
+                    description = 'Organize imports',
+                },
+                {
+                    command_name = 'TypescriptGoToSourceDefinition',
+                    keymap = 'gs',
+                    action = function()
+                        typescript_commands.go_to_source_definition({ client = client, use_fallback = true })
+                    end,
+                    description = 'Go to source definition',
+                },
+            }
+
+            for _, command in ipairs(ts_commands) do
+                local desc = nil
+                if command.description then
+                    desc = 'typescript: ' .. command.description
+                end
+
+                vim.api.nvim_buf_create_user_command(
+                    bufnr,
+                    command.command_name,
+                    command.action,
+                    { desc = desc }
+                )
+
+                if command.keymap then
+                    vim.keymap.set(
+                        'n',
+                        command.keymap,
+                        command.action,
+                        { buffer = bufnr, desc = desc }
+                    )
+                end
+            end
+
+            vim.api.nvim_buf_create_user_command(
+                bufnr,
+                'Typescript',
+                function()
+                    local select_items = {}
+                    local desc_to_item = {}
+
+                    for _, cmd in pairs(ts_commands) do
+                        table.insert(select_items, cmd.description)
+                        desc_to_item[cmd.description] = cmd
+                    end
+
+                    -- TODO: handle selection and non selection
+                    vim.ui.select(
+                        select_items,
+                        {},
+                        function(selected)
+                            if not selected then
+                                vim.notify('no selection', vim.log.levels.DEBUG)
+                                return
+                            end
+
+                            local selected_item = desc_to_item[selected]
+                            selected_item.action()
+                        end
+                    )
+                end,
+                { desc = 'typescript: select action' }
+            )
+
+            -- vim.api.nvim_buf_create_user_command(
+            --     bufnr,
+            --     'Typescript',
+            --     function()
+            --         local choices = {
+            --         }
+            --
+            --         vim.ui.select(vim.tbl_keys(choices), {}, function() end)
+            --     end,
+            --     { desc = 'typescript: Organize imports' }
+            -- )
+        end,
     },
 
-    html = {},
+    html = {
+        filetypes = {
+            'angular.html',
+            'html', 'templ',
+        },
+    },
     -- TODO: how to configure tailwind to attach to .pug files ?
     -- tailwindcss = {
     --     filetypes = {'html', 'css', 'javascript', 'typescript', 'tsx', 'pug'},
@@ -75,42 +296,44 @@ M.servers = {
         -- maps to lspconfig's `cmd` option
         -- cmd = { '/home/louis/.cargo/bin/rust-analyzer' },
 
-        ["rust-analyzer"] = {
-            diagnostics = {
-                enable = true,
-                -- experimental = { enable = true },
-            },
-            cargo = {
-                features = 'all',
-                buildScripts = {
+        settings = {
+            ["rust-analyzer"] = {
+                diagnostics = {
                     enable = true,
+                    -- experimental = { enable = true },
                 },
-                -- allFeatures = true,
-                -- loadOutDirsFromCheck = true,
-                -- runBuildScripts = true,
-            },
-            -- Add clippy lints for Rust.
-            -- checkOnSave = {
-            --     allFeatures = true,
-            --     command = "clippy",
-            --     extraArgs = { "--no-deps" }, --, "-A", "clippy::needless_return" },
-            -- },
-            checkOnSave = true,
-            procMacro = {
-                enable = true,
-                ignored = {
-                    ["async-trait"] = { "async_trait" },
-                    ["napi-derive"] = { "napi" },
-                    ["async-recursion"] = { "async_recursion" },
+                cargo = {
+                    features = 'all',
+                    buildScripts = {
+                        enable = true,
+                    },
+                    -- allFeatures = true,
+                    -- loadOutDirsFromCheck = true,
+                    -- runBuildScripts = true,
+                },
+                -- Add clippy lints for Rust.
+                -- checkOnSave = {
+                --     allFeatures = true,
+                --     command = "clippy",
+                --     extraArgs = { "--no-deps" }, --, "-A", "clippy::needless_return" },
+                -- },
+                checkOnSave = true,
+                procMacro = {
+                    enable = true,
+                    ignored = {
+                        ["async-trait"] = { "async_trait" },
+                        ["napi-derive"] = { "napi" },
+                        ["async-recursion"] = { "async_recursion" },
+                    },
+                },
+                check = {
+                    command = "clippy",
+                    extraArgs = { "--no-deps" },
+                    -- overrideCommand = { "cargo", "clippy", "--workspace", "--message-format=json", "--all-targets", "--",
+                    --     "-A", "clippy::needless_return", },
                 },
             },
-            check = {
-                command = "clippy",
-                extraArgs = { "--no-deps" },
-                -- overrideCommand = { "cargo", "clippy", "--workspace", "--message-format=json", "--all-targets", "--",
-                --     "-A", "clippy::needless_return", },
-            },
-        },
+        }
     },
 
     -- gopls = {
@@ -128,39 +351,38 @@ M.servers = {
     -- },
 
     lua_ls = {
-        Lua = {
-            telemetry = { enable = false },
+        settings = {
+            Lua = {
+                telemetry = { enable = false },
 
-            -- hint = { enable = true }, -- TODO: enable inlay hints in nvim >=0.10
+                hint = { enable = true }, -- TODO: enable inlay hints in nvim >=0.10
 
-            runtime = { version = 'LuaJIT' },
+                runtime = { version = 'LuaJIT' },
 
-            -- Make the server aware of Neovim runtime files
-            workspace = {
-                checkThirdParty = false,
-                -- FIXME: undefined global `vim` in certain lua config files
-                -- (config/init.lua, config/after/ftplugin/*.lua, ...)
-                -- see this ?
-                -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
-                --
-                -- library = {
-                --     vim.env.VIMRUNTIME
-                --
-                --     -- Depending on the usage, you might want to add additional paths here.
-                --     -- E.g.: For using `vim.*` functions, add vim.env.VIMRUNTIME/lua.
-                --     -- "${3rd}/luv/library"
-                --     -- "${3rd}/busted/library",
-                -- }
-                --
-                -- -- or pull in all of 'runtimepath'. NOTE: this is a lot slower:
-                --
-                library = vim.api.nvim_get_runtime_file("", true)
+                -- Make the server aware of Neovim runtime files
+                workspace = {
+                    checkThirdParty = false,
+                    -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
+                    --
+                    library = {
+                        vim.env.VIMRUNTIME
+
+                        -- Depending on the usage, you might want to add additional paths here.
+                        -- E.g.: For using `vim.*` functions, add vim.env.VIMRUNTIME/lua.
+                        -- "${3rd}/luv/library"
+                        -- "${3rd}/busted/library",
+                    }
+                    --
+                    -- -- or pull in all of 'runtimepath'. NOTE: this is a lot slower:
+                    --
+                    -- library = vim.api.nvim_get_runtime_file("", true)
+                },
+
+                completion = {
+                    callSnippet = 'Replace',
+                },
             },
-
-            completion = {
-                callSnippet = 'Replace',
-            },
-        },
+        }
     },
 
     bashls = {
@@ -172,14 +394,58 @@ M.servers = {
         },
     },
 
-    jsonls = {},
+    jsonls = {
+        settings = {
+            json = {
+                schemas = {
+                    {
+                        fileMatch = "tsconfig*.json",
+                        url = "https://json.schemastore.org/tsconfig"
+                    },
+                    {
+                        fileMatch = "package.json",
+                        url = "https://json.schemastore.org/package.json"
+                    },
+                    -- {
+                    --     fileMatch = "nest-cli.json",
+                    --     url = "https://json.schemastore.org/nest-cli"
+                    -- },
+                }
+            }
+        }
+    },
 
     -- docker_compose_language_service = {
     --     -- default is 'yaml.docker-compose'
     --     -- filetypes = { 'yaml.docker-compose' },
     -- },
+    angularls = {
+        filetypes = {
+            'angular.html',
+            -- defaults
+            'typescript', 'html', 'typescriptreact', 'typescript.tsx'
+        },
+    },
+
+
+    yamlls = {
+        settings = {
+            redhat = {
+                telemetry = {
+                    enabled = false,
+                }
+            },
+            yaml = {
+                schemas = {
+                    ['.github/workflows/*.{yml,yaml}'] = 'https://json.schemastore.org/github-workflow.json',
+                }
+            }
+        }
+    }
 }
 
+---@param client vim.lsp.Client
+---@param bufnr integer
 function M.on_attach(client, bufnr)
     local map = function(modes, keys, func, desc)
         if desc then
@@ -201,12 +467,25 @@ function M.on_attach(client, bufnr)
     nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
     nmap('<A-Enter>', vim.lsp.buf.code_action, 'Code Action')
 
-    nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-    nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-    nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-    nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-    nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-    nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+
+    local telescope_lsp_options = {
+        layout_strategy = 'vertical',
+        -- layout_config = {
+        -- },
+        fname_width = 70,
+    }
+
+
+    nmap('gd', function() require('telescope.builtin').lsp_definitions(telescope_lsp_options) end, '[G]oto [D]efinition')
+    nmap('gr', function() require('telescope.builtin').lsp_references(telescope_lsp_options) end, '[G]oto [R]eferences')
+    nmap('gI', function() require('telescope.builtin').lsp_implementations(telescope_lsp_options) end,
+        '[G]oto [I]mplementation')
+    nmap('<leader>D', function() require('telescope.builtin').lsp_type_definitions(telescope_lsp_options) end,
+        'Type [D]efinition')
+    nmap('<leader>ds', function() require('telescope.builtin').lsp_document_symbols(telescope_lsp_options) end,
+        '[D]ocument [S]ymbols')
+    nmap('<leader>ws', function() require('telescope.builtin').lsp_dynamic_workspace_symbols(telescope_lsp_options) end,
+        '[W]orkspace [S]ymbols')
 
     -- See `:help K` for why this keymap
     nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -237,16 +516,21 @@ function M.on_attach(client, bufnr)
             buffer = bufnr,
         }
     end
+    if client.supports_method(LSP_METHODS.document_highlight) then
+        vim.api.nvim_create_autocmd('CursorHold', highlight_augroup_opts(vim.lsp.buf.document_highlight))
+        vim.api.nvim_create_autocmd('CursorHoldI', highlight_augroup_opts(vim.lsp.buf.document_highlight))
+        vim.api.nvim_create_autocmd('CursorMoved', highlight_augroup_opts(vim.lsp.buf.clear_references))
+        vim.api.nvim_create_autocmd('CursorMovedI', highlight_augroup_opts(vim.lsp.buf.clear_references))
+    end
 
-    local function trigger_highlight(callback)
-        if client.supports_method('textDocument/documentHighlight') then
-            return highlight_augroup_opts(callback)
+
+    -- Enable inlay hints
+    -- if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+    if client.supports_method(LSP_METHODS.inlay_hint) then
+        if vim.lsp.inlay_hint and type(vim.lsp.inlay_hint.enable) == 'function' then
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
     end
-    vim.api.nvim_create_autocmd("CursorHold", trigger_highlight(vim.lsp.buf.document_highlight))
-    vim.api.nvim_create_autocmd("CursorHoldI", trigger_highlight(vim.lsp.buf.document_highlight))
-    vim.api.nvim_create_autocmd("CursorMoved", trigger_highlight(vim.lsp.buf.clear_references))
-    vim.api.nvim_create_autocmd("CursorMovedI", trigger_highlight(vim.lsp.buf.clear_references))
 end
 
 return M

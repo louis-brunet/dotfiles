@@ -20,17 +20,25 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- NOTE: Here is where you install your plugins.
---  You can configure plugins using the `config` key.
---
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
-require('lazy').setup({
-    -- load plugins from lua/user/plugins
-    { import = 'user.plugins' },
-}, {})
+require('lazy').setup(
+    {
+        -- load plugins from lua/user/lazy-spec
+        { import = 'user.lazy-spec' },
+    },
+    {
+        dev = {
+            path = '~/code',
+            -- patterns = { 'ollouma' },
+        },
+        install = {
+            colorscheme = { 'onedark' },
+        },
+        ui = {
+            backdrop = 100, -- transparent backdrop
+        },
+    }
+)
 
 require('user')
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=4 sts=4 sw=4 et

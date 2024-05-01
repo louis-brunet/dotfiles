@@ -14,8 +14,9 @@ local M = {
 
             -- Document existing key chains
             wk.register {
-                ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
+                -- ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
                 ['<leader>d'] = { name = '[d]ebug', _ = 'which_key_ignore' },
+                ['<leader>q'] = { name = '[q]uickfix', _ = 'which_key_ignore' },
                 ['<leader>r'] = { name = '[r]est-nvim', _ = 'which_key_ignore' },
                 ['<leader>s'] = { name = '[s]earch', _ = 'which_key_ignore' },
                 ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
@@ -31,7 +32,7 @@ local M = {
     {
         -- Add indentation guides even on blank lines
         'lukas-reineke/indent-blankline.nvim',
-        -- Enable `lukas-reineke/indent-blankline.nvim`
+
         -- See `:help indent_blankline.txt`
         event = 'VeryLazy',
         main = 'ibl',
@@ -158,10 +159,20 @@ local M = {
         opts = {},
 
         keys = {
-            { "<leader>st", ":TodoTelescope<CR>", desc = "[S]earch [T]odos" },
+            { "<leader>st", ":TodoTelescope<CR>", desc = "[s]earch [t]odos" },
         },
 
         cmd = { 'TodoQuickfix', 'TodoTelescope' },
+    },
+
+    {
+        'mbbill/undotree',
+
+        cmd = { 'UndotreeToggle' },
+
+        keys = {
+            { '<leader>u', vim.cmd.UndotreeToggle, desc = '[u]ndotree toggle' },
+        },
     },
 }
 

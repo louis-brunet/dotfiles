@@ -11,10 +11,11 @@
   l = log-format-oneline --graph --all
   last = log -n 1 --decorate --stat HEAD
 
+  sw = switch
   co = checkout
   mt = mergetool
   unstage = reset HEAD --
-  alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
+  alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ / | grep --color -E '^[^=]* ='
 
 [push]
 # See `git help config` (search for push.default)

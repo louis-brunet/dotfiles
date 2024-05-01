@@ -8,7 +8,7 @@ local M = {
     -- event = 'VeryLazy',
     dependencies = {
         -- DAP dependencies in lua/user/plugins/dap/*.lua (except init.lua)
-        { import = 'user.plugins.dap' },
+        { import = 'user.lazy-spec.dap' },
     },
     cmd = user_dap_config.dap_cmd,
     keys = user_dap_config.dap_keys,

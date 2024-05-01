@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 set -e
 
@@ -38,5 +38,12 @@ if [ ! -d "$ZSH_AUTOSUGGESTIONS_DIR" ]
 then
     git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_AUTOSUGGESTIONS_DIR"
     echo "✅ downloaded zsh-autosuggestions plugin"
+fi
+
+ZSH_YARN_SUGGESTIONS_DIR="$zsh_custom/plugins/zsh-yarn-completions"
+if [ ! -d "$ZSH_YARN_SUGGESTIONS_DIR" ]
+then
+    git clone https://github.com/chrisands/zsh-yarn-completions "$ZSH_AUTOSUGGESTIONS_DIR"
+    echo "✅ downloaded zsh-yarn-completions"
 fi
 

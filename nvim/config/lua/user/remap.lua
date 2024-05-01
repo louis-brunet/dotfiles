@@ -40,9 +40,14 @@ vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "New tmux session (tmux-sessionizer)" })
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "[F]ormat current buffer" })
 
--- -- Navigate quickfix list (:h quickfix)
--- vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
--- vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
+-- Navigate quickfix list (:h quickfix)
+for _, lhs in ipairs({']q', '<leader>qn'}) do
+    vim.keymap.set("n", lhs, "<cmd>cnext<CR>zz", { desc = "Next [q]uickfix item" })
+end
+for _, lhs in ipairs({'[q', '<leader>qp'}) do
+    vim.keymap.set("n", lhs, "<cmd>cprev<CR>zz", { desc = "Previous [q]uickfix item" })
+end
+vim.keymap.set("n", '<leader>qr', ":cdo s///gc<Left><Left><Left><Left>", { desc = "[q]uickfix search and [r]eplace" })
 
 -- -- Navigate location list (:h location-list)
 -- vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
@@ -51,19 +56,23 @@ vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "[F]ormat current 
 -- exit terminal mode with Esc
 vim.cmd("tnoremap <Esc> <C-\\><C-n>")
 
+-- Close and navigate tabs
 vim.keymap.set("n", "<C-w>Q", vim.cmd.tabclose, { desc = "Close current tab" })
 vim.keymap.set("n", "<M-L>", vim.cmd.tabnext, { desc = "Next tab" })
 vim.keymap.set("n", "<M-H>", vim.cmd.tabprevious, { desc = "Previous tab" })
 
 -- toggle transparent background
-vim.keymap.set({"n", "v"}, "<leader>t", vim.cmd.TransparentToggle, { desc = "Toggle [T]ransparent background" })
+vim.keymap.set({'n', 'v'}, '<leader>t',
+    function() vim.cmd('TransparentToggle') end,
+    { desc = 'Toggle [T]ransparent background' }
+)
 
--- A-Backspace to delele word backwards (C-BS is captured by tmux as C-H)
+-- Alt-Backspace to delele word backwards (C-BS is captured by tmux as C-H)
 vim.keymap.set("i", "<M-BS>", "<C-W>", { desc = "Delete word backwards" })
 
 -- Better indenting
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent right' })
-vim.keymap.set('n', '<', '<<_', { desc = 'Indent left' })
-vim.keymap.set('n', '>', '>>_', { desc = 'Indent right' })
+vim.keymap.set('n', '<', '<<', { desc = 'Indent left' })
+vim.keymap.set('n', '>', '>>', { desc = 'Indent right' })
 

@@ -1,10 +1,12 @@
-#!/bin/bash 
+#!/bin/bash
 
 set -e
 # echo "⚠️  TODO: uncomment nvim install script (commented bc docker ubuntu doesn't support snap)"
 
+sudo apt install make
+
 # $HOME/bin should be in PATH
-nvim_path="$HOME/bin/nvim" 
+nvim_path="$HOME/bin/nvim"
 if [[ ! -x "$nvim_path" ]]; then
     # download latest stable appimage, save it as $HOME/bin/nvim with execution permissions
     echo "🌐 pulling latest stable nvim appimage"
@@ -18,9 +20,9 @@ fi
 if ! nvim --version; then
     sudo apt install libfuse2 -y
     echo "✅ installed libfuse2 to run AppImages"
-else 
+else
     echo "✅ installed nvim"
-fi 
+fi
 
 sudo apt install ripgrep
 rg --version
