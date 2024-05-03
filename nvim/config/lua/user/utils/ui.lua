@@ -2,7 +2,7 @@ local M = {}
 
 ---@param prompt string
 ---@param callbacks { on_accept: fun():nil; on_deny: nil|fun():nil }
-function M.confirm(prompt, callbacks)
+function M.ui_confirm(prompt, callbacks)
     local CHOICES = { yes = 'Yes', no = 'No' }
 
     vim.ui.select(

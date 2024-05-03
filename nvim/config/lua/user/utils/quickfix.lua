@@ -23,18 +23,19 @@ end
 function M.delete_quickfix_current_line(opts)
     opts = opts or {}
     local current_line = vim.api.nvim_win_get_cursor(0)[1]
+
     local function do_delete_qf_item()
         M.delete_quickfix_item(current_line)
         vim.notify('Deleted quickfix item', vim.log.levels.INFO, { title = 'delete_quickfix_current_line' })
     end
 
     if opts.confirm then
-        local confirm = require('user.utils.ui').confirm
+        local ui_confirm = require('user.utils.ui').ui_confirm
         local prompt = 'Delete quickfix item at line ' .. current_line .. '?'
         local callbacks = {
             on_accept = do_delete_qf_item,
         }
-        confirm(prompt, callbacks)
+        ui_confirm(prompt, callbacks)
     else
         do_delete_qf_item()
     end

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e 
+set -e
 
 sudo apt install tmux fzf -y
 fzf --version
