@@ -9,6 +9,7 @@ local fzf_git_config_file="$DOTFILES"/tmux/fzf-git.sh
 local fzf_default_opts=(
     --cycle
     --info inline-right
+    --layout reverse
     --preview-window "right,50%,border-left,<70(up,30%,border-bottom)"
     --color "dark,pointer:red,prompt:bright-blue,bg+:bright-black"
 )

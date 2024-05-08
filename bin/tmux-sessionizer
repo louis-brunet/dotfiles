@@ -6,14 +6,14 @@
 
 set -e
 
+start_tmux() {
+    TERM=tmux-256color tmux -u $@
+}
+
 if ! which tmux >/dev/null 2>/dev/null; then
     echo '[tmux-sessionizer] tmux: not found'
     exit 1
 fi
-
-start_tmux() {
-    TERM=tmux-256color tmux -u $@
-}
 
 local fzf_opts=(
    # --header 'tmux-sessionizer target' 
@@ -21,7 +21,7 @@ local fzf_opts=(
    --filepath-word
    --color 'dark,pointer:red,prompt:bright-blue,bg+:bright-black'
 )
-if which tmux-preview-session >/dev/null; then
+if which tmux-preview-session >/dev/null 2>/dev/null; then
     fzf_opts+=--preview
     fzf_opts+='tmux-preview-session {}'
 fi
@@ -34,7 +34,14 @@ else
     else
         dirs="$PROJECTS"
     fi
-    selected=$(find $dirs -mindepth 1 -maxdepth 1 -type d -not -path '*.git*' | fzf $fzf_opts)
+    find_opts=(
+        $dirs 
+        -mindepth 1 -maxdepth 1 
+        -type d 
+        -not -path '*.git*'
+    )
+    
+    selected=$(find $find_opts | fzf $fzf_opts)
 fi
 if [[ -z $selected ]]; then
     exit 0

@@ -1,4 +1,6 @@
 #!/bin/zsh
+#
+# Usage: tmux-preview-session <dir_path>
 
 fail() {
     echo 'error:' $@
@@ -34,11 +36,11 @@ local ansi_placeholders=(
 
     # ANSI_RED
     # ANSI_GREEN
-    ANSI_YELLOW
+    # ANSI_YELLOW
     ANSI_BLUE
-    ANSI_MAGENTA
+    # ANSI_MAGENTA
     ANSI_WHITE
-    ANSI_BRIGHT_BLACK
+    # ANSI_BRIGHT_BLACK
 
     ANSI_RESET
 )
@@ -78,32 +80,6 @@ replace_placeholders() {
     sed $sed_opts
 }
 
-preview_tmux_session() {
-    local session_name=$1
-    local term_lines=$(tput lines)
-
-    # filters
-    local session_filter="#{==:#{session_name},$session_name}"
-    local pane_filter="$session_filter"
-
-    # ids/names
-    local active_pane=$(tmux list-panes -af "#{&&:$session_filter,#{&&:#{window_active},#{pane_active}}}" -F "#{session_name}:#{window_index}.#{pane_index}")
-
-    # formats
-    local session_format="ANSI_MAGENTA#{session_name}ANSI_DIMANSI_WHITE - Last activity: #{t:session_activity}ANSI_RESET"
-    local window='#{?window_active,ANSI_BOLDANSI_MAGENTA,ANSI_WHITE}#{window_index}ANSI_RESET'
-    local pane='#{?window_active,ANSI_BOLD,}#{?pane_active,ANSI_MAGENTA,ANSI_WHITE}#{pane_current_command}ANSI_RESET'
-    local pane_format="$window.$pane"
-
-    # display preview
-    tmux list-sessions -f "$session_filter" -F "$session_format" | replace_placeholders
-    tmux list-panes -af "$pane_filter" -F "$pane_format" | replace_placeholders
-
-    # echo "activepane=$active_pane pid=$active_pane_pid"
-    tmux capture-pane -Jpet "$active_pane" | head -n $((term_lines / 2))
-    # -F "#(tmux capture-pane -Jpet #{session_name}:#{window_index}.#{pane_index})"
-}
-
 preview_git_status() {
     local dir_name=$1
     local git_opts=(
@@ -115,32 +91,66 @@ preview_git_status() {
         --branch
     )
 
-    git $git_opts status $git_status_opts 2>/dev/null
+    local status_stdout=$(git $git_opts status $git_status_opts 2>/dev/null)
+    if [[ -n "$status_stdout" ]]; then
+        echo "${ANSI_WHITE}Git status:$ANSI_RESET "
+        echo $status_stdout
+        echo
+    fi
+}
+
+preview_tmux_session() {
+    local session_name=$1
+
+    # filters
+    local session_filter="#{==:#{session_name},$session_name}"
+    local pane_filter="$session_filter"
+
+    # ids/names
+    local active_pane=$(tmux list-panes -af "#{&&:$session_filter,#{&&:#{window_active},#{pane_active}}}" -F "#{session_name}:#{window_index}.#{pane_index}")
+
+    # formats
+    local session_format="ANSI_BLUE#{session_name}ANSI_DIMANSI_WHITE - Last activity: #{t:session_activity}ANSI_RESET"
+    local window='#{?window_active,ANSI_BOLDANSI_BLUE,ANSI_WHITE}#{window_index}ANSI_RESET'
+    local pane='#{?window_active,ANSI_BOLD,}#{?pane_active,ANSI_BLUE,ANSI_WHITE}#{pane_current_command}ANSI_RESET'
+    local pane_format="$window.$pane"
+
+    # display preview
+    echo -n "${ANSI_WHITE}Tmux session:$ANSI_RESET "
+    tmux list-sessions -f "$session_filter" -F "$session_format" | replace_placeholders
+    tmux list-panes -af "$pane_filter" -F "$pane_format" | replace_placeholders
+
+    echo
+    echo "${ANSI_WHITE}Active pane:$ANSI_RESET "
+    # local term_lines=$(tput lines)
+    tmux capture-pane -Jpet "$active_pane" #  | head -n $term_lines # $((term_lines / 3))
+    echo
+}
+
+preview_dir() {
+    local eza_opts=(
+        --all
+        --long --no-user --no-permissions --no-time --no-filesize
+        --tree --level 1
+        --git --git-ignore
+        --color=always --icons=always
+    )
+    if ! eza $eza_opts "$dir_name"; then
+        ls -lAh --color=always "$dir_name"
+    fi
 }
 
 preview_tmux_sessionizer_entry() {
     local dir_name=$1
     local session_name=$(basename "$dir_name" | tr . _)
 
+    preview_git_status "$dir_name"
+
     if session_exists "$session_name"; then
         preview_tmux_session "$session_name"
     else
-        local eza_opts=(
-            --all
-            --long --no-user --no-permissions --no-time --no-filesize
-            --tree --level 1
-            --git --git-ignore
-            --color=always --icons=always
-        )
-        if ! eza $eza_opts "$dir_name"; then
-            ls -lAh --color=always "$dir_name"
-        fi
+        preview_dir "$dir_name"
     fi
-
-    echo
-    echo
-
-    preview_git_status "$dir_name"
 }
 
 [[ $# -eq 1 ]] || fail "usage: $0 <dir_path>"
