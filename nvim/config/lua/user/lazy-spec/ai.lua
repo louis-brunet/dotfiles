@@ -7,11 +7,13 @@ local M = {
         event = 'VeryLazy',
 
         keys = {
-            { "<leader>ot", ":Telescope ollouma ", desc = "[o]llouma: [t]elescope" },
+            -- { "<leader>ot", ":Telescope ollouma ",                              desc = "[o]llouma: [t]elescope" },
+            { "<leader>oh", function() require('ollouma').hide_session() end,   desc = "[o]llouma: [h]ide session" },
             { "<leader>or", function() require('ollouma').resume_session() end, desc = "[o]llouma: [r]esume session" },
-            { "<leader>oe", function() require('ollouma').exit_session() end, desc = "[o]llouma: [e]xit session" },
-            { "<leader>oo", ':Ollouma select_action<CR>', desc = "[o]llouma select action" },
-            { "<leader>o", ':Ollouma select_action<CR>', desc = "[o]llouma", mode = 'x' },
+            { "<leader>oe", function() require('ollouma').exit_session() end,   desc = "[o]llouma: [e]xit session" },
+            -- TODO: this API should be more easily accessible in lua
+            { "<leader>oo", ':Ollouma select_action<CR>',                       desc = "[o]llouma select action" },
+            { "<leader>o",  ':Ollouma select_action<CR>',                       desc = "[o]llouma",                  mode = 'x' },
         },
 
         dependencies = {
@@ -22,13 +24,22 @@ local M = {
                 --     telescope.setup(opts)
                 --     telescope.register_extension('ollouma')
                 -- end
-            }
+            },
 
+            'folke/which-key.nvim',
         },
 
         ---@type OlloumaPartialConfig
         opts = {
-            model = 'mistral',
+            model = 'llama3',
+
+            log_level = vim.log.levels.TRACE,
+
+            -- highlights = {
+            --
+            --     -- ['Oll'] = { link = 'Normal' }
+            -- },
+
             -- model_actions = {
             --     {
             --         name = 'test from lazy spec',
@@ -39,9 +50,13 @@ local M = {
             -- },
         },
 
-        -- config = function (_, opts)
-        --     require('ollouma').setup(opts)
-        -- end
+        config = function(_, opts)
+            require('ollouma').setup(opts)
+
+            require('which-key').register {
+                ['<leader>o'] = { name = '[o]llouma', _ = 'which_key_ignore' },
+            }
+        end
     },
 
     -- {
