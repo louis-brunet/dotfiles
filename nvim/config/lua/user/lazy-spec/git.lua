@@ -60,6 +60,7 @@ local M = {
             -- { '<leader>g<Space>', ':Git<Space>',                                              desc = 'Start Fugitive command (:Git )' },
             { '<leader>gg',  ':Git<CR>',                                desc = 'Git status (fugitive)' },
             { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[g]it [m]erge[t]ool' },
+            { '<leader>gdt', function() vim.cmd 'Git difftool -y' end, desc = '[g]it [d]iff[t]ool' },
         },
     },
 
