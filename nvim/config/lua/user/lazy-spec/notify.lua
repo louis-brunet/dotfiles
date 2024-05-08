@@ -7,6 +7,7 @@ return {
     ---@type notify.Config
     opts = {
         fps = 60,
+        stages = 'fade'
 
         -- background_colour = "NotifyBackground",
         -- fps = 30,
