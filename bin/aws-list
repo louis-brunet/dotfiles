@@ -3,13 +3,13 @@
 set -e
 
 CMDS=(
-    'rds describe-db-clusters --query DBClusters[].[DBClusterIdentifier] --output text'
-    'rds describe-db-instances --query DBInstances[].[DBInstanceIdentifier] --output text'
-    'ec2 describe-vpcs --query Vpcs[].[VpcId] --output text'
-    'ec2 describe-subnets --query Subnets[].[SubnetId,VpcId,AvailabilityZone] --output text'
-    's3api list-buckets --query Buckets[].Name --output text'
-    'apigatewayv2 get-apis --query Items[].Name --output text'
-    'lambda list-functions --query Functions[].FunctionName --output text'
+    # 'rds describe-db-clusters --query DBClusters[].[DBClusterIdentifier] --output text'
+    # 'rds describe-db-instances --query DBInstances[].[DBInstanceIdentifier] --output text'
+    # 'ec2 describe-vpcs --query Vpcs[].[VpcId] --output text'
+    # 'ec2 describe-subnets --query Subnets[].[SubnetId,VpcId,AvailabilityZone] --output text'
+    # 's3api list-buckets --query Buckets[].Name --output text'
+    # 'apigatewayv2 get-apis --query Items[].Name --output text'
+    # 'lambda list-functions --query Functions[].FunctionName --output text'
 )
 
 AWS_BIN=aws
