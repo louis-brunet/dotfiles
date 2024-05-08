@@ -4,7 +4,6 @@
 # credit to ThePrimeagen
 # requires the command fzf
 
-# set -x
 set -e
 
 if ! which tmux >/dev/null 2>/dev/null; then
@@ -16,21 +15,16 @@ start_tmux() {
     TERM=tmux-256color tmux -u $@
 }
 
-local fzf_preview_dir='ls -lAh --color=always {}' 
-if which eza >/dev/null 2>/dev/null; then
-    fzf_preview_dir='eza --long --no-user --no-permissions --no-time --no-filesize --tree --level 1 --git --git-ignore --all --color=always --icons=always {}'
-fi
-
 local fzf_opts=(
-   --preview "$fzf_preview_dir"
-   --header 'tmux-sessionizer target' 
-   --info=inline
+   # --header 'tmux-sessionizer target' 
    --keep-right
    --filepath-word
-   --cycle 
-   --border
    --color 'dark,pointer:red,prompt:bright-blue,bg+:bright-black'
 )
+if which tmux-preview-session >/dev/null; then
+    fzf_opts+=--preview
+    fzf_opts+='tmux-preview-session {}'
+fi
 
 if [[ $# -eq 1 ]]; then
     selected=$1

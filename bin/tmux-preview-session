@@ -1,0 +1,147 @@
+#!/bin/zsh
+
+fail() {
+    echo 'error:' $@
+    exit 1
+}
+
+session_exists() {
+    local session_name=$1
+    [[ -z "$session_name" ]] && fail 'session_name is empty'
+
+    local list_sessions_output="$(tmux list-sessions -f '#{==:#{session_name},'"$session_name"'}' 2>/dev/null)"
+
+    [[ -n "$list_sessions_output" ]]
+}
+
+
+local ANSI_BOLD="\x1b[1m" 
+local ANSI_DIM="\x1b[2m" 
+
+local ANSI_RED="\x1b[31m" 
+local ANSI_GREEN="\x1b[32m" 
+local ANSI_YELLOW="\x1b[33m" 
+local ANSI_BLUE="\x1b[34m" 
+local ANSI_MAGENTA="\x1b[35m" 
+local ANSI_WHITE="\x1b[37m" 
+local ANSI_BRIGHT_BLACK="\x1b[90m" 
+
+local ANSI_RESET="\x1b[0m" 
+
+local ansi_placeholders=(
+    ANSI_BOLD
+    ANSI_DIM
+
+    # ANSI_RED
+    # ANSI_GREEN
+    ANSI_YELLOW
+    ANSI_BLUE
+    ANSI_MAGENTA
+    ANSI_WHITE
+    ANSI_BRIGHT_BLACK
+
+    ANSI_RESET
+)
+
+placeholder_to_ansi_escape() {
+    local placeholder=$1
+
+    case "$placeholder" in
+        ANSI_BOLD) echo "$ANSI_BOLD";;
+        ANSI_DIM) echo "$ANSI_DIM";;
+
+        ANSI_RED) echo  "$ANSI_RED";;
+        ANSI_GREEN) echo  "$ANSI_GREEN";;
+        ANSI_YELLOW) echo  "$ANSI_YELLOW";;
+        ANSI_BLUE) echo  "$ANSI_BLUE";;
+        ANSI_MAGENTA) echo  "$ANSI_MAGENTA";;
+        ANSI_WHITE) echo  "$ANSI_WHITE";;
+        ANSI_BRIGHT_BLACK) echo "$ANSI_BRIGHT_BLACK";;
+
+        ANSI_RESET) echo  "$ANSI_RESET";;
+
+        *) echo default
+            fail 'unrecognized placeholder: ' '$placeholder'
+        ;;
+    esac
+}
+
+replace_placeholders() {
+    local sed_opts=(
+    )
+
+    for placeholder in $ansi_placeholders; do
+        sed_opts+=-e
+        sed_opts+="s/$placeholder/$(placeholder_to_ansi_escape "$placeholder")/g"
+    done
+
+    sed $sed_opts
+}
+
+preview_tmux_session() {
+    local session_name=$1
+    local term_lines=$(tput lines)
+
+    # filters
+    local session_filter="#{==:#{session_name},$session_name}"
+    local pane_filter="$session_filter"
+
+    # ids/names
+    local active_pane=$(tmux list-panes -af "#{&&:$session_filter,#{&&:#{window_active},#{pane_active}}}" -F "#{session_name}:#{window_index}.#{pane_index}")
+
+    # formats
+    local session_format="ANSI_MAGENTA#{session_name}ANSI_DIMANSI_WHITE - Last activity: #{t:session_activity}ANSI_RESET"
+    local window='#{?window_active,ANSI_BOLDANSI_MAGENTA,ANSI_WHITE}#{window_index}ANSI_RESET'
+    local pane='#{?window_active,ANSI_BOLD,}#{?pane_active,ANSI_MAGENTA,ANSI_WHITE}#{pane_current_command}ANSI_RESET'
+    local pane_format="$window.$pane"
+
+    # display preview
+    tmux list-sessions -f "$session_filter" -F "$session_format" | replace_placeholders
+    tmux list-panes -af "$pane_filter" -F "$pane_format" | replace_placeholders
+
+    # echo "activepane=$active_pane pid=$active_pane_pid"
+    tmux capture-pane -Jpet "$active_pane" | head -n $((term_lines / 2))
+    # -F "#(tmux capture-pane -Jpet #{session_name}:#{window_index}.#{pane_index})"
+}
+
+preview_git_status() {
+    local dir_name=$1
+    local git_opts=(
+        -C "$dir_name"
+        -c color.status=always
+    )
+    local git_status_opts=(
+        --short
+        --branch
+    )
+
+    git $git_opts status $git_status_opts 2>/dev/null
+}
+
+preview_tmux_sessionizer_entry() {
+    local dir_name=$1
+    local session_name=$(basename "$dir_name" | tr . _)
+
+    if session_exists "$session_name"; then
+        preview_tmux_session "$session_name"
+    else
+        local eza_opts=(
+            --all
+            --long --no-user --no-permissions --no-time --no-filesize
+            --tree --level 1
+            --git --git-ignore
+            --color=always --icons=always
+        )
+        if ! eza $eza_opts "$dir_name"; then
+            ls -lAh --color=always "$dir_name"
+        fi
+    fi
+
+    echo
+    echo
+
+    preview_git_status "$dir_name"
+}
+
+[[ $# -eq 1 ]] || fail "usage: $0 <dir_path>"
+preview_tmux_sessionizer_entry "$1"
