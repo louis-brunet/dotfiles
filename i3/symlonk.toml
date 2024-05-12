@@ -1,0 +1,18 @@
+#:schema ../symlonk-schema.json
+
+[config]
+extends = "../symlonk-config.toml"
+source_dir = "."
+
+[symlinks]
+".config/i3/config" = "config"
+".config/i3/i3blocks.conf" = "i3blocks.conf"
+".config/i3/i3-rofi-system-actions.sh" = "rofi/i3-rofi-system-actions.sh"
+".config/rofi/config.rasi" = "rofi/config.rasi"
+".config/rofi/my-theme.rasi" = "rofi/my-theme.rasi"
+".config/polybar/launch.sh" = "polybar/launch.sh"
+".config/polybar/config.ini" = "polybar/config.ini"
+"Pictures/wallpaper/wallpaper_16x9.jpg" = "wallpaper/wallpaper_16x9.jpg"
+".config/compton.conf" = "compton/compton.conf"
+# TODO: use custom workspace_command in i3 4.23
+# .config/i3/i3bar_workspaces.sh = i3bar_workspaces.sh

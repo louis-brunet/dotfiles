@@ -1,0 +1,5 @@
+#:schema ./symlonk-schema.json
+
+[config]
+source_dir = "."
+destination_dir = "~"
