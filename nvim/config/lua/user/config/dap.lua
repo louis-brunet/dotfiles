@@ -1,48 +1,125 @@
----@class UserDapConfig
-local M = {}
+---@param language string
+---@param dap_configs Configuration[]
+local function set_configs_if_not_defined(language, dap_configs)
+    local dap = require('dap')
+
+    if not dap.configurations[language] then
+        dap.configurations[language] = dap_configs
+    end
+end
+
+
+---@param adapter_key string
+---@param dap_adapter Adapter|fun(callback: fun(adapter:Adapter), config: Configuration)
+local function set_adapter_if_not_defined(adapter_key, dap_adapter)
+    local dap = require('dap')
+
+    if not dap.adapters[adapter_key] then
+        dap.adapters[adapter_key] = dap_adapter
+    end
+end
+
+
+local function config_rust()
+    -- vim.ui.input(input_opts, input_on_confirm)
+    local adapter_key = 'rust_codelldb';
+    set_adapter_if_not_defined(adapter_key, {
+        type = 'server',
+        port = '${port}',
+        host = '127.0.0.1',
+        executable = {
+            -- command = 'codelldb',
+            -- TODO: 💀 Make sure to update this path to point to your installation
+            command = require('mason-registry').get_package('codelldb'):get_install_path()
+                .. '/codelldb',
+            args = {
+                -- '--liblldb', liblldb_path,
+                '--port', '${port}',
+            },
+        },
+    })
+
+    set_configs_if_not_defined('rust', {
+        -- {
+        --     type = adapter_key,
+        --     request = 'launch',
+        --     name = 'TODO: this config (Launch file or smth)',
+        --     -- program = '${file}',
+        --     cwd = '${workspaceFolder}',
+        --     -- args = opts.executable_args or {},
+        --     -- console = 'integratedTerminal',
+        -- },
+
+        {
+            name = 'TODO: config?',
+            type = adapter_key,
+            request = 'launch',
+            cargo = {
+                args = { 'test', '--no-run', '--lib', '--bin' }, -- Cargo command line to build the debug target
+                -- args = { 'build' }, --, "--bin=foo"] is another possibility
+
+                -- The rest are optional
+                -- env = { RUSTFLAGS = '-Clinker=ld.mold' }, -- Extra environment variables.
+                -- problemMatcher = "$rustc",        -- Problem matcher(s) to apply to cargo output.
+                -- filter = {                                 -- Filter applied to compilation artifacts.
+                --     name = "mylib",
+                --     kind = "lib"
+                -- }
+            },
+            cwd = '${workspaceFolder}',
+            -- program = '${workspaceFolder}/target/debug/${file}',
+            program = function()
+                return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+            end,
+            stopOnEntry = false,
+        }
+    })
+end
 
 
 local function config_javascript()
-    local dap = require('dap')
+    local dap_utils = require('dap.utils')
 
-    if not dap.adapters['pwa-node'] then
-        dap.adapters['pwa-node'] = {
-            type = 'server',
-            host = 'localhost',
-            port = '${port}',
-            executable = {
-                command = 'node',
-                -- 💀 Make sure to update this path to point to your installation
-                args = {
-                    require('mason-registry').get_package('js-debug-adapter'):get_install_path()
-                    .. '/js-debug/src/dapDebugServer.js',
-                    '${port}',
-                },
+    local adapter_key = 'pwa-node'
+    ---@type Adapter
+    local js_adapter = {
+        type = 'server',
+        host = 'localhost',
+        port = '${port}',
+        executable = {
+            command = 'node',
+            -- 💀 Make sure to update this path to point to your installation
+            args = {
+                require('mason-registry').get_package('js-debug-adapter'):get_install_path()
+                .. '/js-debug/src/dapDebugServer.js',
+                '${port}',
             },
-        }
-    end
+        },
+    }
+    ---@type Configuration[]
+    local js_configs = {
+        {
+            type = adapter_key,
+            request = 'launch',
+            name = 'Launch file',
+            program = '${file}',
+            cwd = '${workspaceFolder}',
+            console = 'integratedTerminal',
+        },
+        {
+            type = adapter_key,
+            request = 'attach',
+            name = 'Attach',
+            processId = dap_utils.pick_process,
+            cwd = '${workspaceFolder}',
+            console = 'integratedTerminal',
+        },
+    }
 
+
+    set_adapter_if_not_defined(adapter_key, js_adapter)
     for _, language in ipairs({ 'typescript', 'javascript', 'typescriptreact', 'javascriptreact' }) do
-        if not dap.configurations[language] then
-            dap.configurations[language] = {
-                {
-                    type = 'pwa-node',
-                    request = 'launch',
-                    name = 'Launch file',
-                    program = '${file}',
-                    cwd = '${workspaceFolder}',
-                    console = 'integratedTerminal',
-                },
-                {
-                    type = 'pwa-node',
-                    request = 'attach',
-                    name = 'Attach',
-                    processId = require('dap.utils').pick_process,
-                    cwd = '${workspaceFolder}',
-                    console = 'integratedTerminal',
-                },
-            }
-        end
+        set_configs_if_not_defined(language, js_configs)
     end
 end
 
@@ -56,28 +133,6 @@ local icons = {
     LogPoint            = ".>",
 }
 
-
-
----@param config {args?:string[]|fun():string[]?}
-local function get_args(config)
-    local args = type(config.args) == "function" and (config.args() or {}) or config.args or {}
-    config = vim.deepcopy(config)
-
-    ---@cast args string[]
-    config.args = function()
-        local new_args = vim.fn.input("Run with args: ", table.concat(args, " ")) --[[@as string]]
-        return vim.split(vim.fn.expand(new_args) --[[@as string]], " ")
-    end
-    return config
-end
-
-
-
---- Commands used to lazy-load nvim-dap
----@type string[]
-M.dap_cmd = {
-    'DapToggleBreakpoint', 'DapContinue', 'DapShowLog'
-}
 
 ---@class DapUserCommand
 ---@field name string
@@ -106,10 +161,35 @@ local user_cmds = {
     },
 }
 
+
+
+---@param config {args?:string[]|fun():string[]?}
+local function get_args(config)
+    local args = type(config.args) == "function" and (config.args() or {}) or config.args or {}
+    config = vim.deepcopy(config)
+
+    ---@cast args string[]
+    config.args = function()
+        local new_args = vim.fn.input("Run with args: ", table.concat(args, " ")) --[[@as string]]
+        return vim.split(vim.fn.expand(new_args) --[[@as string]], " ")
+    end
+    return config
+end
+
+
+
+
+---@class UserDapConfig
+local M = {}
+
+--- Commands used to lazy-load nvim-dap
+---@type string[]
+M.dap_cmd = {
+    'DapToggleBreakpoint', 'DapContinue', 'DapShowLog'
+}
 for _, user_cmd in ipairs(user_cmds) do
     table.insert(M.dap_cmd, user_cmd.name)
 end
-
 
 
 -- config() for nvim-dap
@@ -131,9 +211,8 @@ function M.dap_config()
 
 
     config_javascript();
+    config_rust();
 end
-
-
 
 --- keymaps used to lazy-load nvim-dap
 ---@type LazyKeysSpec[]
