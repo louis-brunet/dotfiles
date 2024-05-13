@@ -8,8 +8,11 @@ local config = wezterm.config_builder()
 config.default_domain = 'WSL:Ubuntu'
 
 config.font = wezterm.font('MesloLGS NF')
+config.font_size = 11.0
+
 config.color_schemes = require('color_schemes')
 config.color_scheme = require('color_schemes.github_dark_dimmed').color_scheme_name
+
 config.command_palette_bg_color = '#2d333b'
 config.command_palette_fg_color = config.color_schemes[config.color_scheme].foreground
 
