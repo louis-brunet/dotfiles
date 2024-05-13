@@ -141,9 +141,11 @@ return {
             palettes = {
                 all = {
                 },
-                -- github_dark = {},
+                -- github_light = {
+                -- },
             },
 
+            -- :h github-nvim-theme-spec.syntax
             specs = {
                 all = {
                     -- Built-in spec keys
@@ -195,6 +197,8 @@ return {
                         bottom_style = 'underline',
                     },
                 },
+                -- github_light = {
+                -- },
             },
 
             groups = {
@@ -232,6 +236,9 @@ return {
                     -- DiagnosticVirtualTextInfo = { bg = 'none' },
                     -- DiagnosticVirtualTextHint = { bg = 'none' },
                     -- DiagnosticVirtualTextOk = { bg = 'none' },
+                },
+                github_light = {
+                    Delimiter = { fg = 'palette.gray' },
                 },
             },
         },
