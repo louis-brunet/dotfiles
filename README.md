@@ -64,34 +64,31 @@
 <!-- sudo snap install nvim --classic -->
 <!-- ``` -->
 
-## Configuration
+## Getting started
 
-### `symlinks.conf`, `<topic>/symlinks.conf`
+### Prerequisites
+- Tested on Ubuntu 22.04, uses `apt` for package management.
+- Install symlonk for symlink management.
+    ```bash
+    path_to_symlonk=path/to/symlonk/clone/
+    git clone git@github.com:louis-brunet/symlonk.git "$path_to_symlonk"
+    cd "$path_to_symlonk"
+    cargo build --release
 
-These files configure the symlinks to add to the user's home directory. Each line
-contains two relative paths, which can be files or directories, separated by
-a colon (`:`).
+    mkdir ~/bin
+    cp ./target/release/symlonk ~/bin
 
-The first path (source) is relative to this repository's root. The second path
-(destination) is relative to the user's home directory. 
+    # PATH="$HOME/bin:$PATH"
+    ```
 
-A symbolic link will be created at the destination by the bootstrap script (`scripts/bootstrap`). If
-the destination already exists, the script asks the user whether to overwrite
-it.
+### First install
+```bash
+# create symlinks, prompt local git options
+./scripts/bootstrap
 
-Example:
+# run all ./*/install.sh scripts from topic folders
+./scripts/install
 ```
-tmux/my_tmux.conf:.config/tmux/tmux.conf
-nvim:.config/nvim
-```
 
-This configuration will create a file symlink `$HOME/.config/tmux/tmux.conf` and a directory symlink `$HOME/.config/nvim`.
-
-### `<topic>/install.sh`
-
-bash scripts ran by `scripts/install`
-
-## Credit
-
-Most of the dotfile management logic is taken from [Zach Holman's dotfiles](https://github.com/holman/dotfiles/).
-
+## Symlinks
+See [louis-brunet/symlonk](https://github.com:louis-brunet/symlonk) for documentation on managing symlinks.
