@@ -77,13 +77,12 @@
 
     mkdir ~/bin
     cp ./target/release/symlonk ~/bin
-
-    # PATH="$HOME/bin:$PATH"
     ```
 
 ### First install
 ```bash
 # create symlinks, prompt local git options
+# might need PATH="$HOME/bin:$PATH" if zsh and symlinks are not configured yet
 ./scripts/bootstrap
 
 # run all ./*/install.sh scripts from topic folders
