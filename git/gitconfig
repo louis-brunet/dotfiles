@@ -32,7 +32,7 @@
   ui = true
 
 [init]
-  defaultBranch = master
+  defaultBranch = main
 
 [diff]
   tool = nvimdiff
