@@ -90,4 +90,4 @@
 ```
 
 ## Symlinks
-See [louis-brunet/symlonk](https://github.com:louis-brunet/symlonk) for documentation on managing symlinks.
+See [louis-brunet/symlonk](https://github.com/louis-brunet/symlonk) for documentation on managing symlinks.
