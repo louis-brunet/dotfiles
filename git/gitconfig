@@ -58,4 +58,8 @@
   # force layout even if no base
   cmd = nvim -d "$MERGED" "$LOCAL" "$BASE" "$REMOTE" -c 'wincmd J'
 
+# Reuse recorded resolutions automatically on merge/rebase conflict
+[rerere]
+  enabled = true
+
 # vim:ft=git_config:
