@@ -556,7 +556,7 @@ function M.on_attach(client, bufnr)
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
         nmap('<leader>li', function()
-            local is_enabled = vim.lsp.inlay_hint.is_enabled(bufnr)
+            local is_enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
             vim.lsp.inlay_hint.enable(not is_enabled, { bufnr = bufnr })
         end, 'toggle [i]nlay hints')
     end
