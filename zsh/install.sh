@@ -36,6 +36,7 @@ fi
 ZSH_AUTOSUGGESTIONS_DIR="$zsh_custom/plugins/zsh-autosuggestions"
 if [ ! -d "$ZSH_AUTOSUGGESTIONS_DIR" ]
 then
+    echo "could not find dir ${ZSH_AUTOSUGGESTIONS_DIR}, downloading"
     git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_AUTOSUGGESTIONS_DIR"
     echo "✅ downloaded zsh-autosuggestions plugin"
 fi
@@ -43,7 +44,8 @@ fi
 ZSH_YARN_SUGGESTIONS_DIR="$zsh_custom/plugins/zsh-yarn-completions"
 if [ ! -d "$ZSH_YARN_SUGGESTIONS_DIR" ]
 then
-    git clone https://github.com/chrisands/zsh-yarn-completions "$ZSH_AUTOSUGGESTIONS_DIR"
+    echo "could not find dir ${ZSH_YARN_SUGGESTIONS_DIR}, downloading"
+    git clone https://github.com/chrisands/zsh-yarn-completions "$ZSH_YARN_SUGGESTIONS_DIR"
     echo "✅ downloaded zsh-yarn-completions"
 fi
 
