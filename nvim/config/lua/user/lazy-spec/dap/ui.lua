@@ -13,6 +13,7 @@ return {
                     library = { plugins = { 'nvim-dap-ui' }, types = true },
                 },
             },
+            'nvim-neotest/nvim-nio'
         },
 
         -- :h dapui.setup()

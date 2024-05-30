@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ "$LOCAL_ENV" != "neoxia" ]]
+then
+    exit 0
+fi
+
 set -e
 set -x
 

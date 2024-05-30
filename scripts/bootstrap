@@ -28,7 +28,7 @@ success () {
 fail () {
   printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
   echo ''
-  exit
+  exit 1
 }
 
 setup_gitconfig () {
@@ -55,117 +55,134 @@ setup_gitconfig () {
 }
 
 
-link_file () {
-  local src=$1 dst=$2
-
-  local overwrite= backup= skip=
-  local action=
-
-  if [ -f "$dst" ] || [ -d "$dst" ] || [ -L "$dst" ]
-  then
-
-    if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
-    then
-
-      local currentSrc="$(readlink $dst)"
-
-      if [ "$currentSrc" == "$src" ]
-      then
-
-        skip=true;
-
-      else
-
-        user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
-        [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action
-
-        case "$action" in
-          o )
-            overwrite=true;;
-          O )
-            overwrite_all=true;;
-          b )
-            backup=true;;
-          B )
-            backup_all=true;;
-          s )
-            skip=true;;
-          S )
-            skip_all=true;;
-          * )
-            ;;
-        esac
-
-      fi
-
-    fi
-
-    overwrite=${overwrite:-$overwrite_all}
-    backup=${backup:-$backup_all}
-    skip=${skip:-$skip_all}
-
-    if [ "$overwrite" == "true" ]
-    then
-      rm -rf "$dst"
-      success "removed $dst"
-    fi
-
-    if [ "$backup" == "true" ]
-    then
-      mv "$dst" "${dst}.backup"
-      success "moved $dst to ${dst}.backup"
-    fi
-
-    if [ "$skip" == "true" ]
-    then
-      success "skipped $src"
-    fi
-  fi
-
-  if [ "$skip" != "true" ]  # "false" or empty
-  then
-    ln -s "$1" "$2"
-    success "linked $1 to $2"
-  fi
-}
-
-setup_symlinks_with_file () {
-  local config_file="$1"
-  if [ ! -f "$config_file" ] 
-  then 
-    fail "symlink config '$config_file' is not a file"
-  fi
-  info "$config_file"
-
-  local overwrite_all=false backup_all=false skip_all=false
-
-  # read from file descriptor 3 so the loop can prompt and read stdin
-  while read -ru 3 line 
-  do
-    if [ -z "$line" ] || [[ "$line" == \#* ]]
-    then
-      continue
-    fi
-    local symlink_delimiter=":"
-    local src=$DOTFILES_ROOT/${line%"$symlink_delimiter"*}
-    local dst=$HOME/${line#*"$symlink_delimiter"}
-
-    if [ ! -f "$src" ] && [ ! -d "$src" ] 
-    then
-      fail "$config_file: '$src' is not a file or a directory"
-    fi
-    mkdir -p "$(dirname "$dst")"
-
-    link_file "$src" "$dst"
-  done 3< "$config_file"
-}
+# link_file () {
+#   local src=$1 dst=$2
+#
+#   local overwrite= backup= skip=
+#   local action=
+#
+#   if [ -f "$dst" ] || [ -d "$dst" ] || [ -L "$dst" ]
+#   then
+#
+#     if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
+#     then
+#
+#       local currentSrc="$(readlink $dst)"
+#
+#       if [ "$currentSrc" == "$src" ]
+#       then
+#
+#         skip=true;
+#
+#       else
+#
+#         user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
+#         [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
+#         read -n 1 action
+#
+#         case "$action" in
+#           o )
+#             overwrite=true;;
+#           O )
+#             overwrite_all=true;;
+#           b )
+#             backup=true;;
+#           B )
+#             backup_all=true;;
+#           s )
+#             skip=true;;
+#           S )
+#             skip_all=true;;
+#           * )
+#             ;;
+#         esac
+#
+#       fi
+#
+#     fi
+#
+#     overwrite=${overwrite:-$overwrite_all}
+#     backup=${backup:-$backup_all}
+#     skip=${skip:-$skip_all}
+#
+#     if [ "$overwrite" == "true" ]
+#     then
+#       rm -rf "$dst"
+#       success "removed $dst"
+#     fi
+#
+#     if [ "$backup" == "true" ]
+#     then
+#       mv "$dst" "${dst}.backup"
+#       success "moved $dst to ${dst}.backup"
+#     fi
+#
+#     if [ "$skip" == "true" ]
+#     then
+#       success "skipped $src"
+#     fi
+#   fi
+#
+#   if [ "$skip" != "true" ]  # "false" or empty
+#   then
+#     ln -s "$1" "$2"
+#     success "linked $1 to $2"
+#   fi
+# }
+#
+# setup_symlinks_with_file () {
+#   local config_file="$1"
+#   if [ ! -f "$config_file" ] 
+#   then 
+#     fail "symlink config '$config_file' is not a file"
+#   fi
+#   info "$config_file"
+#
+#   local overwrite_all=false backup_all=false skip_all=false
+#
+#   # read from file descriptor 3 so the loop can prompt and read stdin
+#   while read -ru 3 line 
+#   do
+#     if [ -z "$line" ] || [[ "$line" == \#* ]]
+#     then
+#       continue
+#     fi
+#     local symlink_delimiter=":"
+#     local src=$DOTFILES_ROOT/${line%"$symlink_delimiter"*}
+#     local dst=$HOME/${line#*"$symlink_delimiter"}
+#
+#     if [ ! -f "$src" ] && [ ! -d "$src" ] 
+#     then
+#       fail "$config_file: '$src' is not a file or a directory"
+#     fi
+#     mkdir -p "$(dirname "$dst")"
+#
+#     link_file "$src" "$dst"
+#   done 3< "$config_file"
+# }
 
 setup_symlinks () {
-  for symlinks_conf in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -type f -name 'symlinks.conf' -not -path '*.git*')
-  do
-    setup_symlinks_with_file "$symlinks_conf"
-  done
+  # for symlinks_conf in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -type f -name 'symlinks.conf' -not -path '*.git*')
+  # do
+  #   setup_symlinks_with_file "$symlinks_conf"
+  # done
+  
+
+  # install symlonk
+  if ! which symlonk >/dev/null; then 
+    # # install rust if necessary
+    # if ! which cargo >/dev/null 2>/dev/null; then
+    #   echo "cargo not found, installing Rust"
+    #   "$DOTFILES_ROOT"/rust/install.sh
+    #   . "$DOTFILES_ROOT"/rust/path.zsh
+    # fi
+    #
+    # # ...
+    fail "could not find symlonk executable: https://github.com/louis-brunet/symlonk"
+  fi
+
+  # run symlonk
+  symlonk create links "$DOTFILES_ROOT"/*/symlonk.toml --prune --verify
 }
 
 setup_gitconfig

@@ -33,7 +33,7 @@ require('lazy').setup(
             -- patterns = { 'ollouma' },
         },
         install = {
-            colorscheme = { 'onedark' },
+            colorscheme = { require('user.config.theme').colorscheme_name },
         },
         ui = {
             backdrop = 100, -- transparent backdrop

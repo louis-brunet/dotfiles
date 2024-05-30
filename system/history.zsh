@@ -1,6 +1,8 @@
+local hist_size=1000000
+
 export HISTFILE=~/.histfile
-export HISTSIZE=1000
-export SAVEHIST=1000
+export HISTSIZE=$hist_size
+export SAVEHIST=$hist_size
 
 # Ignore duplicates in history
 setopt HIST_EXPIRE_DUPS_FIRST

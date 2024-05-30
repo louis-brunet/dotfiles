@@ -69,7 +69,7 @@ vim.opt.colorcolumn = "80"
 vim.diagnostic.config({
     underline = true,
     severity_sort = true, -- show higher severity diagnostics first
-    -- update_in_insert = true,
+    update_in_insert = true,
 })
 -- override default diagnostic signs
 local signs = {

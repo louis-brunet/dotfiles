@@ -16,7 +16,7 @@ local function codeium_status()
     return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
 end
 
-local colorscheme_name = 'github_dark_dimmed'
+local colorscheme_name = require('user.config.theme').colorscheme_name
 
 ---@type LazySpec
 return {
@@ -64,6 +64,8 @@ return {
     --     end,
     -- },
     {
+        -- FIXME: wrong highlights sometimes (cursor line, column line, indent markers, ...)
+        --   removing ~/.cache/nvim/github-theme/github* and restarting nvim seems to fix this
         'projekt0n/github-nvim-theme',
         dependencies = {
             {
@@ -139,9 +141,11 @@ return {
             palettes = {
                 all = {
                 },
-                -- github_dark = {},
+                -- github_light = {
+                -- },
             },
 
+            -- :h github-nvim-theme-spec.syntax
             specs = {
                 all = {
                     -- Built-in spec keys
@@ -193,6 +197,8 @@ return {
                         bottom_style = 'underline',
                     },
                 },
+                -- github_light = {
+                -- },
             },
 
             groups = {
@@ -231,13 +237,15 @@ return {
                     -- DiagnosticVirtualTextHint = { bg = 'none' },
                     -- DiagnosticVirtualTextOk = { bg = 'none' },
                 },
+                github_light = {
+                    Delimiter = { fg = 'palette.gray' },
+                },
             },
         },
         config = function(_, opts)
             require('github-theme').setup(opts)
             vim.cmd.colorscheme(colorscheme_name);
 
-            -- FIXME: wrong highlights sometimes (cursor line, column line, indent markers, ...)
             vim.api.nvim_create_user_command('TransparentToggle', function()
                 local is_transparent = require('github-theme.config').options.transparent
                 opts.options.transparent = not is_transparent

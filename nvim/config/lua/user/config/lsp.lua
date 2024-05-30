@@ -351,11 +351,25 @@ M.lspconfig_servers = {
     -- },
 
     lua_ls = {
+        ---@class LuaLanguageServerSetting
         settings = {
+            ---@class LuaLanguageServerSettingsLua
             Lua = {
                 telemetry = { enable = false },
 
-                hint = { enable = true }, -- TODO: enable inlay hints in nvim >=0.10
+                hint = {
+                    enable = true,
+
+                    --- assignment operations
+                    setType = true,
+
+                    --- Auto: Only show hint when there is more than 3 items or the table is mixed (indexes and keys)
+                    ---@type 'Enable' | 'Auto' | 'Disable'
+                    arrayIndex = 'Disable',
+
+                    ---@type 'All' | 'Literal' | 'Disable'
+                    paramName = 'Literal',
+                },
 
                 runtime = { version = 'LuaJIT' },
 
@@ -397,14 +411,15 @@ M.lspconfig_servers = {
     jsonls = {
         settings = {
             json = {
+                validate = { enable = true },
                 schemas = {
-                    {
-                        fileMatch = "tsconfig*.json",
-                        url = "https://json.schemastore.org/tsconfig"
-                    },
                     {
                         fileMatch = "package.json",
                         url = "https://json.schemastore.org/package.json"
+                    },
+                    {
+                        fileMatch = { 'tsconfig.json', 'tsconfig.*.json' },
+                        url = "https://json.schemastore.org/tsconfig"
                     },
                     -- {
                     --     fileMatch = "nest-cli.json",
@@ -447,6 +462,10 @@ M.lspconfig_servers = {
 ---@param client vim.lsp.Client
 ---@param bufnr integer
 function M.on_attach(client, bufnr)
+    ---@param modes string[]|string
+    ---@param keys string
+    ---@param func function|string
+    ---@param desc string
     local map = function(modes, keys, func, desc)
         if desc then
             desc = 'LSP: ' .. desc
@@ -455,10 +474,16 @@ function M.on_attach(client, bufnr)
         vim.keymap.set(modes, keys, func, { buffer = bufnr, desc = desc })
     end
 
+    ---@param keys string
+    ---@param func function|string
+    ---@param desc string
     local nmap = function(keys, func, desc)
         map('n', keys, func, desc)
     end
 
+    ---@param keys string
+    ---@param func function|string
+    ---@param desc string
     local imap = function(keys, func, desc)
         map('i', keys, func, desc)
     end
@@ -530,6 +555,10 @@ function M.on_attach(client, bufnr)
         if vim.lsp.inlay_hint and type(vim.lsp.inlay_hint.enable) == 'function' then
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
+        nmap('<leader>li', function()
+            local is_enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+            vim.lsp.inlay_hint.enable(not is_enabled, { bufnr = bufnr })
+        end, 'toggle [i]nlay hints')
     end
 end
 

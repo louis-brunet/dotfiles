@@ -1,0 +1,10 @@
+#:schema ../symlonk-schema.json
+
+[config]
+extends = "../symlonk-config.toml"
+source_dir = "."
+
+[symlinks]
+".gitconfig" = "gitconfig"
+".gitignore" = "gitignore"
+".gitconfig.local" = "gitconfig.local"

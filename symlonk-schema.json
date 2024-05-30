@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "symlinks": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9_./-]+$": {
+          "type": "string",
+          "title": "Maps symlink name to target path relative to the configured source directory.",
+          "description": ""
+        }
+      },
+      "title": "Symlinks",
+      "description": "Object whose keys are symlink names and whose values are symlink target paths."
+    },
+    "$schema": {
+      "type": "string",
+      "title": "JSON schema",
+      "description": "URL or path to the JSON schema used to validate this document."
+    },
+    "config": {
+      "title": "Configuration",
+      "description": "Either a root configuration or a child configuration that inherits default config values from another configuration file.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "destination_dir": {
+              "type": "string",
+              "title": "Symlink destination directory",
+              "description": "Prefix joined with each symlink name"
+            },
+            "source_dir": {
+              "type": "string",
+              "title": "Symlink source directory",
+              "description": "Prefix joined with each symlink target path"
+            }
+          },
+          "required": [
+            "source_dir",
+            "destination_dir"
+          ],
+          "title": "",
+          "description": ""
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extends": {
+              "type": "string",
+              "title": "Parent configuration",
+              "description": "Inherit default configuration values from another configuration file."
+            },
+            "source_dir": {
+              "type": "string",
+              "title": "Symlink source directory",
+              "description": "Prefix joined with each symlink target path"
+            },
+            "destination_dir": {
+              "type": "string",
+              "title": "Symlink destination directory",
+              "description": "Prefix joined with each symlink name"
+            }
+          },
+          "required": [
+            "extends"
+          ],
+          "title": "",
+          "description": ""
+        }
+      ]
+    }
+  },
+  "required": [
+    "config"
+  ],
+  "title": "Symlonk configuration",
+  "description": ""
+}

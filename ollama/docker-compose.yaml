@@ -3,7 +3,7 @@ version: '3'
 services:
   ollama:
     # TODO: update version
-    image: 'ollama/ollama:0.1.29'
+    image: 'ollama/ollama:0.1.34'
     restart: 'no'
     # restart: 'unless-stopped'
     volumes:
