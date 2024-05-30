@@ -28,7 +28,7 @@ local M = {
     --
     --     ---@type OlloumaPartialConfig
     --     opts = {
-    --         model = 'mistral',
+    --         model = 'llama3',
     --         -- model_actions = {
     --         --     {
     --         --         name = 'test from lazy spec',
