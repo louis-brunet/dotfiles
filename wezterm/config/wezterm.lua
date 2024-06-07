@@ -5,6 +5,7 @@ local config = wezterm.config_builder()
 
 -- CONFIG
 
+-- TODO: cross-platform
 config.default_domain = 'WSL:Ubuntu'
 
 config.font = wezterm.font('MesloLGS NF')
@@ -35,6 +36,10 @@ config.window_padding = {
 
 -- config.initial_cols = 100
 -- config.initial_rows = 32
+
+-- Fix error with LSHIFT, LCTRL, etc. jumping forward in neovim (like W) when kanata keyboard remapper is running in WSL+wezterm
+config.allow_win32_input_mode = false
+config.treat_left_ctrlalt_as_altgr = true
 
 
 -- EVENTS

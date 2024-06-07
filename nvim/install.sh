@@ -28,3 +28,13 @@ sudo apt install ripgrep
 rg --version
 echo "✅ installed ripgrep for Telescope"
 
+
+if ! which tree-sitter >/dev/null
+then
+    if which npm >/dev/null
+    then
+        npm install -g tree-sitter-cli
+        echo "✅ installed tree-sitter CLI to install languages (latex) from grammar"
+    fi
+fi
+

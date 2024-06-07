@@ -1,5 +1,39 @@
+local function toggle_auto_pairs()
+    vim.g.minipairs_disable = not vim.g.minipairs_disable
+    if vim.g.minipairs_disable then
+        vim.notify("disabled auto pairs", vim.log.levels.WARN, { title = "mini.pairs" })
+        -- LazyVim.warn("Disabled auto pairs", { title = "Option" })
+    else
+        vim.notify("enabled auto pairs", vim.log.levels.INFO, { title = "mini.pairs" })
+        -- LazyVim.info("Enabled auto pairs", { title = "Option" })
+    end
+end
+
 ---@type LazySpec
 local M = {
+    -- auto pairs
+    {
+        "echasnovski/mini.pairs",
+        event = "VeryLazy",
+        opts = {
+            mappings = {
+                ["`"] = { action = "closeopen", pair = "``", neigh_pattern = "[^\\`].", register = { cr = false } },
+            },
+        },
+        keys = {
+            -- {
+            --     "<leader>mp",
+            --     toggle_auto_pairs,
+            --     desc = "Toggle Auto Pairs",
+            -- },
+        },
+        config = function (_, opts)
+            vim.api.nvim_create_user_command('ToggleAutoPairs', toggle_auto_pairs, { desc = "Toggle Auto Pairs" })
+
+            require('mini.pairs').setup(opts)
+        end
+    },
+
     -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
 
