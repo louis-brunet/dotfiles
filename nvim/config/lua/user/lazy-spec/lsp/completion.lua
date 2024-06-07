@@ -15,6 +15,9 @@ local M = {
             -- Adds LSP signature help
             'hrsh7th/cmp-nvim-lsp-signature-help',
 
+            'hrsh7th/cmp-buffer',
+            'hrsh7th/cmp-path',
+
             -- Adds a number of user-friendly snippets
             'rafamadriz/friendly-snippets',
         },
@@ -75,11 +78,13 @@ local M = {
                         end
                     end, { 'i', 's' }),
                 },
-                sources = {
-                    { name = 'nvim_lsp_signature_help' },
-                    { name = 'nvim_lsp' },
-                    { name = 'luasnip' },
-                },
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp_signature_help" },
+                    { name = "nvim_lsp" },
+                    { name = "path" },
+                }, {
+                    { name = "buffer" },
+                })
             }
         end
     }
