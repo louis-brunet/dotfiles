@@ -110,6 +110,7 @@ return {
             -- local ft_to_parser = require"nvim-treesitter.parsers".filetype_to_parsername
             -- ft_to_parser.ejs = "html"
             vim.treesitter.language.register('html', 'ejs')
+            vim.treesitter.language.register('html', 'handlebars')
 
             vim.treesitter.language.register('angular', 'angular.html')
 

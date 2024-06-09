@@ -276,6 +276,7 @@ M.lspconfig_servers = {
     html = {
         filetypes = {
             'angular.html',
+            'handlebars',
             'html', 'templ',
         },
     },
