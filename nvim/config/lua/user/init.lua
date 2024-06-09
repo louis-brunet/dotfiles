@@ -13,5 +13,5 @@ require('user.autocommands');
 require('user.remap');
 
 -- create new filetype associations
-require('user.detect-filetype')
+require('user.filetype')
 

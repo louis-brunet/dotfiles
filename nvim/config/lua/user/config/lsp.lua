@@ -457,6 +457,14 @@ M.lspconfig_servers = {
                 }
             }
         }
+    },
+
+    terraformls = {
+        init_options = {
+            experimentalFeatures = {
+                prefillRequiredFields = true
+            }
+        }
     }
 }
 

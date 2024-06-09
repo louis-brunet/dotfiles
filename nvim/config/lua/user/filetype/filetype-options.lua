@@ -1,0 +1,59 @@
+--- :h event-args
+---@class VimAucmdCallbackEvent
+---@field id number autocommand id
+---@field event string name of the triggered event
+---@field group number|nil autocommand group id, if any
+---@field match string expanded value of <amatch>
+---@field buf number expanded value of <abuf>
+---@field file string expanded value of <afile>
+---@field data any arbitrary data passed from
+
+
+---@type table<string, fun(opts: VimAucmdCallbackEvent):nil>
+local ft_handlers = {
+    qf = function()
+        vim.keymap.set(
+            'n',
+            '<leader>qd',
+            function()
+                require('user.utils.quickfix').delete_quickfix_current_line({ confirm = false })
+            end,
+            { desc = '[q]uickfix: [d]elete current line', buffer = 0 }
+        )
+        vim.keymap.set(
+            'x',
+            '<leader>qd',
+            function()
+                require('user.utils.quickfix').delete_quickfix_visual({ confirm = false })
+            end,
+            { desc = '[q]uickfix: [d]elete selected lines', buffer = 0 }
+        )
+    end,
+}
+
+local ft_options = {
+    gitcommit = { spell = true, wrap = true },
+    markdown = { spell = true, wrap = true },
+    tex = { spell = true, wrap = true },
+}
+
+local function setup_filetype_options()
+    for filetype, options in pairs(ft_options) do
+        for option_name, option_value in pairs(options) do
+            vim.api.nvim_set_option_value(option_name, option_value, { filetype = filetype })
+        end
+    end
+    for filetype, handler in pairs(ft_handlers) do
+        vim.api.nvim_create_autocmd('FileType', {
+            desc = 'Configure buffer with filetype ' .. filetype,
+
+            pattern = filetype,
+            group = vim.api.nvim_create_augroup('FileType_handler_' .. filetype, { clear = true }),
+            callback = function(_)
+                handler()
+            end,
+        })
+    end
+end
+
+setup_filetype_options()
