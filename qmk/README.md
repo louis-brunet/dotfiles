@@ -9,7 +9,7 @@ QMK_HOME="${PROJECTS:-$HOME/code}"
 QMK_KEYBOARD_NAME=keychron/k6_pro/iso/rgb
 QMK_KEYMAP_NAME=louis-brunet
 
-qmk new-keymap -kb "$QMK_KEYBOARD_NAME" -km "$QMK_KEYMAP_NAME"
+qmk new-keymap --keyboard "$QMK_KEYBOARD_NAME" --keymap "$QMK_KEYMAP_NAME"
 nvim "${QMK_HOME}/qmk_firmware/keyboards/${QMK_KEYBOARD_NAME}/keymaps/${QMK_KEYMAP_NAME}/"
 ```
 
@@ -24,7 +24,8 @@ nvim "${QMK_HOME}/qmk_firmware/keyboards/${QMK_KEYBOARD_NAME}/keymaps/${QMK_KEYM
 ## Build firmware
 
 ```bash
-qmk compile [-kb <keyboard>] [-km <keymap>]
+# generate .build/<keyboard>_<keymap>.bin
+qmk compile [--keyboard <keyboard>] [--keymap <keymap>]
 ```
 
 ## Flash firmware
@@ -35,5 +36,5 @@ Need [QMK Toolbox](https://docs.qmk.fm/newbs_flashing#flashing-your-keyboard-wit
 ### Command line - Linux (& Mac ?) only
 
 ```bash
-qmk flash [-kb <keyboard>] [-km <keymap>]
+qmk flash [--keyboard <keyboard>] [--keymap <keymap>]
 ```
