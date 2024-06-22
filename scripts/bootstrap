@@ -178,7 +178,7 @@ setup_symlinks () {
     # fi
     #
     # # ...
-    fail "could not find symlonk executable: https://github.com/louis-brunet/symlonk"
+    fail "could not find symlonk executable: install https://github.com/louis-brunet/symlonk"
   fi
 
   # run symlonk
