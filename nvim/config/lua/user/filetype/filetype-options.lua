@@ -35,17 +35,27 @@ local ft_options = {
     gitcommit = { spell = true, wrap = true },
     markdown = { spell = true, wrap = true },
     tex = { spell = true, wrap = true },
+    ['terraform-vars'] = { commentstring = '#%s' },
 }
 
 local function setup_filetype_options()
     for filetype, options in pairs(ft_options) do
-        for option_name, option_value in pairs(options) do
-            vim.api.nvim_set_option_value(option_name, option_value, { filetype = filetype })
-        end
+        vim.api.nvim_create_autocmd('FileType', {
+            desc = 'Configure buffer options for filetype ' .. filetype,
+
+            pattern = filetype,
+            group = vim.api.nvim_create_augroup('FileType_options_' .. filetype, { clear = true }),
+            callback = function(_)
+                for option_name, option_value in pairs(options) do
+                    vim.api.nvim_set_option_value(option_name, option_value, { scope = 'local' })
+                end
+            end,
+        })
     end
+
     for filetype, handler in pairs(ft_handlers) do
         vim.api.nvim_create_autocmd('FileType', {
-            desc = 'Configure buffer with filetype ' .. filetype,
+            desc = 'Execute configuration handler for buffer with filetype ' .. filetype,
 
             pattern = filetype,
             group = vim.api.nvim_create_augroup('FileType_handler_' .. filetype, { clear = true }),

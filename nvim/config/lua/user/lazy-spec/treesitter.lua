@@ -118,6 +118,8 @@ return {
 
             vim.treesitter.language.register('angular', 'angular.html')
 
+            -- vim.treesitter.language.register('terraform-vars', 'terraform')
+
             -- vim.treesitter.language.register('http', 'httpResult')
         end
     },

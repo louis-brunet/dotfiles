@@ -52,6 +52,7 @@ vim.opt.expandtab = true
 vim.opt.smartindent = true
 
 vim.opt.wrap = false
+vim.opt.spell = false
 
 vim.opt.swapfile = false
 vim.opt.backup = false
