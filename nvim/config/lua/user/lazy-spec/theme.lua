@@ -96,13 +96,14 @@ return {
 
         lazy = false,
         priority = 1000,
+        ---@type GhTheme.Config
         opts = {
             options = {
                 transparent = false,
 
                 darken = {
                     sidebars = {
-                        enabled = false,
+                        enable = false,
                     },
                 },
 
@@ -134,7 +135,7 @@ return {
                 },
 
                 styles = {
-                    -- comments = 'italic',
+                    comments = 'italic',
                 },
             },
 
@@ -171,28 +172,28 @@ return {
                     cursor_line = {
                         bg = 'neutral.subtle',
                         number_fg = 'yellow.bright',
-                        number_style = 'bold',
+                        -- number_style = 'bold',
                     },
                     elevated = {
                         bg = 'canvas.overlay',
                     },
+                    elevated_bg = 'canvas.overlay',
                     fugitive = {
                         header_fg = 'gray.bright',
                         hash_fg = 'gray.bright',
                     },
                     lsp = {
                         inlay_hint_bg = 'none',
-                        inlay_hint_style = 'italic',
+                        -- FIXME: since update to v1.0, cant' reference styles or colors like this in "groups":  `{ style = 'lsp.inlay_hint_style' }`
+                        -- inlay_hint_style = 'italic',
                         document_highlight_read_bg = 'accent.subtle',
                         document_highlight_write_bg = 'accent.subtle',
                     },
                     nvim_tree = {
                         bg = 'none',
                         indent_marker_fg = 'neutral.muted',
-                        -- modified_fg = 'gray.bright',
                     },
                     treesitter_context = {
-                        -- bg = 'bg',
                         bottom_sp = 'gray',
                         bottom_style = 'underline',
                     },
@@ -203,31 +204,31 @@ return {
 
             groups = {
                 all = {
-                    ColorColumn = { bg = 'color_column.bg' },
-                    CursorLine = { bg = 'cursor_line.bg' },
-                    CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
-                    fugitiveHash = { fg = 'fugitive.hash_fg' },
-                    fugitiveHeader = { fg = 'fugitive.header_fg' },
+                    ColorColumn = { bg = 'palette.color_column.bg' },
+                    CursorLine = { bg = 'palette.cursor_line.bg' },
+                    CursorLineNr = { style = 'bold', fg = 'palette.cursor_line.number_fg' },
+                    fugitiveHash = { fg = 'palette.fugitive.hash_fg' },
+                    fugitiveHeader = { fg = 'palette.fugitive.header_fg' },
                     fugitiveStagedHeading = { fg = 'git.add' },
                     fugitiveUnstagedHeading = { fg = 'git.changed' },
                     IblIndent = { fg = 'palette.neutral.subtle' },
                     IblScope = { fg = 'palette.accent.muted' },
-                    LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'lsp.inlay_hint_style' },
-                    LspReferenceText = { bg = 'lsp.document_highlight_read_bg' },
-                    LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
-                    LspReferenceWrite = { bg = 'lsp.document_highlight_write_bg', style = 'italic' },
+                    LspInlayHint = { fg = 'fg3', bg = 'palette.lsp.inlay_hint_bg', style = 'italic' },
+                    LspReferenceText = { bg = 'palette.lsp.document_highlight_read_bg' },
+                    LspReferenceRead = { bg = 'palette.lsp.document_highlight_read_bg' },
+                    LspReferenceWrite = { bg = 'palette.lsp.document_highlight_write_bg', style = 'italic' },
                     LspSignatureActiveParameter = { style = 'bold,underline' },
-                    FloatBorder = { fg = 'palette.accent.muted', bg = 'elevated.bg' },
-                    NormalFloat = { bg = 'elevated.bg' },
-                    NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
-                    -- NvimTreeModifiedIcon = { fg = 'nvim_tree.modified_fg' },
-                    NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
-                    NvimTreeNormal = { bg = 'nvim_tree.bg' },
-                    NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
+                    FloatBorder = { fg = 'palette.accent.muted', bg = 'palette.elevated_bg' },
+                    NormalFloat = { bg = 'palette.elevated_bg' },
+                    NvimTreeIndentMarker = { fg = 'palette.nvim_tree.indent_marker_fg' },
+                    -- NvimTreeModifiedIcon = { fg = 'palette.nvim_tree.modified_fg' },
+                    NvimTreeEndOfBuffer = { bg = 'palette.nvim_tree.bg' },
+                    NvimTreeNormal = { bg = 'palette.nvim_tree.bg' },
+                    NvimTreeVertSplit = { bg = 'palette.nvim_tree.bg' },
                     TabLineSel = { bg = '#31353f', fg = '#999999' },
                     TabLine = { bg = '#31353f', fg = '#555555' },
-                    TelescopeNormal = { bg = 'elevated.bg' },
-                    WhichKeyFloat = { bg = 'elevated.bg' },
+                    TelescopeNormal = { bg = 'palette.elevated_bg' },
+                    WhichKeyFloat = { bg = 'palette.elevated_bg' },
                     -- TelescopePreviewNormal = { bg = 'bg1' },
                     -- TreesitterContext = { bg = 'none' },
                     -- TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
@@ -242,6 +243,8 @@ return {
                 },
             },
         },
+
+        ---@param opts GhTheme.Config
         config = function(_, opts)
             require('github-theme').setup(opts)
             vim.cmd.colorscheme(colorscheme_name);
