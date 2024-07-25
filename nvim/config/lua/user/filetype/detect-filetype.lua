@@ -8,7 +8,10 @@ vim.filetype.add({
         http = 'http',
     },
     pattern = {
-        ['.*%.component%.html'] = "angular.html",
+        ['.*%.component%.html'] = 'angular.html',
+
+        ['%.env'] = 'sh',
+        ['%.env%..*'] = 'sh',
     },
 })
 
