@@ -27,7 +27,7 @@ local M = {
             --     desc = "Toggle Auto Pairs",
             -- },
         },
-        config = function (_, opts)
+        config = function(_, opts)
             vim.api.nvim_create_user_command('ToggleAutoPairs', toggle_auto_pairs, { desc = "Toggle Auto Pairs" })
 
             require('mini.pairs').setup(opts)
@@ -47,19 +47,32 @@ local M = {
             wk.setup(opts)
 
             -- Document existing key chains
-            wk.register {
-                -- ['<leader>c'] = { name = '[c]ode', _ = 'which_key_ignore' },
-                ['<leader>d'] = { name = '[d]ebug', _ = 'which_key_ignore' },
-                ['<leader>q'] = { name = '[q]uickfix', _ = 'which_key_ignore' },
-                ['<leader>r'] = { name = '[r]est-nvim', _ = 'which_key_ignore' },
-                ['<leader>s'] = { name = '[s]earch', _ = 'which_key_ignore' },
-                ['<leader>w'] = { name = '[w]orkspace', _ = 'which_key_ignore' },
-                ['<leader>H'] = { name = '[H]arpoon', _ = 'which_key_ignore' },
+            wk.add({
+                { "<leader>H",   group = "[H]arpoon" },
+                { "<leader>H_",  hidden = true },
 
-                ['<leader>g'] = { name = '[g]it', _ = 'which_key_ignore' },
-                ['<leader>gm'] = { name = '[m]erge', _ = 'which_key_ignore' },
-                ['<leader>gh'] = { name = '[h]unk', _ = 'which_key_ignore' },
-            }
+                { "<leader>d",   group = "[d]ebug" },
+                { "<leader>d_",  hidden = true },
+
+                { "<leader>g",   group = "[g]it" },
+                { "<leader>g_",  hidden = true },
+                { "<leader>gh",  group = "[h]unk" },
+                { "<leader>gh_", hidden = true },
+                { "<leader>gm",  group = "[m]erge" },
+                { "<leader>gm_", hidden = true },
+
+                { "<leader>q",   group = "[q]uickfix" },
+                { "<leader>q_",  hidden = true },
+
+                { "<leader>r",   group = "[r]est-nvim" },
+                { "<leader>r_",  hidden = true },
+
+                { "<leader>s",   group = "[s]earch" },
+                { "<leader>s_",  hidden = true },
+
+                { "<leader>w",   group = "[w]orkspace" },
+                { "<leader>w_",  hidden = true },
+            })
         end
     },
 
