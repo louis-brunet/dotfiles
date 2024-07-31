@@ -1,4 +1,0 @@
-[*.kbd]
-trim_trailing_whitespace = true
-charset = utf-8
-tab_width = 2
