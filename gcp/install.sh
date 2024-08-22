@@ -14,9 +14,9 @@ set -x
 # }
 
 # Install gcloud CLI
-if ! which gcloud >/dev/null; then
-    sudo apt-get update
-    sudo apt-get install apt-transport-https ca-certificates gnupg curl
+if ! which gcloud; then
+    sudo apt-get update -y
+    sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
 
     # Import the Google Cloud public key
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor --yes -o /usr/share/keyrings/cloud.google.gpg
