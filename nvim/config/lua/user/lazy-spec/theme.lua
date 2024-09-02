@@ -96,13 +96,14 @@ return {
 
         lazy = false,
         priority = 1000,
+        ---@type GhTheme.Config
         opts = {
             options = {
                 transparent = false,
 
                 darken = {
                     sidebars = {
-                        enabled = false,
+                        enable = false,
                     },
                 },
 
@@ -134,7 +135,7 @@ return {
                 },
 
                 styles = {
-                    -- comments = 'italic',
+                    comments = 'italic',
                 },
             },
 
@@ -146,102 +147,165 @@ return {
             },
 
             -- :h github-nvim-theme-spec.syntax
+            -- specs = {
+            --     all = {
+            --         -- Built-in spec keys
+            --         git = {
+            --             -- changed = 'blue.bright',
+            --         },
+            --         syntax = {
+            --             -- ibl = {
+            --             --     indent = {
+            --             --         char = {
+            --             --             'red',
+            --             --         }
+            --             --     }
+            --             -- },
+            --             -- string = 'green.bright',
+            --         },
+            --         -- diag = {}, diag_bg = {}, diff = {},
+            --
+            --         -- Custom spec keys
+            --         color_column = {
+            --             bg = 'neutral.subtle',
+            --         },
+            --         cursor_line = {
+            --             bg = 'neutral.subtle',
+            --             number_fg = 'yellow.bright',
+            --             -- number_style = 'bold',
+            --         },
+            --         elevated = {
+            --             -- bg = 'scale.gray[9]',
+            --             -- bg = 'canvas.overlay',
+            --             bg = 'black.bright',
+            --         },
+            --         -- elevated_bg = 'black',
+            --         fugitive = {
+            --             header_fg = 'gray.bright',
+            --             hash_fg = 'gray.bright',
+            --         },
+            --         lsp = {
+            --             inlay_hint_bg = 'none',
+            --             -- FIXME: since update to v1.0, cant' reference styles or colors like this in "groups":  `{ style = 'lsp.inlay_hint_style' }`
+            --             -- inlay_hint_style = 'italic',
+            --             document_highlight_read_bg = 'accent.subtle',
+            --             document_highlight_write_bg = 'accent.subtle',
+            --         },
+            --         nvim_tree = {
+            --             bg = 'none',
+            --             indent_marker_fg = 'neutral.muted',
+            --         },
+            --         treesitter_context = {
+            --             bottom_sp = 'gray',
+            --             bottom_style = 'underline',
+            --         },
+            --     },
+            --     -- github_light = {
+            --     -- },
+            -- },
+            --
+            -- groups = {
+            --     all = {
+            --         ColorColumn = { bg = 'color_column.bg' },
+            --         CursorLine = { bg = 'cursor_line.bg' },
+            --         CursorLineNr = { style = 'bold', fg = 'cursor_line.number_fg' },
+            --         fugitiveHash = { fg = 'fugitive.hash_fg' },
+            --         fugitiveHeader = { fg = 'fugitive.header_fg' },
+            --         fugitiveStagedHeading = { fg = 'git.add' },
+            --         fugitiveUnstagedHeading = { fg = 'git.changed' },
+            --         IblIndent = { fg = 'palette.neutral.subtle' },
+            --         IblScope = { fg = 'palette.accent.muted' },
+            --         LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'italic' },
+            --         LspReferenceText = { bg = 'lsp.document_highlight_read_bg' },
+            --         LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
+            --         LspReferenceWrite = { bg = 'lsp.document_highlight_write_bg', style = 'italic' },
+            --         LspSignatureActiveParameter = { style = 'bold,underline' },
+            --         FloatBorder = { fg = 'palette.accent.muted', bg = 'elevated.bg' },
+            --         -- NormalFloat = { bg = 'elevated.bg' },
+            --         NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
+            --         -- NvimTreeModifiedIcon = { fg = 'palette.nvim_tree.modified_fg' },
+            --         NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
+            --         NvimTreeNormal = { bg = 'nvim_tree.bg' },
+            --         NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
+            --         TabLineSel = { bg = '#31353f', fg = '#999999' },
+            --         TabLine = { bg = '#31353f', fg = '#555555' },
+            --         -- TelescopeNormal = { bg = 'elevated.bg' },
+            --         -- WhichKeyFloat = { bg = 'elevated.bg' },
+            --
+            --         -- TelescopePreviewNormal = { bg = 'bg1' },
+            --         -- TreesitterContext = { bg = 'none' },
+            --         -- TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
+            --         -- DiagnosticVirtualTextError = { bg = 'palette.danger.muted', fg ='palette.danger.fg' },
+            --         -- DiagnosticVirtualTextWarn = { bg = 'none' },
+            --         -- DiagnosticVirtualTextInfo = { bg = 'none' },
+            --         -- DiagnosticVirtualTextHint = { bg = 'none' },
+            --         -- DiagnosticVirtualTextOk = { bg = 'none' },
+            --     },
+            --     github_light = {
+            --         Delimiter = { fg = 'palette.gray' },
+            --     },
+            -- },
+
             specs = {
                 all = {
-                    -- Built-in spec keys
                     git = {
                         -- changed = 'blue.bright',
                     },
-                    syntax = {
-                        -- ibl = {
-                        --     indent = {
-                        --         char = {
-                        --             'red',
-                        --         }
-                        --     }
-                        -- },
-                        -- string = 'green.bright',
-                    },
-                    -- diag = {}, diag_bg = {}, diff = {},
-
                     -- Custom spec keys
-                    color_column = {
-                        bg = 'neutral.subtle',
-                    },
-                    cursor_line = {
-                        bg = 'neutral.subtle',
-                        number_fg = 'yellow.bright',
-                        number_style = 'bold',
-                    },
-                    elevated = {
-                        bg = 'canvas.overlay',
-                    },
+                    -- color_column = {
+                    --     bg = 'neutral.subtle',
+                    -- },
+                    -- color_column_bg = 'neutral',
+                    -- color_column_bg = 'neutral.subtle',
+
                     fugitive = {
-                        header_fg = 'gray.bright',
-                        hash_fg = 'gray.bright',
+                        -- header_fg = 'gray.bright',
+                        -- hash_fg = 'gray.bright',
                     },
                     lsp = {
                         inlay_hint_bg = 'none',
-                        inlay_hint_style = 'italic',
-                        document_highlight_read_bg = 'accent.subtle',
-                        document_highlight_write_bg = 'accent.subtle',
+                        -- FIXME: since update to v1.0, can't reference styles or colors like this in "groups":  `{ style = 'lsp.inlay_hint_style' }`
+                        -- inlay_hint_style = 'italic',
+                        --
+                        -- FIXME: since update to v1.0, can't palette values in spec
+                        -- document_highlight_read_bg = 'accent.subtle',
+                        -- document_highlight_write_bg = 'accent.subtle',
                     },
                     nvim_tree = {
                         bg = 'none',
-                        indent_marker_fg = 'neutral.muted',
-                        -- modified_fg = 'gray.bright',
+                        -- indent_marker_fg = 'neutral.muted',
                     },
-                    treesitter_context = {
-                        -- bg = 'bg',
-                        bottom_sp = 'gray',
-                        bottom_style = 'underline',
-                    },
-                },
-                -- github_light = {
-                -- },
+                }
             },
 
             groups = {
                 all = {
-                    ColorColumn = { bg = 'color_column.bg' },
-                    CursorLine = { bg = 'cursor_line.bg' },
-                    CursorLineNr = { style = 'cursor_line.number_style', fg = 'cursor_line.number_fg' },
-                    fugitiveHash = { fg = 'fugitive.hash_fg' },
-                    fugitiveHeader = { fg = 'fugitive.header_fg' },
+                    fugitiveHash = { fg = 'palette.gray.bright' },
+                    fugitiveHeader = { fg = 'palette.gray.bright' },
+                    -- fugitiveHash = { fg = 'fugitive.hash_fg' },
+                    -- fugitiveHeader = { fg = 'fugitive.header_fg' },
                     fugitiveStagedHeading = { fg = 'git.add' },
                     fugitiveUnstagedHeading = { fg = 'git.changed' },
                     IblIndent = { fg = 'palette.neutral.subtle' },
                     IblScope = { fg = 'palette.accent.muted' },
-                    LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'lsp.inlay_hint_style' },
-                    LspReferenceText = { bg = 'lsp.document_highlight_read_bg' },
-                    LspReferenceRead = { bg = 'lsp.document_highlight_read_bg' },
-                    LspReferenceWrite = { bg = 'lsp.document_highlight_write_bg', style = 'italic' },
+                    LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'italic' },
+                    LspReferenceText = { bg = 'palette.accent.subtle' },
+                    LspReferenceRead = { bg = 'palette.accent.subtle' },
+                    LspReferenceWrite = { bg = 'palette.accent.subtle', style = 'italic' },
                     LspSignatureActiveParameter = { style = 'bold,underline' },
-                    FloatBorder = { fg = 'palette.accent.muted', bg = 'elevated.bg' },
-                    NormalFloat = { bg = 'elevated.bg' },
-                    NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
-                    -- NvimTreeModifiedIcon = { fg = 'nvim_tree.modified_fg' },
+                    NvimTreeIndentMarker = { fg = 'palette.neutral.muted' },
+                    -- NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
+                    -- NvimTreeModifiedIcon = { fg = 'palette.nvim_tree.modified_fg' },
                     NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
                     NvimTreeNormal = { bg = 'nvim_tree.bg' },
                     NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
                     TabLineSel = { bg = '#31353f', fg = '#999999' },
                     TabLine = { bg = '#31353f', fg = '#555555' },
-                    TelescopeNormal = { bg = 'elevated.bg' },
-                    WhichKeyFloat = { bg = 'elevated.bg' },
-                    -- TelescopePreviewNormal = { bg = 'bg1' },
-                    -- TreesitterContext = { bg = 'none' },
-                    -- TreesitterContextBottom = { style = 'treesitter_context.bottom_style', sp = 'treesitter_context.bottom_sp' },
-                    -- DiagnosticVirtualTextError = { bg = 'palette.danger.muted', fg ='palette.danger.fg' },
-                    -- DiagnosticVirtualTextWarn = { bg = 'none' },
-                    -- DiagnosticVirtualTextInfo = { bg = 'none' },
-                    -- DiagnosticVirtualTextHint = { bg = 'none' },
-                    -- DiagnosticVirtualTextOk = { bg = 'none' },
-                },
-                github_light = {
-                    Delimiter = { fg = 'palette.gray' },
-                },
-            },
+                }
+            }
         },
+
+        ---@param opts GhTheme.Config
         config = function(_, opts)
             require('github-theme').setup(opts)
             vim.cmd.colorscheme(colorscheme_name);

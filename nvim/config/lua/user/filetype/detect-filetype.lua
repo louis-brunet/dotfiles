@@ -4,11 +4,14 @@ vim.filetype.add({
         ['docker-compose.yaml'] = 'yaml.docker-compose',
     },
     extension = {
-        tfvars = 'terraform',
+        -- tfvars = 'terraform',
         http = 'http',
     },
     pattern = {
-        ['.*%.component%.html'] = "angular.html",
+        ['.*%.component%.html'] = 'angular.html',
+
+        ['%.env'] = 'sh',
+        ['%.env%..*'] = 'sh',
     },
 })
 

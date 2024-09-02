@@ -119,7 +119,14 @@ local M = {}
 M.lspconfig_servers = {
     -- clangd = {},
     -- gopls = {},
-    -- pyright = {},
+    pyright = {
+        settings = {
+            python = {
+                venv = '.venv'
+            }
+        }
+    },
+
     tsserver = {
         -- filetypes = {
         --     'angular.html',
@@ -465,7 +472,18 @@ M.lspconfig_servers = {
                 prefillRequiredFields = true
             }
         }
-    }
+    },
+
+    eslint = {
+        settings = {
+            eslint = {
+                runtime = 'node',
+
+                -- FIXME: seems to not work like I thought (like NODE_OPTIONS=--max_old_space_size=4096)
+                execArgv = {'--max_old_space_size=4096'}
+            }
+        }
+    },
 }
 
 ---@param client vim.lsp.Client

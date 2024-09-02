@@ -84,6 +84,9 @@ load_ohmyzsh() {
       # npm
       nvm
       rust
+      python
+      # poetry
+      pyenv
 
       # custom plugins (added in $ZSH_CUSTOM/plugins)
       zsh-autosuggestions
