@@ -307,8 +307,8 @@ bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%- # decr
 # Monitor config generated with arandr GUI (`apt install arandr`)
 # exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
 
-# exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
-exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --off --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+# exec --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+exec --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 1920x230 --rotate normal
 
 # to move workspace to other display (from terminal)
 # i3-msg move workspace to output left
@@ -328,7 +328,7 @@ exec --no-startup-id nm-applet
 
 # Monitor config generated with arandr GUI (`apt install arandr`)
 # exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
-exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
+# exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 
 # background wallpaper 
 exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
