@@ -287,17 +287,16 @@ M.lspconfig_servers = {
             'html', 'templ',
         },
     },
-    -- TODO: how to configure tailwind to attach to .pug files ?
-    -- tailwindcss = {
-    --     filetypes = {'html', 'css', 'javascript', 'typescript', 'tsx', 'pug'},
-    --     tailwindCSS = {
-    --         emmetCompletions = true,
-    --         includeLanguages = {
-    --             pug = 'html',
-    --             -- plaintext = 'html',
-    --         },
-    --     },
-    -- },
+    tailwindcss = {
+        filetypes = {'html', 'css', 'tsx', 'angular.html' }, --, 'javascript', 'typescript', 'tsx', 'pug'},
+        tailwindCSS = {
+            emmetCompletions = true,
+            -- includeLanguages = {
+            --     pug = 'html',
+            --     -- plaintext = 'html',
+            -- },
+        },
+    },
 
     rust_analyzer = {
 
@@ -479,7 +478,7 @@ M.lspconfig_servers = {
             eslint = {
                 runtime = 'node',
 
-                -- FIXME: seems to not work like I thought (like NODE_OPTIONS=--max_old_space_size=4096)
+                -- FIXME: seems to not work like I thought (like NODE_OPTIONS=--max_old_space_size=4096) -- for big files
                 execArgv = {'--max_old_space_size=4096'}
             }
         }
