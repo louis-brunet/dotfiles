@@ -16,5 +16,10 @@ PYENV_PLUGIN_VIRTUALENV="$PYENV_PLUGINS/pyenv-virtualenv"
     git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
 }
 
-[[ -d "$PYENV_PLUGIN_VIRTUALENV" ]] || git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_PLUGIN_VIRTUALENV"
+[[ -d "$PYENV_PLUGIN_VIRTUALENV" ]] || {
+    git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_PLUGIN_VIRTUALENV"
+}
 
+which poetry || {
+    curl -sSL https://install.python-poetry.org | python3 -
+}
