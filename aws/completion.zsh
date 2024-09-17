@@ -1,4 +1,5 @@
-[[ "$LOCAL_ENV" != "neoxia" ]] || {
+# [[ "$LOCAL_ENV" != "neoxia" ]] ||
+{
     # aws
     complete -C '/usr/local/bin/aws_completer' aws
 
