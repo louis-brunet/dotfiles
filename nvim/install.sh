@@ -5,7 +5,7 @@ set -e
 
 sudo apt install make
 
-# $HOME/bin should be in PATH
+# NOTE: $HOME/bin should be in PATH
 nvim_path="$HOME/bin/nvim"
 if [[ ! -x "$nvim_path" ]]; then
     # download latest stable appimage, save it as $HOME/bin/nvim with execution permissions
@@ -38,3 +38,5 @@ then
     fi
 fi
 
+# sudo apt install -y liblua5.1-0-dev
+# echo "✅ installed Lua for luarocks.nvim (rest.nvim)"

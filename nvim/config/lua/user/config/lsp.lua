@@ -127,7 +127,7 @@ M.lspconfig_servers = {
         }
     },
 
-    tsserver = {
+    ts_ls = {
         -- filetypes = {
         --     'angular.html',
         --     -- defaults
