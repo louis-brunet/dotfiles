@@ -1,5 +1,7 @@
 -- [[ Basic Keymaps ]]
 
+vim.keymap.set("n", "Q", "<nop>")
+
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
@@ -11,7 +13,8 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+vim.keymap.set('n', '<leader>qd', vim.diagnostic.setqflist, { desc = 'Open diagnostics quickfix list' })
+-- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- TODO: "move left/right" keybind that won't mess with "" (unnamed register for pastes)
 vim.keymap.set("v", "H", "dhP`[v`]", { desc = "Move selection left" })
@@ -36,7 +39,6 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set("i", "<C-c>", "<Esc>")
 vim.keymap.set({"i", "n", "v", "s"}, "ù", "<Esc>")
 
-vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "New tmux session (tmux-sessionizer)" })
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "[F]ormat current buffer" })
 

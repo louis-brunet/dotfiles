@@ -83,3 +83,9 @@ for type, icon in pairs(signs) do
     local hl = "DiagnosticSign" .. type
     vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
+
+-- Folding options
+vim.api.nvim_set_option_value('foldmethod', 'expr', {})
+vim.api.nvim_set_option_value('foldexpr', 'v:lua.vim.treesitter.foldexpr()', {})
+vim.api.nvim_set_option_value('foldtext', '', {}) -- show first line with regular buffer highlight
+vim.api.nvim_set_option_value('foldenable', false, {}) -- hide folds by default

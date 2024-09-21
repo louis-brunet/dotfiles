@@ -41,38 +41,83 @@ local M = {
     {
         'folke/which-key.nvim',
         event = 'VeryLazy',
-        opts = {},
+        ---@type wk.Opts
+        opts = {
+            -- preset = "classic",
+            keys = {
+                scroll_down = "<c-Down>", -- binding to scroll down inside the popup
+                scroll_up = "<c-Up>",   -- binding to scroll up inside the popup
+            },
+            ---@type wk.Spec
+            spec = {
+                { "z",           group = "fold" },
+
+                { "ys",          group = "[s]urround" },
+
+                { "]",           group = "next" },
+
+                { "[",           group = "previous" },
+
+                { "<leader>H",   group = "[H]arpoon" },
+
+                { "<leader>d",   group = "[d]ebug" },
+
+                { "<leader>g",   group = "[g]it" },
+                { "<leader>gh",  group = "[h]unk" },
+                { "<leader>gm",  group = "[m]erge" },
+
+                { "<leader>q",   group = "[q]uickfix" },
+
+                { "<leader>r",   group = "[r]est-nvim" },
+
+                { "<leader>s",   group = "[s]earch" },
+
+                { "<leader>w",   group = "[w]orkspace" },
+            },
+        },
         config = function(_, opts)
             local wk = require('which-key')
             wk.setup(opts)
 
             -- Document existing key chains
-            wk.add({
-                { "<leader>H",   group = "[H]arpoon" },
-                { "<leader>H_",  hidden = true },
-
-                { "<leader>d",   group = "[d]ebug" },
-                { "<leader>d_",  hidden = true },
-
-                { "<leader>g",   group = "[g]it" },
-                { "<leader>g_",  hidden = true },
-                { "<leader>gh",  group = "[h]unk" },
-                { "<leader>gh_", hidden = true },
-                { "<leader>gm",  group = "[m]erge" },
-                { "<leader>gm_", hidden = true },
-
-                { "<leader>q",   group = "[q]uickfix" },
-                { "<leader>q_",  hidden = true },
-
-                { "<leader>r",   group = "[r]est-nvim" },
-                { "<leader>r_",  hidden = true },
-
-                { "<leader>s",   group = "[s]earch" },
-                { "<leader>s_",  hidden = true },
-
-                { "<leader>w",   group = "[w]orkspace" },
-                { "<leader>w_",  hidden = true },
-            })
+            -- wk.add({
+            --     { "z",           group = "fold" },
+            --     { "z_",          hidden = true },
+            --
+            --     { "ys",          group = "[s]urround" },
+            --     { "ys_",         hidden = true },
+            --
+            --     { "]",           group = "next" },
+            --     { "]_",          hidden = true },
+            --
+            --     { "[",           group = "previous" },
+            --     { "[_",          hidden = true },
+            --
+            --     { "<leader>H",   group = "[H]arpoon" },
+            --     { "<leader>H_",  hidden = true },
+            --
+            --     { "<leader>d",   group = "[d]ebug" },
+            --     { "<leader>d_",  hidden = true },
+            --
+            --     { "<leader>g",   group = "[g]it" },
+            --     { "<leader>g_",  hidden = true },
+            --     { "<leader>gh",  group = "[h]unk" },
+            --     { "<leader>gh_", hidden = true },
+            --     { "<leader>gm",  group = "[m]erge" },
+            --     { "<leader>gm_", hidden = true },
+            --
+            --     { "<leader>q",   group = "[q]uickfix" },
+            --     { "<leader>q_",  hidden = true },
+            --
+            --     { "<leader>r",   group = "[r]est-nvim" },
+            --     { "<leader>r_",  hidden = true },
+            --
+            --     { "<leader>s",   group = "[s]earch" },
+            --     { "<leader>s_",  hidden = true },
+            --
+            --     { "<leader>w",   group = "[w]orkspace" },
+            --     { "<leader>w_",  hidden = true },
+            -- })
         end
     },
 
