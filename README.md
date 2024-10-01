@@ -23,6 +23,7 @@
 ./scripts/bootstrap
 
 # run all ./*/install.sh scripts from topic folders
+# might need PATH="$HOME/bin:$HOME/.cargo/bin:$PATH"
 ./scripts/install
 ```
 
