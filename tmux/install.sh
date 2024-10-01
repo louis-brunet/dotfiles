@@ -9,10 +9,11 @@ tmux -V
 if ! which fzf
 then
     # sudo apt install fzf -y
+    (cd ~ && rm -r .fzf)
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --no-update-rc --xdg
 fi
-fzf --version
+# fzf --version
 
 echo "✅ installed tmux (& fzf for tmux-sessionizer)"
 

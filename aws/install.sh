@@ -27,6 +27,7 @@ if ! which aws >/dev/null; then
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$zip_file"
 
     cd "$(dirname "$zip_file")"
+    sudo apt install -y unzip
     unzip "$zip_file"
     sudo ./aws/install
 
