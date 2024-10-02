@@ -15,6 +15,7 @@
   co = checkout
   mt = mergetool
   unstage = reset HEAD --
+  undo = reset --soft HEAD~1
   alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ / | grep --color -E '^[^=]* ='
 
 [push]
