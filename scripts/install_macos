@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Run all dotfiles installers.
+#
+# Adapted from https://github.com/holman/dotfiles/blob/master/script/install
+
+set -e
+
+cd "$(dirname $0)"/..
+
+
+info () {
+    printf "\r  [\033[00;34minfo\033[0m] %s\n" "$1"
+}
+
+fail () {
+  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
+  echo ''
+  exit 1
+}
+
+brew update
+brew outdated
+brew upgrade
+brew upgrade --casks
+
+brew install coreutils git curl gcc
+
+install_topic_script_name="install_macos.sh"
+
+# find the installers and run them iteratively
+find . -maxdepth 2 -name "$install_topic_script_name" -not -path './scripts/*' -not -path '*.git*' | while read installer
+do 
+    info "Installing '$installer'"
+    if [ -x "$installer" ]; then
+        "$installer"
+    else 
+        fail "Execution is not authorized for install script '$installer'"
+    fi
+done
+
+info "Ran all macOS installers. Consider restarting zsh (exec zsh)."
+

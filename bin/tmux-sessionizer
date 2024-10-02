@@ -4,7 +4,7 @@
 # credit to ThePrimeagen
 # requires the command fzf
 
-set -e
+# set -e
 
 start_tmux() {
     TERM=tmux-256color tmux -u $@

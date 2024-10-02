@@ -89,8 +89,8 @@ load_ohmyzsh() {
       pyenv
 
       # custom plugins (added in $ZSH_CUSTOM/plugins)
-      zsh-autosuggestions
-      zsh-yarn-completions
+      # zsh-autosuggestions
+      # zsh-yarn-completions
   )
 
   ### Custom plugin configuration
