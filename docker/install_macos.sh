@@ -1,14 +1,9 @@
 #!/usr/bin/env sh
 
-# softwareupdate --install-rosetta
-#
-# if ! which docker >/dev/null; then
-#     ...................
-#
-#     echo "✅ installed docker"
-# fi
-#
-# if ! groups | grep -q 'docker'; then
-#     sudo usermod -aG docker "$USER"
-#     echo "✅ created docker group"
-# fi
+set -e
+
+softwareupdate --install-rosetta --agree-to-license
+
+brew install --cask rancher
+
+# NOTE: Rancher Desktop GUI needs to manually be opened (and manual PATH modification selected) for $HOME/.rd/bin/ to be created
