@@ -10,4 +10,9 @@ CMDS=(
     'compose ls -a'
 )
 
+if ! command -v cmd-list 2>&1 >/dev/null 
+then
+    echo "Please install cmd-list : https://github.com/louis-brunet/cmd-list"
+fi
+
 cmd-list run --output-format=header --cmd-format-highlight-color=4 docker -- "${CMDS[@]}"
