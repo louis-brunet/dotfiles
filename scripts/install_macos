@@ -24,7 +24,7 @@ brew outdated
 brew upgrade
 brew upgrade --casks
 
-brew install coreutils git curl gcc
+brew install coreutils git curl gcc jq
 
 install_topic_script_name="install_macos.sh"
 
