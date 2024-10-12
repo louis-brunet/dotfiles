@@ -126,6 +126,17 @@ M.lspconfig_servers = {
             }
         }
     },
+    ruff = {
+        -- init_options = {
+        --     settings = {
+        --         -- Ruff language server settings go here
+        --     }
+        -- },
+        on_attach = function(client, _)
+            -- Disable hover in favor of Pyright
+            client.server_capabilities.hoverProvider = false
+        end,
+    },
 
     ts_ls = {
         -- filetypes = {
@@ -288,7 +299,7 @@ M.lspconfig_servers = {
         },
     },
     tailwindcss = {
-        filetypes = {'html', 'css', 'tsx', 'angular.html' }, --, 'javascript', 'typescript', 'tsx', 'pug'},
+        filetypes = { 'html', 'css', 'tsx', 'angular.html' }, --, 'javascript', 'typescript', 'tsx', 'pug'},
         tailwindCSS = {
             emmetCompletions = true,
             -- includeLanguages = {
@@ -479,7 +490,7 @@ M.lspconfig_servers = {
                 runtime = 'node',
 
                 -- FIXME: seems to not work like I thought (like NODE_OPTIONS=--max_old_space_size=4096) -- for big files
-                execArgv = {'--max_old_space_size=4096'}
+                execArgv = { '--max_old_space_size=4096' }
             }
         }
     },
