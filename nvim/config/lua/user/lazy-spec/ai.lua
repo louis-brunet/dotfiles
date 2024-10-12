@@ -86,8 +86,155 @@
 --         end,
 --     },
 -- }
+
+HF_NUM_PREDICT = 128
+-- HF_CTX_SIZE=8192
+-- HF_CTX_SIZE=4096
+-- HF_CTX_SIZE=2048
+HF_CTX_SIZE=1024
+-- HF_CTX_SIZE = 512
+
 ---@type LazySpec
 local M = {
+    {
+        'huggingface/llm.nvim',
+        opts = {
+            -- api_token = nil,             -- cf Install paragraph
+            backend = "ollama",             -- backend ID, "huggingface" | "ollama" | "openai" | "tgi"
+            url = "http://localhost:11434", -- llm-ls uses "/api/generate"
+            -- tokens_to_clear = { "<|endoftext|>" }, -- tokens to remove from the model's output
+
+            request_body = { -- https://github.com/ollama/ollama/blob/main/docs/api.md#parameters
+                options = {  -- https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values
+                    temperature = 0.1,
+                    top_p = 0.9,
+                    num_predict = HF_NUM_PREDICT,
+                    num_ctx = HF_CTX_SIZE,
+                    -- top_k = 40,
+                },
+                keep_alive = "5h",
+            },
+
+            -- -- NOTE: codellama config
+            -- model = "codellama:code",
+            -- tokens_to_clear = { "<EOT>" },
+            -- fim = {
+            --     enabled = true,
+            --     prefix = "<PRE> ",
+            --     middle = " <MID>",
+            --     suffix = " <SUF>",
+            -- },
+            -- context_window = HF_CTX_SIZE,
+            -- tokenizer = {
+            --     repository = "codellama/CodeLlama-7b-hf",
+            -- }
+
+            -- -- -- NOTE: qwen2.5 config
+            -- model = "qwen2.5-coder:7b-base",
+            -- -- tokens_to_clear = { "<|file_sep|>",  "<|endoftext|>",  "<|fim_prefix|>" },
+            -- tokens_to_clear = { "<|endoftext|>" },
+            -- fim = {
+            --     enabled = true,
+            --     prefix = "<|fim_prefix|>",
+            --     middle = "<|fim_middle|>",
+            --     suffix = "<|fim_suffix|>",
+            -- },
+            -- context_window = HF_CTX_SIZE,
+            -- tokenizer = {
+            --     repository = "Qwen/Qwen2.5-Coder-7B",
+            --     -- repository = "Qwen/Qwen2.5-Coder-1.5B",
+            --     -- repository = "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+            -- },
+
+
+            -- -- NOTE: starcoder2 config
+            -- model = "starcoder2:3b",
+            -- tokens_to_clear = { "<file_sep>", "<|end_of_text|>" , "<|endoftext|>" },
+            -- fim = {
+            --     enabled = true,
+            --     prefix = "<fim_prefix>",
+            --     -- prefix = "<file_sep>\n<fim_prefix>\n",
+            --     middle = "<fim_middle>",
+            --     suffix = "<fim_suffix>",
+            -- },
+            -- context_window = HF_CTX_SIZE,
+            -- tokenizer = {
+            --     repository = "bigcode/starcoder2-3b",
+            --     -- repository = "bigcode/starcoder2-7b",
+            -- },
+
+            -- -- NOTE: codegemma config
+            -- model = "codegemma:2b-code",
+            -- -- tokens_to_clear = { "<|file_separator|>", "<|fim_prefix|>" , "<|fim_suffix|>" , "<|fim_middle|>", "<end_of_turn>" },
+            -- tokens_to_clear = { "<|file_separator|>" },
+            -- fim = {
+            --     enabled = true,
+            --     prefix = "<|fim_prefix|>",
+            --     middle = "<|fim_middle|>",
+            --     suffix = "<|fim_suffix|>",
+            -- },
+            -- context_window = HF_CTX_SIZE,
+            -- tokenizer = {
+            --     repository = "google/codegemma-2b",
+            -- },
+
+            -- NOTE: deepseek-coder-v2 config
+            model = "deepseek-coder-v2:16b-lite-base-q4_0",
+            tokens_to_clear = {}; -- { "<|end_of_sentence|>" },
+            fim = {
+                enabled = true,
+                prefix = "<｜fim▁begin｜>",
+                middle = "<｜fim▁end｜>",
+                suffix = "<｜fim▁hole｜>",
+                -- prefix = "<|fim_begin|>",
+                -- -- middle = "<|fim_hole|>",
+                -- -- suffix = "<|fim_end|>",
+                -- middle = "<|fim_end|>",
+                -- suffix = "<|fim_hole|>",
+            },
+            context_window = HF_CTX_SIZE,
+            tokenizer = {
+                repository = "deepseek-ai/DeepSeek-V2-Lite",
+            }
+
+            -- -- parameters that are added to the request body, values are arbitrary, you can set any field:value pair here it will be passed as is to the backend
+            -- request_body = {
+            --     parameters = {
+            --         max_new_tokens = 60,
+            --         temperature = 0.2,
+            --         top_p = 0.95,
+            --     },
+            -- },
+
+            -- -- set this if the model supports fill in the middle
+            -- fim = {
+            --     enabled = true,
+            --     prefix = "<fim_prefix>",
+            --     middle = "<fim_middle>",
+            --     suffix = "<fim_suffix>",
+            -- },
+            -- debounce_ms = 150,
+            -- accept_keymap = "<Tab>",
+            -- dismiss_keymap = "<S-Tab>",
+            -- tls_skip_verify_insecure = false,
+            --
+            -- -- llm-ls configuration, cf llm-ls section
+            -- lsp = {
+            --     bin_path = nil,
+            --     host = nil,
+            --     port = nil,
+            --     cmd_env = nil, -- or { LLM_LOG_LEVEL = "DEBUG" } to set the log level of llm-ls
+            --     version = "0.5.3",
+            -- },
+            --
+            -- tokenizer = nil,           -- cf Tokenizer paragraph
+            -- context_window = 1024,     -- max number of tokens for the context window
+            -- enable_suggestions_on_startup = true,
+            -- enable_suggestions_on_files = "*", -- pattern matching syntax to enable suggestions on specific files, either a string or a list of strings
+            -- disable_url_path_completion = false, -- cf Backend
+        }
+    },
+
     -- {
     --     "yetone/avante.nvim",
     --     event = "VeryLazy",
