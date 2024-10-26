@@ -38,3 +38,8 @@ llama-gguf-split --merge "$models_dir"/qwen2.5-coder-7b-instruct-q5_k_m-00001-of
 
 ./scripts/serve_model.py --model-file ./models/qwen2.5-coder-1.5b-instruct-q8_0.gguf
 ```
+
+```bash
+python3 -m llama_cpp.server --config_file llama-cpp-python-server.config.json
+```
+

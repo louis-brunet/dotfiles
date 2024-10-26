@@ -1,19 +1,84 @@
 #!/usr/bin/env python3
 
+# import http.server
 import argparse
+import datetime
 import os
 import select
 import signal
 import socket
 import sys
 import threading
-import datetime
 from typing import Optional
 
-BUFFER_SIZE = 1 << 15  # 1 << k == 2 ** k
+# BUFFER_SIZE = 1 << 15  # 1 << k == 2 ** k
 CONNECTION_QUEUE_SIZE = 5
 LLAMA_SERVER_PORT = 8081
 MAX_CONCURRENT_CONNECTIONS = 2
+
+# def proxy_http():
+#     s = http.server.HTTPServer(
+#         server_address=("", 8083),
+#         RequestHandlerClass=http.server.BaseHTTPRequestHandler,
+#     )
+#     s.serve_forever()
+
+
+def receive_from(s: socket.socket):
+    received = b""
+    buf_size = 4096
+    while True:
+        data = s.recv(buf_size)
+        received += data
+        if not data or len(data) < buf_size:
+            break
+    return received
+
+
+def proxy_tcp(client_socket: socket.socket, target_host: str, target_port: int) -> None:
+    with client_socket as client_socket:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as target_socket:
+            try:
+                target_socket.connect(
+                    (target_host, target_port),
+                )
+            except socket.error as e:
+                log(f"ERROR failed to connect to {target_host}:{target_port}", e)
+                return
+
+            select_read_sockets = [client_socket, target_socket]
+            proxy_running = True
+
+            while proxy_running:
+                read_sockets, _, _ = select.select(select_read_sockets, [], [])
+
+                for read_socket in read_sockets:
+                    received = receive_from(read_socket)
+                    log(f"received {len(received)} bytes from {read_socket}")
+
+                    if read_socket == client_socket:
+                        if len(received):
+                            target_socket.sendall(received)
+                        else:
+                            log("connection from client socket closed")
+
+                            # target_socket.close()
+                            # proxy_running = False
+                            # break
+
+                            # NOTE: don't terminate this proxy yet, keep it alive
+                            #  so the resource is still considered occupied
+                            select_read_sockets.remove(client_socket)
+                    elif read_socket == target_socket:
+                        if len(received):
+                            if client_socket in select_read_sockets:
+                                client_socket.sendall(received)
+                        else:
+                            log("connection from target socket closed")
+                            if client_socket in select_read_sockets:
+                                client_socket.close()
+                            proxy_running = False
+                            break
 
 
 def log(*args) -> None:
@@ -24,92 +89,6 @@ def log(*args) -> None:
     prefix = f"{ansi_bold_blue}[INFO]{ansi_reset} {ansi_grey}{timestamp}{ansi_reset}"
 
     print(prefix, *args, sep=" ", flush=True)
-
-# class TcpProxy:
-#     def __init__(
-#         self,
-#         listen_host: str,
-#         listen_port: int,
-#         target_host: str,
-#         target_port: int,
-#         max_concurrent_connections: int,
-#     ):
-#         self.listen_host = listen_host
-#         self.listen_port = listen_port
-#         self.target_host = target_host
-#         self.target_port = target_port
-#         self.stop_accepting_connections = False
-#         self.thread_count_semaphore = threading.Semaphore(max_concurrent_connections)
-#
-#     def start(self) -> None:
-#         listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#         listen_socket.bind((self.listen_host, self.listen_port))
-#         listen_socket.listen(CONNECTION_QUEUE_SIZE)
-#
-#         print(f"Listening on {self.listen_host}:{self.listen_port}")
-#
-#         while not self.stop_accepting_connections:
-#             client_socket, client_address = listen_socket.accept()
-#             print(f"Accepted connection from {client_address}")
-#
-#             self.thread_count_semaphore.acquire(blocking=True, timeout=None)
-#
-#             proxy_thread = threading.Thread(
-#                 target=self._handle_client, args=(client_socket,)
-#             )
-#             proxy_thread.run()
-#
-#     # def stop(self):
-#     #     self.stop_proxy_client = True
-#
-#     def _handle_client(self, client_socket: socket.socket) -> None:
-#         BUFFER_SIZE = 1 << 15  # 1 << k == 2 ** k
-#
-#         with client_socket:
-#             # Create a socket to connect to the target
-#             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as target_socket:
-#                 target_socket.connect((self.target_host, self.target_port))
-#
-#                 sockets = [client_socket, target_socket]
-#                 stop_proxy_thread = False
-#                 while not stop_proxy_thread:
-#                     s_read, _, _ = select.select(sockets, [], [])
-#
-#                     for s in s_read:
-#                         data = s.recv(BUFFER_SIZE)
-#
-#                         if s == client_socket:
-#                             # d = LOCAL_DATA_HANDLER(data)
-#                             if not data:
-#                                 target_socket.shutdown(socket.SHUT_RDWR)
-#                                 target_socket.close()
-#                                 stop_proxy_thread = True
-#                                 break
-#                             else:
-#                                 target_socket.sendall(data)
-#                         elif s == target_socket:
-#                             # d = REMOTE_DATA_HANDLER(data)
-#                             if not data:
-#                                 client_socket.shutdown(socket.SHUT_RDWR)
-#                                 client_socket.close()
-#                                 stop_proxy_thread = True
-#                                 break
-#                             else:
-#                                 client_socket.sendall(data)
-#
-#                 # target_socket.shutdown(socket.SHUT_RDWR)
-#                 # target_socket.close()
-#                 # client_socket.shutdown(socket.SHUT_RDWR)
-#                 # client_socket.close()
-#
-#                 print(
-#                     "Terminating proxy _handle_client thread (TODO: kill any child llama-server process created? probably not necessarily here)"
-#                 )
-#         self.thread_count_semaphore.release()
-#
-#     # def stop(self):
-#     #     # Implement the logic to stop
-#     #     pass
 
 
 def parse_args() -> argparse.Namespace:
@@ -139,115 +118,121 @@ def start_llama_server(cmd: list[str]) -> int:
     # return running_server_pid
 
 
-def stop_llama_server_and_proxies(
-    server_pid: Optional[int],
-    proxy_pids: set[int],
-    proxy_semaphore: threading.Semaphore,
-) -> None:
-    try:
-        for child_proxy_pid in proxy_pids:
-            log("stopping child proxy with pid {}".format(child_proxy_pid))
-            os.kill(child_proxy_pid, signal.SIGTERM)
-            # proxy_semaphore.release()
-            # proxy_pids.remove(child_proxy_pid)
-            log(
-                f"There are now {MAX_CONCURRENT_CONNECTIONS - proxy_semaphore._value} connected clients"
-            )
-    # except Exception as e:
-    #     log("ERROR [stop_llama_server_and_proxies] -", e)
-    #
-    # try:
-        for child_proxy_pid in proxy_pids:
-            pid_awaited, status_awaited = os.waitpid(child_proxy_pid, 0)
-    except Exception as e:
-        log("ERROR [stop_llama_server_and_proxies] -", e)
-
-    try:
-        if server_pid:
-            log("stopping child server with pid {}".format(server_pid))
-            os.kill(server_pid, signal.SIGTERM)
-            pid_awaited, status_awaited = os.waitpid(server_pid, 0)
-    except Exception as e:
-        log("ERROR [stop_llama_server_and_proxies] -", e)
-
-
-
-
 def main() -> None:
     """
     Start llama-server and proxy traffic. If the client closes the connection,
     then
     """
 
-    def proxy_client_to_target(client_socket: socket.socket) -> None:
+    # def proxy_client_to_target(client_socket: socket.socket) -> None:
+    #     try:
+    #         with client_socket:
+    #             # Create a socket to connect to the target
+    #             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as target_socket:
+    #                 target_socket.connect(
+    #                     (target_host, target_port),
+    #                 )
+    #
+    #                 sockets = [client_socket, target_socket]
+    #                 stop_proxy_thread = False
+    #
+    #                 while not stop_proxy_thread:
+    #                     s_read, _, _ = select.select(sockets, [], [])
+    #
+    #                     for s in s_read:
+    #                         data = s.recv(BUFFER_SIZE)
+    #
+    #                         if s == client_socket:
+    #                             # d = LOCAL_DATA_HANDLER(data)
+    #                             if not data:
+    #                                 log("shutting down because CLIENT sent 0 data")
+    #                                 # target_socket.shutdown(socket.SHUT_RDWR)
+    #                                 # target_socket.close()
+    #                                 # stop_proxy_thread = True
+    #                                 # break
+    #
+    #                                 target_socket.shutdown(socket.SHUT_WR)
+    #                                 sockets.remove(client_socket)
+    #                                 # client_socket.close()
+    #                             else:
+    #                                 target_socket.sendall(data)
+    #                         elif s == target_socket:
+    #                             # d = REMOTE_DATA_HANDLER(data)
+    #                             if not data:
+    #                                 log("shutting down because TARGET sent 0 data")
+    #
+    #                                 if client_socket in sockets:
+    #                                     client_socket.shutdown(socket.SHUT_RDWR)
+    #                                     client_socket.close()
+    #                                 stop_proxy_thread = True
+    #                                 break
+    #                             else:
+    #                                 if client_socket in sockets:
+    #                                     client_socket.sendall(data)
+    #     except Exception as e:
+    #         log("[proxy_client_to_target] ERROR -", e)
+    #     finally:
+    #         log("[proxy_client_to_target] done")
+    #         # log("Terminating proxy proxy_client_to_target thread, releasing semaphore")
+    #         # concurrent_clients_semaphore.release()
+    #         # log(
+    #         #     f"There are now {max_concurrent_connections - concurrent_clients_semaphore._value} connected clients"
+    #         # )
+
+    def waitpid_with_release(pid: int, options: int = 0) -> int:
+        awaited_pid, status = os.waitpid(pid, options)
+        if awaited_pid == 0:
+            return awaited_pid
+
+        log(f"[waitpid_with_release]: child with pid {awaited_pid} has terminated")
+        if awaited_pid in running_proxy_pids:
+            concurrent_clients_semaphore.release()
+            running_proxy_pids.remove(awaited_pid)
+            log(
+                f"There are now {MAX_CONCURRENT_CONNECTIONS - concurrent_clients_semaphore._value} connected clients"
+            )
+
+        return awaited_pid
+
+    def stop_llama_server_and_proxies(
+        server_pid: Optional[int],
+        proxy_pids: set[int],
+        proxy_semaphore: threading.Semaphore,
+    ) -> None:
         try:
-            with client_socket:
-                # Create a socket to connect to the target
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as target_socket:
-                    target_socket.connect(
-                        (target_host, target_port),
-                    )
+            for child_proxy_pid in proxy_pids:
+                log("stopping child proxy with pid {}".format(child_proxy_pid))
+                os.kill(child_proxy_pid, signal.SIGTERM)
+                # proxy_semaphore.release()
+                # proxy_pids.remove(child_proxy_pid)
+                log(
+                    f"There are now {MAX_CONCURRENT_CONNECTIONS - proxy_semaphore._value} connected clients"
+                )
+            # except Exception as e:
+            #     log("ERROR [stop_llama_server_and_proxies] -", e)
+            #
+            # try:
+            for child_proxy_pid in proxy_pids:
+                _pid = waitpid_with_release(child_proxy_pid)
+                # pid_awaited, status_awaited = os.waitpid(child_proxy_pid, 0)
+        except ChildProcessError as e:
+            log("ERROR [stop_llama_server_and_proxies] -", e)
 
-                    sockets = [client_socket, target_socket]
-                    stop_proxy_thread = False
-
-                    while not stop_proxy_thread:
-                        s_read, _, _ = select.select(sockets, [], [])
-
-                        for s in s_read:
-                            data = s.recv(BUFFER_SIZE)
-
-                            if s == client_socket:
-                                # d = LOCAL_DATA_HANDLER(data)
-                                if not data:
-                                    log("shutting down because CLIENT sent 0 data")
-                                    # target_socket.shutdown(socket.SHUT_RDWR)
-                                    # target_socket.close()
-                                    # stop_proxy_thread = True
-                                    # break
-
-                                    target_socket.shutdown(socket.SHUT_WR)
-                                    sockets.remove(client_socket)
-                                    # client_socket.close()
-                                else:
-                                    target_socket.sendall(data)
-                            elif s == target_socket:
-                                # d = REMOTE_DATA_HANDLER(data)
-                                if not data:
-                                    log("shutting down because TARGET sent 0 data")
-
-                                    if client_socket in sockets:
-                                        client_socket.shutdown(socket.SHUT_RDWR)
-                                        client_socket.close()
-                                    stop_proxy_thread = True
-                                    break
-                                else:
-                                    if client_socket in sockets:
-                                        client_socket.sendall(data)
-        except Exception as e:
-            log("[proxy_client_to_target] ERROR -", e)
-        finally:
-            log("[proxy_client_to_target] done")
-            # log("Terminating proxy proxy_client_to_target thread, releasing semaphore")
-            # concurrent_clients_semaphore.release()
-            # log(
-            #     f"There are now {max_concurrent_connections - concurrent_clients_semaphore._value} connected clients"
-            # )
+        try:
+            if server_pid:
+                log("stopping child server with pid {}".format(server_pid))
+                os.kill(server_pid, signal.SIGTERM)
+                pid_awaited, status_awaited = os.waitpid(server_pid, 0)
+        except ChildProcessError as e:
+            log("ERROR [stop_llama_server_and_proxies] -", e)
 
     def sigchld_handler(signal, frame) -> None:
         try:
             while True:
-                pid, status = os.waitpid(-1, os.WNOHANG)
-                if pid == 0:
+                pid = waitpid_with_release(-1, os.WNOHANG)
+                if pid <= 0:
                     break
-                log(f"SIGCHLD: child with pid {pid} has terminated")
-                if pid in running_proxy_pids:
-                    concurrent_clients_semaphore.release()
-                    running_proxy_pids.remove(pid)
-                    log(
-                        f"There are now {MAX_CONCURRENT_CONNECTIONS - concurrent_clients_semaphore._value} connected clients"
-                    )
-        except Exception as e:
+        except ChildProcessError as e:
             log("ERROR [sigchld_handler] -", e)
 
     def sigint_handler(sig, frame) -> None:
@@ -298,7 +283,6 @@ def main() -> None:
     # running_server_pid: Optional[int] = None
     running_proxy_pids: set[int] = set()
 
-
     signal.signal(signal.SIGCHLD, sigchld_handler)
     signal.signal(signal.SIGINT, sigint_handler)
 
@@ -309,22 +293,17 @@ def main() -> None:
     concurrent_clients_semaphore: threading.Semaphore = threading.Semaphore(
         MAX_CONCURRENT_CONNECTIONS
     )
-    log(f"server will be restarted if more than {MAX_CONCURRENT_CONNECTIONS} connections try to be established simultaneously")
+    log(
+        f"server will be restarted if more than {MAX_CONCURRENT_CONNECTIONS} connections try to be established simultaneously"
+    )
 
     while True:
         log(f"Listening on {listen_host}:{listen_port}")
         client_socket, client_address = listen_socket.accept()
-        log(f"Accepted connection from {client_address}")
+        log(f"Accepted connection from {client_address}, requesting resource.")
 
         can_connect = concurrent_clients_semaphore.acquire(blocking=False, timeout=None)
-        log(
-            f"There are {MAX_CONCURRENT_CONNECTIONS - concurrent_clients_semaphore._value} connected clients"
-        )
-
         if not can_connect:
-            # assert (
-            #     running_server_pid is not None
-            # ), "Could not acquire semaphore but server is not yet running"
             log("Too many connections, restarting server and killing children.")
             stop_llama_server_and_proxies(
                 server_pid=running_server_pid,
@@ -334,12 +313,21 @@ def main() -> None:
             running_server_pid = start_llama_server(server_cmd)
             concurrent_clients_semaphore.acquire(blocking=True, timeout=None)
 
+        log(
+            f"There are {MAX_CONCURRENT_CONNECTIONS - concurrent_clients_semaphore._value} connected clients"
+        )
+
         proxy_child_pid = os.fork()
         if proxy_child_pid > 0:
             log(f"started proxy child with pid {proxy_child_pid}")
             running_proxy_pids.add(proxy_child_pid)
         else:
-            proxy_client_to_target(client_socket)
+            # proxy_client_to_target(client_socket)
+            proxy_tcp(
+                client_socket=client_socket,
+                target_host=target_host,
+                target_port=target_port,
+            )
             sys.exit(0)
 
 

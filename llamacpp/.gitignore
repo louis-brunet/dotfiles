@@ -1,2 +1,5 @@
 # models/
 **/*.gguf
+
+**/__pycache__/
+pyrightconfig.json

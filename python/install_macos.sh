@@ -13,8 +13,8 @@ brew install pyenv
 }
 
 which poetry || {
-    # FIXME:
-    # exception
-    # ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)
     curl -sSL https://install.python-poetry.org | python3 -
 }
+
+# # needed to build wheels from source with pip
+# brew install cmake
