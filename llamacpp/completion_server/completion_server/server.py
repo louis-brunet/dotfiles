@@ -20,16 +20,19 @@ class CompletionService:
     runner_busy: bool = False
 
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     async def generate(
         self,
         request: CompletionRequest,
     ) -> CreateCompletionResponse | Iterator[CreateCompletionStreamResponse]:
         if self.current_runner is not None and self.runner_busy:
+            self.logger.info("Current runner is busy, terminating.")
             self.current_runner.kill()
             self.current_runner = None
+
         if self.current_runner is None:
+            self.logger.info("Creating new completionn runner.")
             current_runner = CompletionRunner(self.request_queue)
             current_runner.start()
 
@@ -40,6 +43,7 @@ class CompletionService:
         self.runner_busy = True
         response = await response_queue.get(block=True, timeout=None)
         if self.request_queue.empty():
+            self.logger.info("No more requests, runner is idle.")
             self.runner_busy = False
         return response
 
@@ -63,7 +67,6 @@ def create_app(completion_service: CompletionService) -> FastAPI:
 
     @app.post("/completion")
     async def completion(request: CompletionRequest):
-        # , completion_service: Annotated[dict, Depends(CompletionService)]):
         return await completion_service.generate(request)
 
     return app

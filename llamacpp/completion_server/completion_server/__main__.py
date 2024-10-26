@@ -24,8 +24,9 @@ def serve_app(host: str, port: int) -> None:
 
 def main() -> None:
     configure_logging()
-    host = os.environ.get("HOST", "localhost")
-    port = int(os.environ.get("PORT", 9000))
+
+    host = os.environ.get("COMPLETION_SERVER_HOST", "localhost")
+    port = int(os.environ.get("COMPLETION_SERVER_PORT", 9000))
 
     serve_app(host=host, port=port)
 

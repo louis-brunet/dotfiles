@@ -2,7 +2,6 @@ import logging
 import multiprocessing
 from multiprocessing.synchronize import Event
 from typing import Iterator
-from fastapi import FastAPI
 from llama_cpp import CreateCompletionResponse, CreateCompletionStreamResponse, Llama
 
 from completion_server import model
@@ -57,7 +56,6 @@ class CompletionRunner:
         self,
         request_queue: multiprocessing.Queue[CompletionRunnerRequest],
     ):
-        self.logger = logging.getLogger(self.__class__.__name__)
         self.stop_accepting_requests_event = multiprocessing.Event()
 
         self.process = multiprocessing.Process(
