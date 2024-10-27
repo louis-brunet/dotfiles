@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class CompletionRequest(BaseModel):
     model: str
     prompt: str
+    suffix: Optional[str] = None
     max_tokens: int = 100
     temperature: float = 0.2
     top_p: float = 0.95

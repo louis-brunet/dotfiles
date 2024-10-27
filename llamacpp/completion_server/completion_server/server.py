@@ -1,6 +1,11 @@
-from contextlib import asynccontextmanager
+import asyncio
 import logging
 import multiprocessing
+import queue
+import uuid
+import time
+from contextlib import asynccontextmanager
+from multiprocessing.managers import DictProxy, SyncManager
 from typing import Iterator
 
 from fastapi import FastAPI
@@ -9,70 +14,295 @@ from llama_cpp import CreateCompletionResponse, CreateCompletionStreamResponse
 from completion_server.entities import CompletionRequest
 from completion_server.runner import CompletionRunner, CompletionRunnerRequest
 
-logger = logging.getLogger(__name__)
+_module_logger = logging.getLogger(__name__)
 
 
 class CompletionService:
-    current_runner: CompletionRunner | None = None
-    request_queue: multiprocessing.Queue[CompletionRunnerRequest] = (
-        multiprocessing.Queue(maxsize=0)
-    )
-    runner_busy: bool = False
+    def __init__(
+        self,
+        manager: SyncManager,
+        verbose: bool = False,
+    ):
+        self.logger = _module_logger.getChild(self.__class__.__name__)
+        self.manager = manager
+        self.pending_request = manager.Queue(maxsize=1)
+        self.pending_responses: DictProxy = manager.dict()
+        self.verbose: bool = verbose
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.runner_busy_event = multiprocessing.Event()
+        self.current_runner = None
+        self.reload_runner()
+        # self.runner_busy: bool = False
+        # self.current_runner = CompletionRunner(
+        #     request_queue=self.pending_request,
+        #     response_queues=self.pending_responses,
+        # )
+        # self.current_runner.start()
+
+    def reload_runner(self):
+        if self.current_runner is not None:
+            self.logger.info("Terminating current runner")
+            self.current_runner.kill()
+
+        self.runner_busy_event.clear()
+        # self.runner_busy = False
+
+        self.logger.info("Initializing new runner")
+        self.current_runner = CompletionRunner(
+            request_queue=self.pending_request,
+            response_queues=self.pending_responses,
+            runner_busy_event=self.runner_busy_event,
+            verbose=self.verbose,
+        )
+        self.current_runner.start()
 
     async def generate(
-        self,
-        request: CompletionRequest,
+        self, request: CompletionRequest
     ) -> CreateCompletionResponse | Iterator[CreateCompletionStreamResponse]:
-        if self.current_runner is not None and self.runner_busy:
-            self.logger.info("Current runner is busy, terminating.")
+        request_start_time = time.time()
+        request_id = uuid.uuid4()
+
+        logger = self.logger.getChild(self.generate.__name__)
+        logger = logger.getChild(str(request_id))
+
+        logger.info(f"Received request: {request}")
+
+        # Empty request queue
+        try:
+            self.pending_request.get_nowait()
+            logger.info("Emptied pending request queue")
+        except queue.Empty:
+            logger.info("No pending requests to empty")
+
+        # Kill and reload runner if a request is being processed
+        if self.runner_busy_event.is_set():
+        # if self.runner_busy:
+            logger.info("Current runner is busy.")
+            self.reload_runner()
+            # if self.current_runner is not None:
+            #     logger.info("Terminating current runner")
+            #     self.current_runner.kill()
+            # logger.info("Initializing new runner")
+            # self.current_runner = CompletionRunner(
+            #     request_queue=self.pending_request,
+            #     response_queues=self.pending_responses,
+            #     verbose=self.verbose,
+            # )
+
+        # Initialize response queue
+        response_queue = self.manager.Queue(maxsize=1)
+        self.pending_responses[request_id.int] = response_queue
+
+        # Set pending request
+        runner_request = CompletionRunnerRequest(
+            request=request, request_id=request_id.int
+        )
+        # self.runner_busy = True
+        logger.info("Sending request to pending queue")
+        self.pending_request.put_nowait(runner_request)
+
+        # Wait for response
+        empty_response = CreateCompletionResponse(
+            choices=[],
+            id=str(request_id),
+            created=0,
+            model=request.model,
+            object="text_completion",
+        )
+        logger.info("Waiting for response...")
+
+        try:
+            # response = response_queue.get(block=True, timeout=None)
+            response = await asyncio.to_thread(
+                response_queue.get,
+                block=True,
+                timeout=None,
+            )
+            logger.info(f"received response {response}")
+            # self.runner_busy = False
+            return response or empty_response
+        except Exception as e:
+            logger.error(f"error while waiting for response: {e}")
+            return empty_response
+        finally:
+            self.pending_responses.pop(request_id.int)
+            request_processing_time = time.time() - request_start_time
+            logger.info(
+                "Requested processing finished in %.3fs." % request_processing_time
+            )
+
+    def shutdown(self):
+        logger = self.logger.getChild(self.shutdown.__name__)
+
+        if self.current_runner is not None:
             self.current_runner.kill()
             self.current_runner = None
-
-        if self.current_runner is None:
-            self.logger.info("Creating new completionn runner.")
-            current_runner = CompletionRunner(self.request_queue)
-            current_runner.start()
-
-        response_queue = multiprocessing.Queue(maxsize=1)
-        self.request_queue.put(
-            CompletionRunnerRequest(request=request, response_queue=response_queue)
-        )
-        self.runner_busy = True
-        response = await response_queue.get(block=True, timeout=None)
-        if self.request_queue.empty():
-            self.logger.info("No more requests, runner is idle.")
-            self.runner_busy = False
-        return response
+            logger.info("runner stopped")
 
 
-def create_app(completion_service: CompletionService) -> FastAPI:
+# class CompletionService:
+#     current_runner: CompletionRunner | None = None
+#     # runner_busy: bool = False
+#
+#     def __init__(
+#         self,
+#         manager: SyncManager,
+#         verbose: bool = False,
+#         # request_queue: queue.Queue[CompletionRunnerRequest],
+#         # response_queues: DictProxy[
+#         #     int,
+#         #     queue.Queue[CreateCompletionResponse | Iterator[CreateCompletionStreamResponse]],
+#         # ] = multiprocessing.Manager().dict(),
+#     ):  # , response_queues):
+#         self.logger = _module_logger.getChild(self.__class__.__name__)
+#         self.manager = manager
+#         self.request_queue = manager.Queue(maxsize=0)
+#         self.response_queues: DictProxy[
+#             int,
+#             queue.Queue[
+#                 CreateCompletionResponse | Iterator[CreateCompletionStreamResponse]
+#             ],
+#         ] = manager.dict()
+#         self.verbose = verbose
+#         # self.request_queue = request_queue
+#         # self.response_queues = response_queues
+#
+#         self.logger.info("Completion service initialized.")
+#
+#     async def generate(
+#         self,
+#         request: CompletionRequest,
+#     ) -> CreateCompletionResponse | Iterator[CreateCompletionStreamResponse]:
+#         logger = self.logger.getChild(self.generate.__name__)
+#
+#         while True:
+#             try:
+#                 pending_request: CompletionRunnerRequest = (
+#                     self.request_queue.get_nowait()
+#                 )
+#                 self.response_queues.pop(pending_request.request_id)
+#                 logger.info(
+#                     f"Removed pending request {pending_request.request_id} from queue"
+#                 )
+#             except queue.Empty:
+#                 break
+#
+#         # if self.current_runner is not None and self.runner_busy:
+#         max_concurrent_requests = 1
+#         if (
+#             self.current_runner is not None
+#             and len(self.response_queues) >= max_concurrent_requests
+#         ):
+#             logger.info("Current runner is busy, terminating.")
+#             self.current_runner.kill()
+#             self.current_runner = None
+#
+#         if self.current_runner is None:
+#             logger.info("Creating new completionn runner.")
+#             self.current_runner = CompletionRunner(
+#                 request_queue=self.request_queue,
+#                 response_queues=self.response_queues,
+#                 verbose=self.verbose,
+#             )
+#             self.current_runner.start()
+#
+#         # response_queue = multiprocessing.Queue(maxsize=1)
+#
+#         request_id = uuid.uuid4()
+#         response_queue = self.manager.Queue(maxsize=1)
+#         self.response_queues[request_id.int] = response_queue
+#         # response_queue = self.response_queues[request_id.int]
+#         # self.response_queues[request_id.int] = response_queue
+#
+#         self.request_queue.put(
+#             CompletionRunnerRequest(request=request, request_id=request_id.int)
+#         )
+#         # logger.info(f"Request added to queue. There are {self.request_queue.} requests pending")
+#         # self.runner_busy = True
+#         empty_response = CreateCompletionResponse(
+#             choices=[],
+#             id=str(request_id),
+#             created=0,
+#             model=request.model,
+#             object="text_completion",
+#         )
+#         try:
+#             response = await asyncio.to_thread(
+#                 response_queue.get, block=True, timeout=None
+#             )
+#             return response or empty_response
+#         except Exception as e:
+#             logger.error(f"Error generating completion: {e}")
+#             return empty_response
+#         finally:
+#             self.response_queues.pop(request_id.int)
+#
+#             # response = await response_queue.get(block=True, timeout=None)
+#
+#             # if self.request_queue.empty():
+#             #     logger.info("No more requests, runner is idle.")
+#             #     self.runner_busy = False
+#
+#         # return response
+#
+#     def shutdown(self):
+#         logger = self.logger.getChild(self.shutdown.__name__)
+#
+#         if self.current_runner is not None:
+#             self.current_runner.kill()
+#             self.current_runner = None
+#             logger.info("runner stopped")
+
+
+def create_app() -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # startup logic
-        logger.info("App starting")
+
+        lifespan_logger = _module_logger.getChild("lifespan")
+        lifespan_logger.info("App starting")
+
+        manager = multiprocessing.Manager()
+
+        lifespan_logger.info("Creating completion service")
+        app.state.completion_service = CompletionService(manager=manager, verbose=False)
 
         yield
 
         # shutdown logic
-        logger.info("App shutting down")
-        if completion_service.current_runner is not None:
-            completion_service.current_runner.kill()
-            completion_service.current_runner = None
-            logger.info("Completion service runner stopped")
+
+        lifespan_logger.info("App shutting down")
+
+        completion_service = get_completion_service(app)
+        completion_service.shutdown()
+        # if completion_service.current_runner is not None:
+        #     completion_service.current_runner.kill()
+        #     completion_service.current_runner = None
+        #     logger.info("Completion service runner stopped")
+
+        manager.shutdown()
 
     app = FastAPI(lifespan=lifespan)
 
-    @app.post("/completion")
+    def get_completion_service(app: FastAPI) -> CompletionService:
+        completion_service = app.state.completion_service
+        assert isinstance(
+            completion_service, CompletionService
+        ), "Expected completion_service to be initialized"
+
+        return completion_service
+
+    @app.post("/v1/completions")
     async def completion(request: CompletionRequest):
+        # -> CreateCompletionResponse | Iterator[CreateCompletionStreamResponse]:
+        completion_service = get_completion_service(app)
+
         return await completion_service.generate(request)
 
     return app
 
 
-app = create_app(CompletionService())
+app = create_app()
 
 # class AppState(TypedDict):
 #     llm: Optional[Llama]
