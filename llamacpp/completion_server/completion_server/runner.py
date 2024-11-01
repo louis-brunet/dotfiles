@@ -70,7 +70,11 @@ def _run_completion(
     while not stop_accepting_requests_event.is_set():
         logger.info("Waiting for request...")
         runner_busy_event.clear()
-        request = request_queue.get(block=True, timeout=None)
+        try:
+            request = request_queue.get(block=True, timeout=None)
+        except EOFError as e:
+            logger.error(f"Request queue closed, cannot process any more requests: {e}")
+            break
         runner_busy_event.set()
 
         request_logger = logger.getChild(f"request.{uuid.UUID(int=request.request_id)}")

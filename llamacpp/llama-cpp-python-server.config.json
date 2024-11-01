@@ -1,0 +1,51 @@
+{
+  "host": "127.0.0.1",
+  "port": 8080,
+  "interrupt_requests": true,
+  "models": [
+    {
+      "model": "models/codellama-7b.Q8_0.gguf",
+      "model_alias": "codellama:code",
+      "n_gpu_layers": -1,
+      "offload_kqv": true,
+      "n_threads": 12,
+      "n_batch": 512,
+      "flash_attn": true,
+      "cache": true,
+      "n_ctx": 2048
+    },
+    {
+      "model": "models/qwen2.5-coder-1.5b-instruct-q8_0.gguf",
+      "model_alias": "qwen2.5-coder:1.5b-instruct-q8_0",
+      "n_gpu_layers": -1,
+      "offload_kqv": true,
+      "n_threads": 12,
+      "n_batch": 512,
+      "flash_attn": true,
+      "cache": true,
+      "n_ctx": 2048
+    },
+    {
+      "model": "models/qwen2.5-coder-7b-instruct-q5_k_m.gguf",
+      "model_alias": "qwen2.5-coder:7b-instruct-q5_K_M",
+      "n_gpu_layers": -1,
+      "offload_kqv": true,
+      "n_threads": 12,
+      "n_batch": 512,
+      "flash_attn": true,
+      "cache": true,
+      "n_ctx": 2048
+    },
+    {
+      "model": "models/deepseek-coder-1.3b-base.Q8_0.gguf",
+      "model_alias": "deepseek-coder:1.3b-base-q8_0",
+      "n_gpu_layers": -1,
+      "offload_kqv": true,
+      "n_threads": 12,
+      "n_batch": 512,
+      "flash_attn": true,
+      "cache": true,
+      "n_ctx": 2048
+    }
+  ]
+}
