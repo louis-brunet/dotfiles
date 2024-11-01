@@ -119,10 +119,12 @@ local M = {}
 M.lspconfig_servers = {
     -- clangd = {},
     -- gopls = {},
+
     pyright = {
         settings = {
             python = {
-                venv = '.venv'
+                -- venv = '.venv'
+                -- venvPath = '~/.pyenv/versions'
             }
         }
     },
@@ -438,6 +440,11 @@ M.lspconfig_servers = {
                     {
                         fileMatch = { 'tsconfig.json', 'tsconfig.*.json' },
                         url = "https://json.schemastore.org/tsconfig"
+                    },
+                    {
+                        fileMatch = 'pyrightconfig.json',
+                        url =
+                        "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json"
                     },
                     -- {
                     --     fileMatch = "nest-cli.json",
