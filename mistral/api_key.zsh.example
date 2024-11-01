@@ -1,0 +1,2 @@
+# From https://console.mistral.ai/codestral
+export MISTRAL_API_KEY="<MY_API_KEY>"
