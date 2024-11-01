@@ -1,3 +1,11 @@
+local function get_llm_completion_module()
+    local llm_completion = require('llm.completion')
+    if not llm_completion then
+        vim.notify('[lsp/completion.lua] module llm.completion not found. Either install it or remove the relevant lines from lazy-spec/lsp/completion.lua', vim.log.levels.WARN)
+    end
+    return llm_completion
+end
+
 ---@type LazySpec
 local M = {
     {
@@ -60,6 +68,11 @@ local M = {
                         select = true,
                     },
                     ['<Tab>'] = cmp.mapping(function(fallback)
+                        -- local llm_completion = get_llm_completion_module()
+                        --
+                        -- if llm_completion and llm_completion.suggestion then
+                        --     llm_completion.complete()
+                        -- elseif cmp.visible() then
                         if cmp.visible() then
                             cmp.select_next_item()
                         elseif luasnip.expand_or_locally_jumpable() then
@@ -69,6 +82,12 @@ local M = {
                         end
                     end, { 'i', 's' }),
                     ['<S-Tab>'] = cmp.mapping(function(fallback)
+                        -- local llm_completion = get_llm_completion_module()
+                        --
+                        -- if llm_completion and llm_completion.suggestion then
+                        --     llm_completion.cancel()
+                        --     llm_completion.suggestion = nil
+                        -- elseif cmp.visible() then
                         if cmp.visible() then
                             cmp.select_prev_item()
                         elseif luasnip.locally_jumpable(-1) then

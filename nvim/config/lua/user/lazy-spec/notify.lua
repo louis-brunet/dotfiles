@@ -31,6 +31,8 @@ return {
     },
 
     config = function(_, opts)
-        vim.notify = require('notify')
+        local nvim_notify = require('notify')
+        nvim_notify.setup(opts)
+        vim.notify = nvim_notify
     end
 }

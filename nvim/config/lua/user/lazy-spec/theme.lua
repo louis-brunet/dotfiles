@@ -91,7 +91,7 @@ return {
                 -- dependencies = {
                 --     'nvim-treesitter/nvim-treesitter',
                 -- },
-            }
+            },
         },
 
         lazy = false,
@@ -301,10 +301,13 @@ return {
                     NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
                     TabLineSel = { bg = '#31353f', fg = '#999999' },
                     TabLine = { bg = '#31353f', fg = '#555555' },
+
+                    -- llama_hl_info = { link = "DiagnosticVirtualTextInfo", style = "italic" },
+                    llama_hl_info = { link = "lualine_transitional_lualine_b_insert_to_lualine_c_insert", style = "italic" },
+                    llama_hl_hint = { fg = 'fg3', style = "" },
                 }
             }
         },
-
         ---@param opts GhTheme.Config
         config = function(_, opts)
             require('github-theme').setup(opts)
