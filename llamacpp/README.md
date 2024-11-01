@@ -10,6 +10,17 @@
 ./scripts/download_model.py --hf-repo "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF" --hf-files "qwen2.5-coder-7b-instruct-q5_k_m*.gguf" --merge --output-file-path "models/qwen2.5-coder-7b-instruct-q5_k_m.gguf"
 ```
 
+## Running for ggml-org/llama.vim plugin
+
+```bash
+llama-server \
+    --hf-repo ggerganov/Qwen2.5-Coder-1.5B-Q8_0-GGUF \
+    --hf-file qwen2.5-coder-1.5b-q8_0.gguf \
+    --port 8012 -ngl 99 -fa -ub 512 -b 1024 -dt 0.1 \
+    --cache-reuse 256
+```
+
+
 ## Manually
 From instructions in https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF :
 
