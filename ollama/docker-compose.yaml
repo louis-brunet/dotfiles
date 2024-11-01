@@ -1,3 +1,6 @@
+# NOTE: Apple Silicon GPUs are incompatible with Docker virtualization as of
+#  13/10/2024, install ollama locally instead
+
 services:
   ollama:
     # TODO: update version
@@ -9,7 +12,7 @@ services:
     ports:
       - '11434:11434'
     environment:
-      OLLAMA_DEBUG: "1" #              Show additional debug information (e.g. OLLAMA_DEBUG=1)
+      # OLLAMA_DEBUG: "1" #              Show additional debug information (e.g. OLLAMA_DEBUG=1)
       # OLLAMA_HOST: "" #               IP Address for the ollama server (default 127.0.0.1:11434)
       OLLAMA_KEEP_ALIVE: "4h" #         The duration that models stay loaded in memory (default "5m")
       # OLLAMA_MAX_LOADED_MODELS: "" #  Maximum number of loaded models per GPU
