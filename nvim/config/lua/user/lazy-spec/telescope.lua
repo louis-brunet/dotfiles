@@ -45,28 +45,28 @@ return {
             local border_chars_merge_top = { '─', '│', '─', '│', '├', '┤', '┘', '└' }
 
             telescope_layout_strategies[custom_layout_strategy] =
-            function(picker, max_columns, max_lines, layout_config)
-                local layout = telescope_layout_strategies.horizontal(picker, max_columns, max_lines, layout_config)
+                function(picker, max_columns, max_lines, layout_config)
+                    local layout = telescope_layout_strategies.horizontal(picker, max_columns, max_lines, layout_config)
 
-                if layout.prompt then
-                    -- layout.prompt.title = ''
-                    layout.prompt.borderchars = border_chars_box
+                    if layout.prompt then
+                        -- layout.prompt.title = ''
+                        layout.prompt.borderchars = border_chars_box
+                    end
+
+                    if layout.results then
+                        layout.results.title = ''
+                        layout.results.borderchars = border_chars_merge_top
+                        layout.results.line = layout.results.line - 1
+                        layout.results.height = layout.results.height + 1
+                    end
+
+                    if layout.preview then
+                        -- layout.preview.title = ''
+                        layout.preview.borderchars = border_chars_box
+                    end
+
+                    return layout
                 end
-
-                if layout.results then
-                    layout.results.title = ''
-                    layout.results.borderchars = border_chars_merge_top
-                    layout.results.line = layout.results.line - 1
-                    layout.results.height = layout.results.height + 1
-                end
-
-                if layout.preview then
-                    -- layout.preview.title = ''
-                    layout.preview.borderchars = border_chars_box
-                end
-
-                return layout
-            end
 
             telescope.setup({
                 extensions = {
@@ -166,7 +166,9 @@ return {
             vim.keymap.set('n', '<leader>sh', telescope_builtin.help_tags, { desc = '[s]earch [h]elp' })
             vim.keymap.set('n', '<leader>sw', telescope_builtin.grep_string,
                 { desc = '[s]earch current [w]ord' })
-            vim.keymap.set('n', '<leader>sg', telescope_builtin.live_grep, { desc = '[s]earch by [g]rep' })
+            vim.keymap.set('n', '<leader>sg', function()
+                telescope_builtin.live_grep({ additional_args = { '--hidden' } })
+            end, { desc = '[s]earch by [g]rep' })
             vim.keymap.set('n', '<leader>sd', telescope_builtin.diagnostics,
                 { desc = '[s]earch [d]iagnostics' })
             vim.keymap.set('n', '<leader>sr', telescope_builtin.resume, { desc = '[s]earch [r]esume' })

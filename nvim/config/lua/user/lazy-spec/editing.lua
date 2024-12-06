@@ -65,6 +65,7 @@ local M = {
                 { "<leader>g",   group = "[g]it" },
                 { "<leader>gh",  group = "[h]unk" },
                 { "<leader>gm",  group = "[m]erge" },
+                { "<leader>gd",  group = "[d]iff" },
 
                 { "<leader>q",   group = "[q]uickfix" },
 
@@ -78,46 +79,6 @@ local M = {
         config = function(_, opts)
             local wk = require('which-key')
             wk.setup(opts)
-
-            -- Document existing key chains
-            -- wk.add({
-            --     { "z",           group = "fold" },
-            --     { "z_",          hidden = true },
-            --
-            --     { "ys",          group = "[s]urround" },
-            --     { "ys_",         hidden = true },
-            --
-            --     { "]",           group = "next" },
-            --     { "]_",          hidden = true },
-            --
-            --     { "[",           group = "previous" },
-            --     { "[_",          hidden = true },
-            --
-            --     { "<leader>H",   group = "[H]arpoon" },
-            --     { "<leader>H_",  hidden = true },
-            --
-            --     { "<leader>d",   group = "[d]ebug" },
-            --     { "<leader>d_",  hidden = true },
-            --
-            --     { "<leader>g",   group = "[g]it" },
-            --     { "<leader>g_",  hidden = true },
-            --     { "<leader>gh",  group = "[h]unk" },
-            --     { "<leader>gh_", hidden = true },
-            --     { "<leader>gm",  group = "[m]erge" },
-            --     { "<leader>gm_", hidden = true },
-            --
-            --     { "<leader>q",   group = "[q]uickfix" },
-            --     { "<leader>q_",  hidden = true },
-            --
-            --     { "<leader>r",   group = "[r]est-nvim" },
-            --     { "<leader>r_",  hidden = true },
-            --
-            --     { "<leader>s",   group = "[s]earch" },
-            --     { "<leader>s_",  hidden = true },
-            --
-            --     { "<leader>w",   group = "[w]orkspace" },
-            --     { "<leader>w_",  hidden = true },
-            -- })
         end
     },
 

@@ -14,4 +14,3 @@ require('user.remap');
 
 -- create new filetype associations
 require('user.filetype')
-
