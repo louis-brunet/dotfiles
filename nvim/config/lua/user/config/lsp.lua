@@ -469,6 +469,9 @@ M.lspconfig_servers = {
 
 
     yamlls = {
+        on_attach = function(client, _)
+            client.server_capabilities.documentFormattingProvider = true
+        end,
         settings = {
             redhat = {
                 telemetry = {
@@ -478,6 +481,7 @@ M.lspconfig_servers = {
             yaml = {
                 schemas = {
                     ['.github/workflows/*.{yml,yaml}'] = 'https://json.schemastore.org/github-workflow.json',
+                    -- ['*cloud-config.{yml,yaml}'] = 'https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json',
                 }
             }
         }
