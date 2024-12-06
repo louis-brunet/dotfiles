@@ -5,7 +5,10 @@
 
 
     # terraform
-    complete -o nospace -C '/usr/bin/terraform' terraform
+    terraform_path="$(which terraform)"
+    if [ -n terraform_path ]; then
+        complete -o nospace -C "$terraform_path" terraform
+    fi
 
 
     #compdef cdktf
