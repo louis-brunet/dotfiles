@@ -13,13 +13,29 @@
 ## Running for ggml-org/llama.vim plugin
 
 ```bash
+# qwen2.5-coder-1.5b
 llama-server \
     --hf-repo ggerganov/Qwen2.5-Coder-1.5B-Q8_0-GGUF \
     --hf-file qwen2.5-coder-1.5b-q8_0.gguf \
-    --port 8012 -ngl 99 -fa -ub 512 -b 1024 -dt 0.1 \
+    --port 8012 \
+    --n-gpu-layers 99 --flash-attn \
+    --ubatch-size 512 --batch-size 1024 \
+    --defrag-thold 0.1 \
+    --cache-reuse 256
+
+# qwen2.5-coder-7b
+llama-server \
+    --hf-repo ggml-org/Qwen2.5-Coder-7B-Q8_0-GGUF \
+    --hf-file qwen2.5-coder-7b-q8_0.gguf \
+    --port 8012 \
+    --n-gpu-layers 99 --flash-attn \
+    --ubatch-size 512 --batch-size 1024 \
+    --defrag-thold 0.1 \
     --cache-reuse 256
 ```
 
+> [!NOTE]
+> use qwen2.5-coder, not qwen2.5-coder-instruct
 
 ## Manually
 From instructions in https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF :
