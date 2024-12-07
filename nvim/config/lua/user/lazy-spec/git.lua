@@ -90,23 +90,23 @@ local M = {
                 -- Gitsigns mappings
                 nmap(
                     '<leader>ghp',
-                    function() require('gitsigns').prev_hunk() end,
+                    function() require('gitsigns').nav_hunk('prev') end,
                     '[g]it: [h]unk [p]revious'
                 )
                 nmap(
                     '[g',
-                    function() require('gitsigns').prev_hunk() end,
+                    function() require('gitsigns').nav_hunk('prev') end,
                     '[g]it: Previous Hunk'
                 )
 
                 nmap(
                     '<leader>ghn',
-                    function() require('gitsigns').next_hunk() end,
+                    function() require('gitsigns').nav_hunk('next') end,
                     '[g]it: [h]unk [n]ext'
                 )
                 nmap(
                     ']g',
-                    function() require('gitsigns').next_hunk() end,
+                    function() require('gitsigns').nav_hunk('next') end,
                     '[g]it: Next Hunk'
                 )
                 nmap(
