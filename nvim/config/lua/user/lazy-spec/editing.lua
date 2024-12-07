@@ -45,6 +45,7 @@ local M = {
         opts = {
             -- preset = "classic",
             keys = {
+                -- FIXME: doesn't work on mac, even after unbinding Mission Control shortcuts
                 scroll_down = "<c-Down>", -- binding to scroll down inside the popup
                 scroll_up = "<c-Up>",   -- binding to scroll up inside the popup
             },
@@ -61,6 +62,8 @@ local M = {
                 { "<leader>H",   group = "[H]arpoon" },
 
                 { "<leader>d",   group = "[d]ebug" },
+
+                { "<leader>l",   group = "[l]sp" },
 
                 { "<leader>g",   group = "[g]it" },
                 { "<leader>gh",  group = "[h]unk" },

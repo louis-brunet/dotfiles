@@ -1,5 +1,5 @@
 ---@param language string
----@param dap_configs Configuration[]
+---@param dap_configs dap.Configuration[]
 local function set_configs_if_not_defined(language, dap_configs)
     local dap = require('dap')
 
@@ -10,7 +10,7 @@ end
 
 
 ---@param adapter_key string
----@param dap_adapter Adapter|fun(callback: fun(adapter:Adapter), config: Configuration)
+---@param dap_adapter dap.Adapter|fun(callback: fun(adapter:dap.Adapter), config: dap.Configuration)
 local function set_adapter_if_not_defined(adapter_key, dap_adapter)
     local dap = require('dap')
 
@@ -81,7 +81,7 @@ local function config_javascript()
     local dap_utils = require('dap.utils')
 
     local adapter_key = 'pwa-node'
-    ---@type Adapter
+    ---@type dap.Adapter
     local js_adapter = {
         type = 'server',
         host = 'localhost',
@@ -96,7 +96,7 @@ local function config_javascript()
             },
         },
     }
-    ---@type Configuration[]
+    ---@type dap.Configuration[]
     local js_configs = {
         {
             type = adapter_key,

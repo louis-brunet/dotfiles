@@ -377,6 +377,8 @@ M.lspconfig_servers = {
             Lua = {
                 telemetry = { enable = false },
 
+                codelens = { enable = true },
+
                 hint = {
                     enable = true,
 

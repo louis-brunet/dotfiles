@@ -36,12 +36,11 @@ return {
         local nvim_notify = require('notify')
         nvim_notify.setup(opts)
 
-        ---@param opts notify.Options|nil
-        vim.notify = function(msg, level, opts)
-            opts = opts or {}
-            opts.animate = false -- turn off the first stage of animation, start timeout immediately
+        vim.notify = function(msg, level, notify_opts)
+            notify_opts = notify_opts or {}
+            notify_opts.animate = false -- turn off the first stage of animation, start timeout immediately
 
-            nvim_notify(msg, level, opts)
+            nvim_notify(msg, level, notify_opts)
         end
 
         local has_which_key, which_key = pcall(require, 'which-key')
