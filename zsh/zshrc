@@ -140,8 +140,8 @@ typeset -U config_files
 # exclude bin/* and scripts/*
 old_extended_glob=$options[extended_glob]
 setopt extended_glob
-config_files=($DOTFILES/*/*.zsh~$DOTFILES/bin/*~$DOTFILES/scripts/*)
-if [ $old_extended_glob != on ]
+config_files=("$DOTFILES"/*/*.zsh~"$DOTFILES"/bin/*~"$DOTFILES"/scripts/*)
+if [ "$old_extended_glob" != on ]
 then
   unsetopt extended_glob
 fi
@@ -158,7 +158,7 @@ done
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 p10k_config_file="$HOME/.p10k.zsh"
-[[ -f $p10k_config_file ]] && source $p10k_config_file
+[[ -f "$p10k_config_file" ]] && source "$p10k_config_file"
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
