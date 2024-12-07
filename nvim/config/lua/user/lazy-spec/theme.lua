@@ -305,6 +305,8 @@ return {
                     -- llama_hl_info = { link = "DiagnosticVirtualTextInfo", style = "italic" },
                     llama_hl_info = { link = "lualine_transitional_lualine_b_insert_to_lualine_c_insert", style = "italic" },
                     llama_hl_hint = { fg = 'fg3', style = "" },
+
+                    ["@module.python"] = { link = "@variable" },
                 }
             }
         },
