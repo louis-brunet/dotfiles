@@ -1,0 +1,19 @@
+#compdef mvdownload
+
+_mvdownload() {
+  local downloads_directory="${DOWNLOADS_DIRECTORY:-$HOME/Downloads}"
+
+  _arguments '1:downloaded_file:->downloads' '2:destination:->destination'
+
+  case $state in
+    (downloads)
+      _path_files -W "$downloads_directory" 
+      # -g "*(.)"
+    ;;
+    (destination)
+      _files
+    ;;
+  esac
+}
+
+_mvdownload "$@"

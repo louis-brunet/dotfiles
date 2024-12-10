@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+DOWNLOADS_DIRECTORY="${DOWNLOADS_DIRECTORY:-$HOME/Downloads}"
+
+if [ $# -ne 2 ]; then
+    echo "usage: $0 <filename_from_downloads> <destination>"
+    exit 1
+fi
+
+mv "$DOWNLOADS_DIRECTORY/$1" "$2"
