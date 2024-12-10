@@ -1,4 +1,4 @@
-local system_bin="$HOME/bin:$DOTFILES/bin:$HOME/.local/bin"
+local system_bin="$HOME/bin:${DOTFILES:-$HOME/code/dotfiles}/bin:$HOME/.local/bin"
 
 case ":${PATH}:" in
     *:"$system_bin":*)
