@@ -312,7 +312,8 @@ return {
                 },
 
                 defaults = {
-                    layout_strategy = custom_layout_strategy_name,
+                    -- layout_strategy = custom_layout_strategy_name,
+                    layout_strategy = "horizontal",
                     -- layout_strategy = "bottom_pane",
                     -- border = false,
                     -- borderchars = border_chars.box,

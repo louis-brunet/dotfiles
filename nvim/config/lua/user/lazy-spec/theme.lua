@@ -310,6 +310,8 @@ return {
                     ["@module.python"] = { link = "@variable" },
 
                     TelescopePromptTitle = { link = "@type" },
+                    TelescopePromptBorder = { link = "@type" },
+                    TelescopeBorder = { fg = "palette.accent.fg" },
                 },
             },
         },
