@@ -12,9 +12,9 @@ local function attached_lsp_clients_str()
     return names_str
 end
 
-local function codeium_status()
-    return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
-end
+-- local function codeium_status()
+--     return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
+-- end
 
 local colorscheme_name = require('user.config.theme').colorscheme_name
 
@@ -307,6 +307,8 @@ return {
                     llama_hl_hint = { fg = 'fg3', style = "" },
 
                     ["@module.python"] = { link = "@variable" },
+
+                    TelescopePromptBorder = { fg = '#FF0000' }, -- TODO: better color
                 }
             }
         },
