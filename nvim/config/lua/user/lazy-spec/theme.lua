@@ -309,7 +309,7 @@ return {
 
                     ["@module.python"] = { link = "@variable" },
 
-                    TelescopePromptBorder = { fg = "#FF0000" },  -- TODO: better color
+                    TelescopePromptTitle = { link = "@type" },
                 },
             },
         },
