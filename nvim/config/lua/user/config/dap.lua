@@ -1,7 +1,7 @@
 ---@param language string
 ---@param dap_configs dap.Configuration[]
 local function set_configs_if_not_defined(language, dap_configs)
-    local dap = require('dap')
+    local dap = require("dap")
 
     if not dap.configurations[language] then
         dap.configurations[language] = dap_configs
@@ -12,7 +12,7 @@ end
 ---@param adapter_key string
 ---@param dap_adapter dap.Adapter|fun(callback: fun(adapter:dap.Adapter), config: dap.Configuration)
 local function set_adapter_if_not_defined(adapter_key, dap_adapter)
-    local dap = require('dap')
+    local dap = require("dap")
 
     if not dap.adapters[adapter_key] then
         dap.adapters[adapter_key] = dap_adapter
@@ -22,24 +22,26 @@ end
 
 local function config_rust()
     -- vim.ui.input(input_opts, input_on_confirm)
-    local adapter_key = 'rust_codelldb';
+    local adapter_key = "rust_codelldb";
     set_adapter_if_not_defined(adapter_key, {
-        type = 'server',
-        port = '${port}',
-        host = '127.0.0.1',
+        type = "server",
+        port = "${port}",
+        host = "127.0.0.1",
         executable = {
             -- command = 'codelldb',
             -- TODO: 💀 Make sure to update this path to point to your installation
-            command = require('mason-registry').get_package('codelldb'):get_install_path()
-                .. '/codelldb',
+            command = require("mason-registry").get_package("codelldb")
+                :get_install_path()
+                .. "/codelldb",
             args = {
                 -- '--liblldb', liblldb_path,
-                '--port', '${port}',
+                "--port",
+                "${port}",
             },
         },
     })
 
-    set_configs_if_not_defined('rust', {
+    set_configs_if_not_defined("rust", {
         -- {
         --     type = adapter_key,
         --     request = 'launch',
@@ -51,11 +53,11 @@ local function config_rust()
         -- },
 
         {
-            name = 'TODO: config?',
+            name = "TODO: config?",
             type = adapter_key,
-            request = 'launch',
+            request = "launch",
             cargo = {
-                args = { 'test', '--no-run', '--lib', '--bin' }, -- Cargo command line to build the debug target
+                args = { "test", "--no-run", "--lib", "--bin" },  -- Cargo command line to build the debug target
                 -- args = { 'build' }, --, "--bin=foo"] is another possibility
 
                 -- The rest are optional
@@ -66,33 +68,35 @@ local function config_rust()
                 --     kind = "lib"
                 -- }
             },
-            cwd = '${workspaceFolder}',
+            cwd = "${workspaceFolder}",
             -- program = '${workspaceFolder}/target/debug/${file}',
             program = function()
-                return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+                return vim.fn.input("Path to executable: ",
+                    vim.fn.getcwd() .. "/target/debug/", "file")
             end,
             stopOnEntry = false,
-        }
+        },
     })
 end
 
 
 local function config_javascript()
-    local dap_utils = require('dap.utils')
+    local dap_utils = require("dap.utils")
 
-    local adapter_key = 'pwa-node'
+    local adapter_key = "pwa-node"
     ---@type dap.Adapter
     local js_adapter = {
-        type = 'server',
-        host = 'localhost',
-        port = '${port}',
+        type = "server",
+        host = "localhost",
+        port = "${port}",
         executable = {
-            command = 'node',
+            command = "node",
             -- 💀 Make sure to update this path to point to your installation
             args = {
-                require('mason-registry').get_package('js-debug-adapter'):get_install_path()
-                .. '/js-debug/src/dapDebugServer.js',
-                '${port}',
+                require("mason-registry").get_package("js-debug-adapter")
+                :get_install_path()
+                .. "/js-debug/src/dapDebugServer.js",
+                "${port}",
             },
         },
     }
@@ -100,25 +104,24 @@ local function config_javascript()
     local js_configs = {
         {
             type = adapter_key,
-            request = 'launch',
-            name = 'Launch file',
-            program = '${file}',
-            cwd = '${workspaceFolder}',
-            console = 'integratedTerminal',
+            request = "launch",
+            name = "Launch file",
+            program = "${file}",
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
         },
         {
             type = adapter_key,
-            request = 'attach',
-            name = 'Attach',
+            request = "attach",
+            name = "Attach",
             processId = dap_utils.pick_process,
-            cwd = '${workspaceFolder}',
-            console = 'integratedTerminal',
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
         },
     }
 
-
     set_adapter_if_not_defined(adapter_key, js_adapter)
-    for _, language in ipairs({ 'typescript', 'javascript', 'typescriptreact', 'javascriptreact' }) do
+    for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
         set_configs_if_not_defined(language, js_configs)
     end
 end
@@ -133,7 +136,6 @@ local icons = {
     LogPoint            = ".>",
 }
 
-
 ---@class DapUserCommand
 ---@field name string
 ---@field cmd fun(): nil
@@ -142,36 +144,35 @@ local icons = {
 ---@type DapUserCommand[]
 local user_cmds = {
     {
-        name = 'DapBreakpointsList',
-        cmd = function() require('dap').list_breakpoints(true) end,
-        desc = 'List breakpoints (quickfix)',
+        name = "DapBreakpointsList",
+        cmd = function() require("dap").list_breakpoints(true) end,
+        desc = "List breakpoints (quickfix)",
     },
     {
-        name = 'DapBreakpointsTelescope',
+        name = "DapBreakpointsTelescope",
         cmd = function()
-            require('dap').list_breakpoints(false)
-            require('telescope.builtin').quickfix()
+            require("dap").list_breakpoints(false)
+            require("telescope.builtin").quickfix()
         end,
-        desc = 'List breakpoints (Telescope)',
+        desc = "List breakpoints (Telescope)",
     },
     {
-        name = 'DapBreakpointsClear',
-        cmd = function() require('dap').clear_breakpoints(); end,
-        desc = 'Clear breakpoints',
+        name = "DapBreakpointsClear",
+        cmd = function() require("dap").clear_breakpoints(); end,
+        desc = "Clear breakpoints",
     },
 }
 
-
-
 ---@param config {args?:string[]|fun():string[]?}
 local function get_args(config)
-    local args = type(config.args) == "function" and (config.args() or {}) or config.args or {}
+    local args = type(config.args) == "function" and (config.args() or {}) or
+        config.args or {}
     config = vim.deepcopy(config)
 
     ---@cast args string[]
     config.args = function()
-        local new_args = vim.fn.input("Run with args: ", table.concat(args, " ")) --[[@as string]]
-        return vim.split(vim.fn.expand(new_args) --[[@as string]], " ")
+        local new_args = vim.fn.input("Run with args: ", table.concat(args, " "))  --[[@as string]]
+        return vim.split(vim.fn.expand(new_args)  --[[@as string]], " ")
     end
     return config
 end
@@ -184,13 +185,10 @@ local M = {}
 
 --- Commands used to lazy-load nvim-dap
 ---@type string[]
-M.dap_cmd = {
-    'DapToggleBreakpoint', 'DapContinue', 'DapShowLog'
-}
+M.dap_cmd = { "DapToggleBreakpoint", "DapContinue", "DapShowLog" }
 for _, user_cmd in ipairs(user_cmds) do
     table.insert(M.dap_cmd, user_cmd.name)
 end
-
 
 -- config() for nvim-dap
 function M.dap_config()
@@ -200,15 +198,19 @@ function M.dap_config()
         sign = type(sign) == "table" and sign or { sign }
         vim.fn.sign_define(
             "Dap" .. name,
-            { text = sign[1], texthl = sign[2] or "DiagnosticInfo", linehl = sign[3], numhl = sign[3] }
+            {
+                text = sign[1],
+                texthl = sign[2] or "DiagnosticInfo",
+                linehl = sign[3],
+                numhl = sign[3],
+            }
         )
     end
 
-
     for _, user_cmd in ipairs(user_cmds) do
-        vim.api.nvim_create_user_command(user_cmd.name, user_cmd.cmd, { desc = 'DAP: ' .. user_cmd.desc })
+        vim.api.nvim_create_user_command(user_cmd.name, user_cmd.cmd,
+            { desc = "DAP: " .. user_cmd.desc, })
     end
-
 
     config_javascript();
     config_rust();
@@ -217,41 +219,110 @@ end
 --- keymaps used to lazy-load nvim-dap
 ---@type LazyKeysSpec[]
 M.dap_keys = {
-    { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "DAP: [B]reakpoint Condition" },
-    { "<leader>db", function() require("dap").toggle_breakpoint() end,                                    desc = "DAP: Toggle [b]reakpoint" },
-    { "<leader>dc", function() require("dap").continue() end,                                             desc = "DAP: [c]ontinue" },
-    { "<leader>da", function() require("dap").continue({ before = get_args }) end,                        desc = "DAP: Run with [a]rgs" },
-    { "<leader>dC", function() require("dap").run_to_cursor() end,                                        desc = "DAP: Run to [C]ursor" },
-    { "<leader>dg", function() require("dap").goto_() end,                                                desc = "DAP: [g]o to line (no execute)" },
-    { "<leader>di", function() require("dap").step_into() end,                                            desc = "DAP: Step [I]nto" },
-    { "<leader>dj", function() require("dap").down() end,                                                 desc = "DAP: Down" },
-    { "<leader>dk", function() require("dap").up() end,                                                   desc = "DAP: Up" },
-    { "<leader>dl", function() require("dap").run_last() end,                                             desc = "DAP: Run [l]ast" },
-    { "<leader>do", function() require("dap").step_out() end,                                             desc = "DAP: Step [o]ut" },
-    { "<leader>dO", function() require("dap").step_over() end,                                            desc = "DAP: Step [O]ver" },
-    { "<leader>dp", function() require("dap").pause() end,                                                desc = "DAP: [p]ause" },
-    { "<leader>dr", function() require("dap").repl.toggle() end,                                          desc = "DAP: Toggle [r]EPL" },
-    { "<leader>dS", function() require("dap").session() end,                                              desc = "DAP: [S]ession" },
-    { "<leader>dt", function() require("dap").terminate() end,                                            desc = "DAP: [t]erminate" },
-    { "<leader>dw", function() require("dap.ui.widgets").hover() end,                                     desc = "DAP: [w]idgets" },
+    {
+        "<leader>dB",
+        function()
+            require("dap").set_breakpoint(vim.fn.input(
+                "Breakpoint condition: "))
+        end,
+        desc = "DAP: [B]reakpoint Condition",
+    },
+    {
+        "<leader>db",
+        function() require("dap").toggle_breakpoint() end,
+        desc = "DAP: Toggle [b]reakpoint",
+    },
+    {
+        "<leader>dc",
+        function() require("dap").continue() end,
+        desc = "DAP: [c]ontinue",
+    },
+    {
+        "<leader>da",
+        function() require("dap").continue({ before = get_args }) end,
+        desc = "DAP: Run with [a]rgs",
+    },
+    {
+        "<leader>dC",
+        function() require("dap").run_to_cursor() end,
+        desc = "DAP: Run to [C]ursor",
+    },
+    {
+        "<leader>dg",
+        function() require("dap").goto_() end,
+        desc = "DAP: [g]o to line (no execute)",
+    },
+    {
+        "<leader>di",
+        function() require("dap").step_into() end,
+        desc = "DAP: Step [I]nto",
+    },
+    { "<leader>dj", function() require("dap").down() end, desc = "DAP: Down" },
+    { "<leader>dk", function() require("dap").up() end,   desc = "DAP: Up" },
+    {
+        "<leader>dl",
+        function() require("dap").run_last() end,
+        desc = "DAP: Run [l]ast",
+    },
+    {
+        "<leader>do",
+        function() require("dap").step_out() end,
+        desc = "DAP: Step [o]ut",
+    },
+    {
+        "<leader>dO",
+        function() require("dap").step_over() end,
+        desc = "DAP: Step [O]ver",
+    },
+    { "<leader>dp", function() require("dap").pause() end,   desc = "DAP: [p]ause" },
+    {
+        "<leader>dr",
+        function() require("dap").repl.toggle() end,
+        desc = "DAP: Toggle [r]EPL",
+    },
+    { "<leader>dS", function() require("dap").session() end, desc = "DAP: [S]ession" },
+    {
+        "<leader>dt",
+        function() require("dap").terminate() end,
+        desc = "DAP: [t]erminate",
+    },
+    {
+        "<leader>dw",
+        function() require("dap.ui.widgets").hover() end,
+        desc = "DAP: [w]idgets",
+    },
 }
-
-
 
 ---@type LazyKeysSpec[]
 M.dapui_keys = {
-    { "<leader>du", function() require("dapui").toggle({}) end,             desc = "DAP: Toggle [u]i" },
-    { "<leader>dU", function() require("dapui").open({ reset = true }) end, desc = "DAP: Reset [U]I" },
-    { "<leader>de", function() require("dapui").eval() end,                 desc = "DAP: [e]val",     mode = { "n", "v" } },
+    {
+        "<leader>du",
+        function() require("dapui").toggle({}) end,
+        desc = "DAP: Toggle [u]i",
+    },
+    {
+        "<leader>dU",
+        function() require("dapui").open({ reset = true }) end,
+        desc = "DAP: Reset [U]I",
+    },
+    {
+        "<leader>de",
+        function() require("dapui").eval() end,
+        desc = "DAP: [e]val",
+        mode = {
+            "n",
+            "v"
+        },
+    },
 }
-
-
 
 --- :h mason-nvim-dap.nvim-available-dap-adapters
 --- https://github.com/jay-babu/mason-nvim-dap.nvim/blob/main/lua/mason-nvim-dap/mappings/source.lua
 ---@type string[]
 M.mason_nvim_dap_ensure_installed = {
-    'js',
+    "js",
+    -- 'codelldb',
+    -- 'python',
 }
 
 return M
