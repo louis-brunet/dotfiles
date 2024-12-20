@@ -226,7 +226,7 @@ M.lspconfig_servers = {
                     action = function()
                         typescript_commands.organize_imports({
                             bufnr = bufnr,
-                            delete_unused = true
+                            delete_unused = true,
                         })
                     end,
                     description = "Organize imports",
@@ -428,7 +428,7 @@ M.lspconfig_servers = {
 
                 completion = { callSnippet = "Replace" },
 
-                format = { defaultConfig = { indent_style = "space" }, },
+                format = { defaultConfig = { indent_style = "space" } },
             },
         },
     },
@@ -520,9 +520,19 @@ M.lspconfig_servers = {
     harper_ls = {
         settings = {
             ["harper-ls"] = {
+                -- userDictPath = vim.fs.joinpath(
+                --     vim.fn.expand("$XDG_CONFIG_HOME"),
+                --     "harper-ls"
+                -- ),
+                -- fileDictPath = vim.fs.joinpath(
+                --     vim.fn.expand("$XDG_DATA_HOME"),
+                --     "harper-ls",
+                --     "file_dictionaries"
+                -- ),
+                diagnosticSeverity = "hint",  -- Can also be "information", "warning", or "error"
                 linters = {
                     spell_check = false,
-                    spelled_numbers = false,
+                    spelled_numbers = true,
                     an_a = true,
                     sentence_capitalization = false,
                     unclosed_quotes = true,
@@ -538,6 +548,7 @@ M.lspconfig_servers = {
                     avoid_curses = true,
                     terminating_conjunctions = true,
                 },
+                codeActions = { forceStable = true },
             },
         },
     },
