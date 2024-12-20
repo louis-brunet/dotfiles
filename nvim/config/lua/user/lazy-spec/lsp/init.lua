@@ -2,8 +2,8 @@
 ---@type LazySpec
 local M = {
     {
-        'dmmulroy/tsc.nvim',
-        cmd = { 'TSC', 'TSCOpen' },
+        "dmmulroy/tsc.nvim",
+        cmd = { "TSC", "TSCOpen" },
         opts = {
             -- auto_open_qflist = true,
             -- auto_close_qflist = false,
@@ -33,40 +33,39 @@ local M = {
                 -- or leave it empty to use the default settings
                 -- refer to the configuration section below
             },
-        }
+        },
     },
     {
         -- LSP Configuration & Plugins
-        'neovim/nvim-lspconfig',
-        event = 'BufReadPre',
+        "neovim/nvim-lspconfig",
+        event = "BufReadPre",
         dependencies = {
             -- Useful status updates for LSP
-            { 'j-hui/fidget.nvim',          tag = 'legacy', opts = {} },
+            { "j-hui/fidget.nvim",          tag = "legacy", opts = {} },
 
             -- Additional lua configuration, makes nvim stuff amazing!
-            'folke/neodev.nvim',
+            "folke/neodev.nvim",
 
             -- LSP dependencies in lua/user/plugins/lsp/*.lua (except init.lua)
-            { import = 'user.lazy-spec.lsp' },
+            { import = "user.lazy-spec.lsp" },
         },
         config = function(_, _)
             -- Setup neovim lua configuration
-            require('neodev').setup()
+            require("neodev").setup()
 
             -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
             local capabilities = vim.lsp.protocol.make_client_capabilities()
-            capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+            capabilities = require("cmp_nvim_lsp").default_capabilities(
+                capabilities)
 
             -- Ensure the servers above are installed
-            local mason_lspconfig = require 'mason-lspconfig'
+            local mason_lspconfig = require("mason-lspconfig")
 
-            local user_config = require('user.config.lsp')
+            local user_config = require("user.config.lsp")
             local servers = user_config.lspconfig_servers
             local common_on_attach = user_config.on_attach
 
-            mason_lspconfig.setup({
-                ensure_installed = vim.tbl_keys(servers),
-            })
+            mason_lspconfig.setup({ ensure_installed = vim.tbl_keys(servers) })
 
             mason_lspconfig.setup_handlers({
                 function(server_name)
@@ -81,13 +80,13 @@ local M = {
                     local server_on_attach = function(client, bufnr)
                         common_on_attach(client, bufnr)
 
-                        if type(server_config.on_attach) == 'function' then
+                        if type(server_config.on_attach) == "function" then
                             server_config.on_attach(client, bufnr)
                         end
                     end
 
                     -- :h lspconfig-setup
-                    require('lspconfig')[server_name].setup {
+                    require("lspconfig")[server_name].setup({
                         capabilities = capabilities,
                         on_attach = server_on_attach,
                         settings = server_config.settings,
@@ -100,10 +99,10 @@ local M = {
                         cmd = server_config.cmd,
                         -- handlers = {},
                         -- on_new_config = function (new_config, new_root_dir) end,
-                    }
+                    })
                 end,
             })
-        end
+        end,
     },
 }
 

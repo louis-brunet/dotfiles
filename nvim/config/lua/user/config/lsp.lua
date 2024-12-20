@@ -224,7 +224,10 @@ M.lspconfig_servers = {
                 {
                     command_name = "TypescriptOrganizeImports",
                     action = function()
-                        typescript_commands.organize_imports({ bufnr = bufnr, delete_unused = true })
+                        typescript_commands.organize_imports({
+                            bufnr = bufnr,
+                            delete_unused = true
+                        })
                     end,
                     description = "Organize imports",
                 },
@@ -425,16 +428,15 @@ M.lspconfig_servers = {
 
                 completion = { callSnippet = "Replace" },
 
-                format = {
-                    defaultConfig = { indent_style = "space" },
-                },
+                format = { defaultConfig = { indent_style = "space" }, },
             },
         },
     },
 
     bashls = {
         filetypes = {
-            "zsh", "bash",
+            "zsh",
+            "bash",
 
             -- default filetypes
             "sh",
@@ -476,7 +478,10 @@ M.lspconfig_servers = {
         filetypes = {
             "angular.html",
             -- defaults
-            "typescript", "html", "typescriptreact", "typescript.tsx",
+            "typescript",
+            "html",
+            "typescriptreact",
+            "typescript.tsx",
         },
     },
 
@@ -508,6 +513,31 @@ M.lspconfig_servers = {
 
                 -- FIXME: seems to not work like I thought (like NODE_OPTIONS=--max_old_space_size=4096) -- for big files
                 execArgv = { "--max_old_space_size=4096" },
+            },
+        },
+    },
+
+    harper_ls = {
+        settings = {
+            ["harper-ls"] = {
+                linters = {
+                    spell_check = false,
+                    spelled_numbers = false,
+                    an_a = true,
+                    sentence_capitalization = false,
+                    unclosed_quotes = true,
+                    wrong_quotes = false,
+                    long_sentences = true,
+                    repeated_words = true,
+                    spaces = true,
+                    matcher = true,
+                    correct_number_suffix = true,
+                    number_suffix_capitalization = true,
+                    multiple_sequential_pronouns = true,
+                    linking_verbs = false,
+                    avoid_curses = true,
+                    terminating_conjunctions = true,
+                },
             },
         },
     },
