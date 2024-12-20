@@ -19,7 +19,9 @@ local fzf_opts=(
    # --header 'tmux-sessionizer target' 
    --keep-right
    --filepath-word
-   --color 'dark,pointer:red,prompt:bright-blue,bg+:bright-black'
+   --color='dark,pointer:red,prompt:bright-blue,bg+:bright-black'
+   --delimiter='/'
+   --nth=-1
 )
 if which tmux-preview-session >/dev/null 2>/dev/null; then
     fzf_opts+=--preview
