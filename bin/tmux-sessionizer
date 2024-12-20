@@ -6,6 +6,11 @@
 
 set -e
 
+fail() {
+    echo "[tmux-sessionizer] $*" >&2
+    exit 1
+}
+
 start_tmux() {
     TERM=tmux-256color tmux -u "$@"
 }
@@ -29,8 +34,7 @@ select_with_fzf() {
     elif [ -n "$PROJECTS" ]; then
         dirs=("$PROJECTS")
     else
-        echo "No projects to search, define TMUX_SESSIONIZER_DIRS or PROJECTS" >&2
-        exit 1
+        fail "No projects to search, define TMUX_SESSIONIZER_DIRS or PROJECTS"
     fi
 
     find_opts=()
@@ -72,8 +76,7 @@ start_session() {
 }
 
 if ! which tmux >/dev/null 2>/dev/null; then
-    echo '[tmux-sessionizer] tmux: not found'
-    exit 1
+    fail "tmux not found"
 fi
 
 if [[ $# -eq 1 ]]; then
@@ -86,4 +89,6 @@ if [[ -z $selected ]]; then
     exit 0
 fi
 
-start_session "$selected"
+if ! start_session "$selected"; then
+    fail "could not start session with selection '$selected'"
+fi
