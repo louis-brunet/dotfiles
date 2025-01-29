@@ -583,9 +583,9 @@ function M.on_attach(client, bufnr)
         map("i", keys, func, desc)
     end
 
-    nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-    nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-    nmap("<A-Enter>", vim.lsp.buf.code_action, "Code Action")
+    nmap("<leader>rn", vim.lsp.buf.rename, "[r]e[n]ame")
+    nmap("<leader>ca", vim.lsp.buf.code_action, "[c]ode [a]ction")
+    nmap("<A-Enter>", vim.lsp.buf.code_action, "code action")
 
     local telescope_lsp_options = {
         layout_strategy = "vertical",
