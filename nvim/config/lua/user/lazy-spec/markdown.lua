@@ -5,9 +5,19 @@ return {
     {
         -- Make sure to set this up properly if you have lazy=true
         "MeanderingProgrammer/render-markdown.nvim",
+        ---@type render.md.UserConfig
         opts = {
             file_types = render_markdown_filetypes,
             pipe_table = { style = "normal", preset = "double" },
+            heading = {
+                -- sign = false,
+                width = "block",
+                min_width = 80,
+                -- position = "inline",
+                -- left_margin = 0.5,
+                -- left_pad = 0.2,
+                -- right_pad = 0.2,
+            },
         },
         ft = render_markdown_filetypes,
         -- dependencies = {'hrsh7th/nvim-cmp'},
