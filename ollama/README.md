@@ -22,3 +22,6 @@ see [open-webui](https://github.com/open-webui/open-webui)
   ```bash
   docker compose --file webui.compose.yaml up --build
   ```
+
+3. Open [http://localhost:3000](http://localhost:3000)  
+
