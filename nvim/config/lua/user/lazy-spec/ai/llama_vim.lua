@@ -32,6 +32,40 @@ local M = {
 
             -- NOTE: customized llama.vim highlight llama_hf_info and
             -- llama_hg_hint; see nvim/config/lua/user/lazy-spec/theme.lua
+
+            local notify = function(message)
+                vim.notify(
+                    message,
+                    vim.log.levels.INFO,
+                    { title = "llama.vim" }
+                )
+            end
+
+            local function toggle_llm_completions()
+                local opts = vim.g.llama_config
+                if opts.endpoint ~= "" then
+                    opts.endpoint = ""
+                else
+                    opts.endpoint = "http://127.0.0.1:8012/infill"
+                end
+                vim.g.llama_config = opts
+
+                local is_enabled = opts.endpoint ~= ""
+                local message = "LLM completions are "
+                if is_enabled then
+                    message = message .. "enabled"
+                else
+                    message = message .. "disabled"
+                end
+
+                notify(message)
+            end
+
+            vim.api.nvim_create_user_command(
+                "ToggleCompletions",
+                toggle_llm_completions,
+                { desc = "Toggle llama.vim completions" }
+            )
         end,
     },
 }
