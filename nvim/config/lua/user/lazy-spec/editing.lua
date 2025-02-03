@@ -240,7 +240,7 @@ local M = {
         config = function(_, opts)
             require("neogen").setup(opts)
             vim.keymap.set("n", "<leader>ld", require("neogen").generate,
-                { desc = "LSP: generate docstring" })
+                { desc = "LSP: generate [d]ocstring" })
         end,
     },
 }

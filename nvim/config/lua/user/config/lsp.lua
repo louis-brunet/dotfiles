@@ -678,6 +678,21 @@ function M.on_attach(client, bufnr)
             vim.lsp.inlay_hint.enable(not is_enabled, { bufnr = bufnr })
         end, "toggle [i]nlay hints")
     end
+
+    nmap("<leader>lt", function()
+        ---@type vim.diagnostic.Filter
+        local diagnostic_filter = { bufnr = 0 }
+        local was_enabled = vim.diagnostic.is_enabled(diagnostic_filter)
+        vim.diagnostic.enable(not was_enabled, diagnostic_filter)
+
+        local message = " diagnostics"
+        if was_enabled then
+            message = "Disabled " .. message
+        else
+            message = "Enabled " .. message
+        end
+        vim.notify(message)
+    end, "[t]oggle diagnostics")
 end
 
 return M
