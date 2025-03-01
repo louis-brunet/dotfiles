@@ -19,7 +19,7 @@ local function get_typescript_lsp_client(bufnr)
     })
 
     for _, client in ipairs(clients) do
-        if client.name == "tsserver" then
+        if client.name == "ts_ls" or client.name == "tsserver" then
             return client
         end
     end
