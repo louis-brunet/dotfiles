@@ -79,6 +79,115 @@ local function config_rust()
     })
 end
 
+local function pick_runtime_executable()
+    return coroutine.create(function(dap_run_co)
+        vim.ui.input({ prompt = "Executable> ", completion = "shellcmd" },
+            function(input)
+                if not input or input == "" then
+                    coroutine.resume(dap_run_co, require("dap").ABORT)
+                    return
+                end
+                coroutine.resume(dap_run_co, input)
+            end)
+    end)
+end
+
+local function pick_runtime_args()
+    return coroutine.create(function(dap_run_co)
+        vim.ui.input({ prompt = "Arguments> " }, function(input)
+            if not input or input == "" then
+                coroutine.resume(dap_run_co, require("dap").ABORT)
+                return
+            end
+            local input_array = vim.split(input, " ", { trimempty = true })
+            coroutine.resume(dap_run_co, input_array)
+        end)
+    end)
+end
+
+local function pick_package_json_script_executable()
+    return coroutine.create(function(dap_run_co)
+        local items = { "npm", "yarn" }
+        vim.ui.select(items, { label = "Runner> " }, function(choice)
+            if not choice or choice == "" then
+                coroutine.resume(dap_run_co, require("dap").ABORT)
+                return
+            end
+            coroutine.resume(dap_run_co, choice)
+        end)
+    end)
+end
+
+local function get_package_json()
+    ---@param message string
+    local function log_error(message)
+        vim.notify(message, vim.log.levels.ERROR,
+            { title = "get_package_json" })
+    end
+
+    -- Find the nearest package.json file
+    local package_json_path = vim.fn.findfile("package.json", ".;")
+
+    if package_json_path ~= "" then
+        -- Read the contents of package.json
+        local content = vim.fn.readfile(package_json_path)
+        local json_str = table.concat(content, "\n")
+
+        -- Parse the JSON content
+        local ok, parsed = pcall(vim.json.decode, json_str)
+
+        if ok then
+            return parsed
+        else
+            log_error('could not decode JSON at "' .. package_json_path .. '"')
+        end
+    else
+        log_error("could not find package.json")
+    end
+end
+
+---@return string[]
+local function get_package_json_script_names()
+    ---@param message string
+    local function log_error(message)
+        vim.notify(message, vim.log.levels.ERROR,
+            { title = "get_package_json_script_names" })
+    end
+    local script_names = {}
+
+    local package_json = get_package_json()
+    if not package_json then
+        log_error("could not find package.json")
+        return {}
+    end
+    if package_json.scripts then
+        for script_name, _ in pairs(package_json.scripts) do
+            table.insert(script_names, script_name)
+        end
+    else
+        log_error("could not find scripts in package.json")
+    end
+
+    return script_names
+end
+
+local function pick_package_json_script_args()
+    return coroutine.create(function(dap_run_co)
+        local script_names = get_package_json_script_names()
+        if not script_names or #script_names == 0 then
+            coroutine.resume(dap_run_co, require("dap").ABORT)
+        end
+        vim.notify("script_names: " .. table.concat(script_names, ", "))
+        vim.ui.select(script_names, { label = "Script> " }, function(choice)
+            if not choice or choice == "" then
+                coroutine.resume(dap_run_co, require("dap").ABORT)
+                return
+            end
+            local result = { "run", choice }
+            coroutine.resume(dap_run_co, result)
+        end)
+    end)
+end
 
 local function config_javascript()
     local dap_utils = require("dap.utils")
@@ -104,17 +213,43 @@ local function config_javascript()
     local js_configs = {
         {
             type = adapter_key,
+            request = "attach",
+            name = "Attach",
+            processId = dap_utils.pick_process,
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
+        },
+        {
+            type = adapter_key,
             request = "launch",
-            name = "Launch file",
+            name = "Launch package.json script",
+            runtimeExecutable = pick_package_json_script_executable,
+            runtimeArgs = pick_package_json_script_args,
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
+        },
+        {
+            type = adapter_key,
+            request = "launch",
+            name = "Launch command",
+            runtimeExecutable = pick_runtime_executable,
+            runtimeArgs = pick_runtime_args,
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
+        },
+        {
+            type = adapter_key,
+            request = "launch",
+            name = "Launch this file",
             program = "${file}",
             cwd = "${workspaceFolder}",
             console = "integratedTerminal",
         },
         {
             type = adapter_key,
-            request = "attach",
-            name = "Attach",
-            processId = dap_utils.pick_process,
+            request = "launch",
+            name = "Pick file",
+            program = dap_utils.pick_file,
             cwd = "${workspaceFolder}",
             console = "integratedTerminal",
         },
@@ -209,7 +344,7 @@ function M.dap_config()
 
     for _, user_cmd in ipairs(user_cmds) do
         vim.api.nvim_create_user_command(user_cmd.name, user_cmd.cmd,
-            { desc = "DAP: " .. user_cmd.desc, })
+            { desc = "DAP: " .. user_cmd.desc })
     end
 
     config_javascript();
@@ -309,10 +444,7 @@ M.dapui_keys = {
         "<leader>de",
         function() require("dapui").eval() end,
         desc = "DAP: [e]val",
-        mode = {
-            "n",
-            "v"
-        },
+        mode = { "n", "v" },
     },
 }
 
