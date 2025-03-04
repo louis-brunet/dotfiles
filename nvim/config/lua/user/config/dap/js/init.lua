@@ -17,7 +17,7 @@ local function pick_runtime_args()
         })
 end
 
-local function get_package_json()
+local function parse_package_json()
     ---@param message string
     local function log_error(message)
         vim.notify(message, vim.log.levels.ERROR,
@@ -41,19 +41,20 @@ local function get_package_json()
             log_error('could not decode JSON at "' .. package_json_path .. '"')
         end
     else
-        log_error("could not find package.json")
+        log_error("could not find package.json in any parent directory")
     end
 end
 
+--- NOTE: order in this table determines priority
 local detectable_packager_managers = {
     { name = "yarn", lock_file = "yarn.lock" },
     { name = "pnpm", lock_file = "pnpm-lock.yaml" },
     { name = "npm",  lock_file = "package-lock.json" },
 }
 
+---@param package_json unknown|nil
 ---@return string|nil
-local function detect_package_manager()
-    local package_json = get_package_json()
+local function detect_package_manager(package_json)
     if package_json and package_json.packageManager then
         assert(type(package_json.packageManager) == "string")
         ---@type string
@@ -76,7 +77,8 @@ end
 
 local function pick_package_json_script_executable()
     return coroutine.create(function(dap_run_co)
-        local detected = detect_package_manager()
+        local package_json = parse_package_json()
+        local detected = detect_package_manager(package_json)
         if detected then
             vim.notify("Detected package manager: " .. detected)
             coroutine.resume(dap_run_co, detected)
@@ -105,7 +107,7 @@ local function get_package_json_script_names()
             { title = "get_package_json_script_names" })
     end
     local script_names = {}
-    local package_json = get_package_json()
+    local package_json = parse_package_json()
     if not package_json then
         log_error("could not find package.json")
         return {}
