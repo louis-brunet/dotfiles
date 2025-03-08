@@ -13,6 +13,8 @@ vim.filetype.add({
 
         ['%.env'] = 'sh',
         ['%.env%..*'] = 'sh',
+        ['.*%.env%.example'] = 'sh',
+        ['.*%.env%.template'] = 'sh',
     },
 })
 
