@@ -498,6 +498,7 @@ M.lspconfig_servers = {
         on_attach = function(client, _)
             client.server_capabilities.documentFormattingProvider = true
         end,
+        -- https://github.com/redhat-developer/yaml-language-server?tab=readme-ov-file#language-server-settings
         settings = {
             redhat = { telemetry = { enabled = false } },
             yaml = {
@@ -506,6 +507,7 @@ M.lspconfig_servers = {
                     "https://json.schemastore.org/github-workflow.json",
                     -- ['*cloud-config.{yml,yaml}'] = 'https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json',
                 },
+                format = { enable = true, singleQuote = true, printWidth = 80, },
             },
         },
     },
