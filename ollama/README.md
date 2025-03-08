@@ -17,7 +17,7 @@ see [open-webui](https://github.com/open-webui/open-webui)
   > [!IMPORTANT]
   > 
   > On the initial run, `cap_drop: - ALL` MUST be commented out for the searxng 
-  > servive in `webui.compose.yaml`.
+  > service in `webui.compose.yaml`.
 
   ```bash
   docker compose --file webui.compose.yaml up --build
