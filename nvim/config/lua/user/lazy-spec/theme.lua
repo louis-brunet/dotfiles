@@ -320,7 +320,10 @@ return {
             require("github-theme").setup(opts)
             vim.cmd.colorscheme(colorscheme_name);
 
-            vim.api.nvim_create_user_command("TransparentToggle", function()
+            local toggle_cmd_name = "TransparentToggle"
+
+            -- toggle transparent background
+            vim.api.nvim_create_user_command(toggle_cmd_name, function()
                 local is_transparent = require("github-theme.config").options
                     .transparent
                 opts.options.transparent = not is_transparent
@@ -328,6 +331,11 @@ return {
 
                 vim.cmd.colorscheme(colorscheme_name)
             end, { desc = "Toggle transparent background" })
+
+            -- vim.keymap.set({ "n", "v" }, "<leader>t",
+            --     function() vim.cmd(toggle_cmd_name) end,
+            --     { desc = "Toggle [T]ransparent background" }
+            -- )
         end,
     },
 

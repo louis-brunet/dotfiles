@@ -3,8 +3,8 @@
 -- set general vim options
 require('user.set');
 
--- -- define new commands
--- require('user.commands');
+-- define new commands
+require('user.user-commands');
 
 -- define new autocommands
 require('user.autocommands');

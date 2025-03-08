@@ -507,7 +507,7 @@ M.lspconfig_servers = {
                     "https://json.schemastore.org/github-workflow.json",
                     -- ['*cloud-config.{yml,yaml}'] = 'https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json',
                 },
-                format = { enable = true, singleQuote = true, printWidth = 80, },
+                format = { enable = true, singleQuote = true, printWidth = 80 },
             },
         },
     },
@@ -527,6 +527,8 @@ M.lspconfig_servers = {
         },
     },
 
+    -- https://writewithharper.com/docs/integrations/neovim
+    -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#harper_ls
     harper_ls = {
         settings = {
             ["harper-ls"] = {
@@ -539,26 +541,25 @@ M.lspconfig_servers = {
                 --     "harper-ls",
                 --     "file_dictionaries"
                 -- ),
-                diagnosticSeverity = "hint",  -- Can also be "information", "warning", or "error"
                 linters = {
-                    spell_check = false,
-                    spelled_numbers = false,
-                    an_a = true,
-                    sentence_capitalization = false,
-                    unclosed_quotes = true,
-                    wrong_quotes = false,
-                    long_sentences = true,
-                    repeated_words = true,
-                    spaces = true,
-                    matcher = true,
-                    correct_number_suffix = true,
-                    number_suffix_capitalization = true,
-                    multiple_sequential_pronouns = true,
-                    linking_verbs = false,
-                    avoid_curses = true,
-                    terminating_conjunctions = true,
+                    -- https://writewithharper.com/docs/rules
+                    SpellCheck = false,
+                    SpelledNumbers = false,
+                    AnA = true,
+                    SentenceCapitalization = false,
+                    UnclosedQuotes = true,
+                    WrongQuotes = false,
+                    LongSentences = false,
+                    RepeatedWords = true,
+                    Spaces = true,
+                    Matcher = true,
+                    CorrectNumberSuffix = true,
+                    ToDoHyphen = false,
                 },
-                codeActions = { forceStable = true },
+                codeActions = { ForceStable = false },
+                markdown = { IgnoreLinkTitle = false },
+                diagnosticSeverity = "hint",  -- Can also be "information", "warning", or "error"
+                isolateEnglish = false,
             },
         },
     },
@@ -710,7 +711,32 @@ function M.on_attach(client, bufnr)
 
     -- Create a command `:Format` local to the LSP buffer
     vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
-        vim.lsp.buf.format()
+        local clients_to_ignore = {}
+        local lsp_utils = require("user.utils.lsp")
+        local attached_clients = lsp_utils.get_buffer_lsp_clients({
+            bufnr = bufnr,
+            method = vim.lsp.protocol.Methods.textDocument_formatting,
+        })
+        local should_ignore_ts_ls = lsp_utils.contains_any_client(
+                attached_clients, { "eslint" }) and
+            lsp_utils.contains_any_client(attached_clients,
+                { "ts_ls", "tsserver" })
+        if should_ignore_ts_ls then
+            for _, ts_ls_name in ipairs({ "ts_ls", "tsserver" }) do
+                table.insert(clients_to_ignore, ts_ls_name)
+            end
+        end
+
+        vim.notify("Ignoring clients " .. vim.inspect(clients_to_ignore),
+            vim.log.levels.DEBUG)
+
+        -- vim.tbl_contains(attached_clients, '')
+        vim.lsp.buf.format({
+            filter = function(format_client)
+                return not vim.tbl_contains(clients_to_ignore, format_client
+                    .name)
+            end,
+        })
     end, { desc = "Format current buffer with LSP" })
 
     -- Create an autocommand to highlight hovered word using attached LSP
