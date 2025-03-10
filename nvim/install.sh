@@ -39,3 +39,10 @@ fi
 
 # sudo apt install -y liblua5.1-0-dev
 # echo "✅ installed Lua for luarocks.nvim (rest.nvim)"
+
+# NOTE: install missing python3-venv for Mason to install certain packages, 
+# like ruff. Should only be needed for Ubuntu/Debian
+# WARN: assumes that WSL is running Ubuntu/Debian
+if python -mplatform | grep -qiE 'Ubuntu|Debian|WSL'; then
+    sudo apt install python3-venv
+fi
