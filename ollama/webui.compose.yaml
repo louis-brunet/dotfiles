@@ -1,0 +1,83 @@
+services:
+  webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - 3000:8080
+    environment:
+      DEFAULT_MODELS: deepseek-r1:14b
+      RAG_TOP_K: 10
+      RAG_TEMPLATE: |
+        **Generate Response to User Query**
+        **Step 1: Parse Context Information**
+        Extract and utilize relevant knowledge from the provided context within `<context></context>` XML tags.
+        **Step 2: Analyze User Query**
+        Carefully read and comprehend the user's query, pinpointing the key concepts, entities, and intent behind the question.
+        **Step 3: Determine Response**
+        If the answer to the user's query can be directly inferred from the context information, provide a concise and accurate response in the same language as the user's query.
+        **Step 4: Handle Uncertainty**
+        If the answer is not clear, ask the user for clarification to ensure an accurate response.
+        **Step 5: Avoid Context Attribution**
+        When formulating your response, do not indicate that the information was derived from the context.
+        **Step 6: Respond in User's Language**
+        Maintain consistency by ensuring the response is in the same language as the user's query.
+        **Step 7: Provide Response**
+        Generate a clear, concise, and informative response to the user's query, adhering to the guidelines outlined above.
+        User Query: [query]
+        <context>
+        [context]
+        </context>
+      TITLE_GENERATION_PROMPT_TEMPLATE: |
+        Create a concise, 3-5 word title with an emoji as a title for the chat history, in the given language. Suitable Emojis for the summary can be prefixed to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+
+        Examples of titles:
+        📉 Stock Market Trends
+        🍪 Perfect Chocolate Chip Recipe
+        Evolution of Music Streaming
+        Remote Work Productivity Tips
+        Artificial Intelligence in Healthcare
+        🎮 Video Game Development Insights
+
+        <chat_history>
+        {{MESSAGES:END:2}}
+      TASK_MODEL: llama3.2:latest
+      ENABLE_RAG_WEB_SEARCH: True
+      RAG_WEB_SEARCH_ENGINE: "searxng"
+      RAG_WEB_SEARCH_RESULT_COUNT: 3
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
+      SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
+      # WEBUI_AUTH: False
+
+  searxng:
+    container_name: searxng
+    build: ./searxng
+    # image: searxng/searxng:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - searxng:/etc/searxng:rw
+    env_file:
+      - searxng.env
+    environment:
+      SEARXNG_HOSTNAME: localhost:8080
+    # WARN: `cap_drop: - ALL` must be removed for (only) the initial run
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+volumes:
+  searxng:
+  open-webui:

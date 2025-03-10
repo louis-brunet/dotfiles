@@ -3,7 +3,7 @@
 PERF_TIME_ZSH=
 
 if [ -n "$PERF_TIME_ZSH" ]; then
-  zshrc_start_ms=`date +%s%3N`
+  zshrc_start_ms=$(date +%s%3N)
 fi
 
 # If you come from bash you might have to change your $PATH.
@@ -11,6 +11,33 @@ fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+
+init_dotfiles_path() {
+  # get the absolute path of the symlinked ~/.zshrc file
+  local zshrc_path
+  zshrc_path=$(readlink -f ~/.zshrc)
+
+  # shortcut to this dotfiles path is $DOTFILES
+  # it should be the grandparent directory of the symlink target (this file)
+  DOTFILES=$(dirname "$(dirname "$zshrc_path")")
+  export DOTFILES
+}
+init_dotfiles_path
+
+# WARN: all modifications to `fpath` must be done before initializing oh-my-zsh
+#  because omz calls compinit (must be called only once)
+init_fpath() {
+  # #add each topic folder to fpath so that they can add functions and completion scripts
+  # for topic_folder ($DOTFILES/*) [ -d $topic_folder ] && fpath=($topic_folder $fpath);
+
+  # NOTE: if the line above (adding topic folders to fpath) is uncommented, should remove dotfiles/functions from fpath below
+  local dotfiles_functions="${DOTFILES:-$HOME/code/dotfiles}/functions"
+  fpath=("$HOME"/bin "$dotfiles_functions" $fpath)
+
+  # autoload functions defined in ./functions/
+  autoload -U "$dotfiles_functions"/*(:t) # The (:t) modifier grabs the basename
+}
+init_fpath
 
 load_ohmyzsh() {
   # Set name of the theme to load --- if set to "random", it will
@@ -87,6 +114,7 @@ load_ohmyzsh() {
       python
       # poetry
       pyenv
+      aws # Available commands documentation: $ZSH/plugins/aws/README.md (asp, asr, aws_profiles, ...)
 
       # custom plugins (added in $ZSH_CUSTOM/plugins)
       zsh-autosuggestions
@@ -96,9 +124,9 @@ load_ohmyzsh() {
   ### Custom plugin configuration
   ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#4a465c"
   ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-  ###
+  ### End custom plugin configuration
 
-  source $ZSH/oh-my-zsh.sh
+  source "$ZSH/oh-my-zsh.sh"
 
 
   if [ -n "$PERF_TIME_ZSH" ]; then
@@ -113,13 +141,6 @@ load_ohmyzsh() {
 
 # your project folder that we can `c [tab]` to
 export PROJECTS=~/code
-
-# get the absolute path of the symlinked ~/.zshrc file
-zshrc_path=$(readlink -f ~/.zshrc)
-
-# shortcut to this dotfiles path is $DOTFILES
-# it should be the grandparent directory of the symlink target (this file)
-export DOTFILES=$(dirname $(dirname "$zshrc_path"))
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
@@ -138,8 +159,8 @@ typeset -U config_files
 # exclude bin/* and scripts/*
 old_extended_glob=$options[extended_glob]
 setopt extended_glob
-config_files=($DOTFILES/*/*.zsh~$DOTFILES/bin/*~$DOTFILES/scripts/*)
-if [ $old_extended_glob != on ]
+config_files=("$DOTFILES"/*/*.zsh~"$DOTFILES"/bin/*~"$DOTFILES"/scripts/*)
+if [ "$old_extended_glob" != on ]
 then
   unsetopt extended_glob
 fi
@@ -155,8 +176,8 @@ done
 ### powerlevel10k config after setting important env vars (POWERLEVEL9K_CONFIG_FILE)
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-local p10k_config_file="$HOME/.p10k.zsh"
-[[ ! -f $p10k_config_file ]] || source $p10k_config_file
+p10k_config_file="$HOME/.p10k.zsh"
+[[ -f "$p10k_config_file" ]] && source "$p10k_config_file"
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -172,7 +193,7 @@ load_ohmyzsh
 
 # use vim keybinds
 bindkey -v
-# Add  shortcut to enter normal mode
+# Add shortcut to enter normal mode
 bindkey -M viins 'ù' vi-cmd-mode
 # # reduce delay to enter normal mode using ESC
 # export KEYTIMEOUT=1
@@ -188,7 +209,7 @@ done
 
 # initialize autocomplete here, otherwise functions won't be loaded
 # autoload -U +X bashcompinit && bashcompinit ## TODO: is bashcompinit necessary ?
-autoload -U compinit && compinit
+autoload -Uz compinit && compinit
 
 # load every completion after autocomplete loads
 for file in ${(M)config_files:#*/completion.zsh}

@@ -1,15 +1,16 @@
 local function toggle_auto_pairs()
     vim.g.minipairs_disable = not vim.g.minipairs_disable
     if vim.g.minipairs_disable then
-        vim.notify("disabled auto pairs", vim.log.levels.WARN, { title = "mini.pairs" })
+        vim.notify("disabled auto pairs", vim.log.levels.WARN,
+            { title = "mini.pairs" })
         -- LazyVim.warn("Disabled auto pairs", { title = "Option" })
     else
-        vim.notify("enabled auto pairs", vim.log.levels.INFO, { title = "mini.pairs" })
+        vim.notify("enabled auto pairs", vim.log.levels.INFO,
+            { title = "mini.pairs" })
         -- LazyVim.info("Enabled auto pairs", { title = "Option" })
     end
 end
 
----@type LazySpec
 local M = {
     -- auto pairs
     {
@@ -17,7 +18,12 @@ local M = {
         event = "VeryLazy",
         opts = {
             mappings = {
-                ["`"] = { action = "closeopen", pair = "``", neigh_pattern = "[^\\`].", register = { cr = false } },
+                ["`"] = {
+                    action = "closeopen",
+                    pair = "``",
+                    neigh_pattern = "[^\\`].",
+                    register = { cr = false },
+                },
             },
         },
         keys = {
@@ -28,141 +34,100 @@ local M = {
             -- },
         },
         config = function(_, opts)
-            vim.api.nvim_create_user_command('ToggleAutoPairs', toggle_auto_pairs, { desc = "Toggle Auto Pairs" })
+            vim.api.nvim_create_user_command("ToggleAutoPairs", toggle_auto_pairs,
+                { desc = "Toggle Auto Pairs" })
 
-            require('mini.pairs').setup(opts)
-        end
+            require("mini.pairs").setup(opts)
+        end,
     },
 
     -- Detect tabstop and shiftwidth automatically
-    'tpope/vim-sleuth',
+    "tpope/vim-sleuth",
 
     -- Useful plugin to show pending keybinds.
     {
-        'folke/which-key.nvim',
-        event = 'VeryLazy',
+        "folke/which-key.nvim",
+        event = "VeryLazy",
         ---@type wk.Opts
         opts = {
             -- preset = "classic",
             keys = {
-                scroll_down = "<c-Down>", -- binding to scroll down inside the popup
-                scroll_up = "<c-Up>",   -- binding to scroll up inside the popup
+                -- FIXME: doesn't work on mac, even after unbinding Mission Control shortcuts
+                scroll_down = "<c-Down>",  -- binding to scroll down inside the popup
+                scroll_up = "<c-Up>",      -- binding to scroll up inside the popup
             },
             ---@type wk.Spec
             spec = {
-                { "z",           group = "fold" },
+                { "z",          group = "fold" },
 
-                { "ys",          group = "[s]urround" },
+                { "ys",         group = "[s]urround" },
 
-                { "]",           group = "next" },
+                { "]",          group = "next" },
 
-                { "[",           group = "previous" },
+                { "[",          group = "previous" },
 
-                { "<leader>H",   group = "[H]arpoon" },
+                { "<leader>H",  group = "[H]arpoon" },
 
-                { "<leader>d",   group = "[d]ebug" },
+                { "<leader>d",  group = "[d]ebug" },
 
-                { "<leader>g",   group = "[g]it" },
-                { "<leader>gh",  group = "[h]unk" },
-                { "<leader>gm",  group = "[m]erge" },
+                { "<leader>l",  group = "[l]sp" },
 
-                { "<leader>q",   group = "[q]uickfix" },
+                { "<leader>g",  group = "[g]it" },
+                { "<leader>gh", group = "[h]unk" },
+                { "<leader>gm", group = "[m]erge" },
+                { "<leader>gd", group = "[d]iff" },
 
-                { "<leader>r",   group = "[r]est-nvim" },
+                { "<leader>q",  group = "[q]uickfix" },
 
-                { "<leader>s",   group = "[s]earch" },
+                { "<leader>r",  group = "[r]est-nvim" },
 
-                { "<leader>w",   group = "[w]orkspace" },
+                { "<leader>s",  group = "[s]earch" },
+
+                { "<leader>w",  group = "[w]orkspace" },
             },
         },
         config = function(_, opts)
-            local wk = require('which-key')
+            local wk = require("which-key")
             wk.setup(opts)
-
-            -- Document existing key chains
-            -- wk.add({
-            --     { "z",           group = "fold" },
-            --     { "z_",          hidden = true },
-            --
-            --     { "ys",          group = "[s]urround" },
-            --     { "ys_",         hidden = true },
-            --
-            --     { "]",           group = "next" },
-            --     { "]_",          hidden = true },
-            --
-            --     { "[",           group = "previous" },
-            --     { "[_",          hidden = true },
-            --
-            --     { "<leader>H",   group = "[H]arpoon" },
-            --     { "<leader>H_",  hidden = true },
-            --
-            --     { "<leader>d",   group = "[d]ebug" },
-            --     { "<leader>d_",  hidden = true },
-            --
-            --     { "<leader>g",   group = "[g]it" },
-            --     { "<leader>g_",  hidden = true },
-            --     { "<leader>gh",  group = "[h]unk" },
-            --     { "<leader>gh_", hidden = true },
-            --     { "<leader>gm",  group = "[m]erge" },
-            --     { "<leader>gm_", hidden = true },
-            --
-            --     { "<leader>q",   group = "[q]uickfix" },
-            --     { "<leader>q_",  hidden = true },
-            --
-            --     { "<leader>r",   group = "[r]est-nvim" },
-            --     { "<leader>r_",  hidden = true },
-            --
-            --     { "<leader>s",   group = "[s]earch" },
-            --     { "<leader>s_",  hidden = true },
-            --
-            --     { "<leader>w",   group = "[w]orkspace" },
-            --     { "<leader>w_",  hidden = true },
-            -- })
-        end
+        end,
     },
 
     {
         -- Add indentation guides even on blank lines
-        'lukas-reineke/indent-blankline.nvim',
+        "lukas-reineke/indent-blankline.nvim",
 
         -- See `:help indent_blankline.txt`
-        event = 'VeryLazy',
-        main = 'ibl',
+        event = "VeryLazy",
+        main = "ibl",
         opts = {
             indent = {
-                char = '▏',
+                char = "▏",
                 -- char = '┊',
             },
-            scope = {
-                enabled = true,
-                show_start = false,
-                show_end = false,
-            },
+            scope = { enabled = true, show_start = false, show_end = false },
             -- whitespace = {
             --     remove_blankline_trail = true,
             -- },
         },
-        dependencies = {
-            'nvim-treesitter/nvim-treesitter',
-        },
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
     },
 
     -- Automatically change normal strings to template strings
     {
-        'axelvc/template-string.nvim',
-        event = 'VeryLazy',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        "axelvc/template-string.nvim",
+        event = "VeryLazy",
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
         opts = {
-            filetypes = { -- filetypes where the plugin is active
+            filetypes = {  -- filetypes where the plugin is active
                 -- 'html',
-                'typescript',
-                'javascript',
-                'typescriptreact',
-                'javascriptreact',
-                'python',
+                "typescript",
+                "javascript",
+                "typescriptreact",
+                "javascriptreact",
+                "python",
             },
-            jsx_brackets = true,            -- must add brackets to jsx attributes
-            remove_template_string = false, -- remove backticks when there are no template string
+            jsx_brackets = true,             -- must add brackets to jsx attributes
+            remove_template_string = false,  -- remove backticks when there are no template string
             restore_quotes = {
                 -- quotes used when "remove_template_string" option is enabled
                 normal = [[']],
@@ -173,16 +138,16 @@ local M = {
 
     -- "gc" to comment visual regions/lines
     {
-        'numToStr/Comment.nvim',
-        event = 'VeryLazy',
+        "numToStr/Comment.nvim",
+        event = "VeryLazy",
         ---@type CommentConfig
         opts = {
             -- DEFAULTS:
             -- padding = true,
             -- sticky = true,
             -- ignore = nil,
-            toggler = { line = 'gcc', block = 'gbc' },
-            opleader = { line = 'gc', block = 'gb' },
+            toggler = { line = "gcc", block = "gbc" },
+            opleader = { line = "gc", block = "gb" },
             -- extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
             -- mappings = { basic = true, extra = true },
             -- pre_hook = nil,
@@ -193,29 +158,29 @@ local M = {
         --     { '<leader>c',  '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = '[C]omment toggle linewise' },
         -- },
         config = function(_, opts)
-            local comment = require('Comment')
-            local comment_filetype = require('Comment.ft')
+            local comment = require("Comment")
+            local comment_filetype = require("Comment.ft")
 
             comment.setup(opts)
 
             -- add commentstring for pug templating engine
-            comment_filetype.set('pug', '// %s')
-            comment_filetype.set('git_config', '# %s')
+            comment_filetype.set("pug", "// %s")
+            comment_filetype.set("git_config", "# %s")
 
             vim.keymap.set(
-                'n', '<leader>cc', '<Plug>(comment_toggle_linewise_current)',
-                { desc = '[C]omment toggle linewise' }
+                "n", "<leader>cc", "<Plug>(comment_toggle_linewise_current)",
+                { desc = "[C]omment toggle linewise" }
             )
             vim.keymap.set(
-                'v', '<leader>c', '<Plug>(comment_toggle_linewise_visual)',
-                { desc = '[C]omment toggle linewise' }
+                "v", "<leader>c", "<Plug>(comment_toggle_linewise_visual)",
+                { desc = "[C]omment toggle linewise" }
             )
-        end
+        end,
     },
 
     {
         "kylechui/nvim-surround",
-        version = "*", -- Use for stability; omit to use `main` branch for the latest features
+        version = "*",  -- Use for stability; omit to use `main` branch for the latest features
         event = "VeryLazy",
         opts = {
             -- Configuration here, or leave empty to use defaults
@@ -243,11 +208,11 @@ local M = {
 
     -- highlight and search for todo comments like TODO, HACK, BUG, FIXME, WARN ...
     {
-        'folke/todo-comments.nvim',
+        "folke/todo-comments.nvim",
 
-        event = 'VeryLazy',
+        event = "VeryLazy",
 
-        dependencies = { 'nvim-lua/plenary.nvim' },
+        dependencies = { "nvim-lua/plenary.nvim" },
 
         -- :h todo-comments.nvim.txt
         opts = {},
@@ -256,17 +221,27 @@ local M = {
             { "<leader>st", ":TodoTelescope<CR>", desc = "[s]earch [t]odos" },
         },
 
-        cmd = { 'TodoQuickfix', 'TodoTelescope' },
+        cmd = { "TodoQuickfix", "TodoTelescope" },
     },
 
     {
-        'mbbill/undotree',
+        "mbbill/undotree",
 
-        cmd = { 'UndotreeToggle' },
+        cmd = { "UndotreeToggle" },
 
         keys = {
-            { '<leader>u', vim.cmd.UndotreeToggle, desc = '[u]ndotree toggle' },
+            { "<leader>u", vim.cmd.UndotreeToggle, desc = "[u]ndotree toggle" },
         },
+    },
+
+    {
+        "danymat/neogen",
+        opts = { snippet_engine = "luasnip" },
+        config = function(_, opts)
+            require("neogen").setup(opts)
+            vim.keymap.set("n", "<leader>ld", require("neogen").generate,
+                { desc = "LSP: generate [d]ocstring" })
+        end,
     },
 }
 

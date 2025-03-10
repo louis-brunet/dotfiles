@@ -1,22 +1,22 @@
 local function attached_lsp_clients_str()
-    local clients = require('user.utils.lsp').get_buffer_lsp_clients()
+    local clients = require("user.utils.lsp").get_buffer_lsp_clients()
 
-    local names_str = ''
+    local names_str = ""
 
     for _, client in ipairs(clients) do
-        if client.name ~= '' then
-            names_str = names_str .. client.name .. ' '
+        if client.name ~= "" then
+            names_str = names_str .. client.name .. " "
         end
     end
 
     return names_str
 end
 
-local function codeium_status()
-    return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
-end
+-- local function codeium_status()
+--     return 'Codeium: ' .. vim.api.nvim_call_function("codeium#GetStatusString", {})
+-- end
 
-local colorscheme_name = require('user.config.theme').colorscheme_name
+local colorscheme_name = require("user.config.theme").colorscheme_name
 
 ---@type LazySpec
 return {
@@ -66,11 +66,11 @@ return {
     {
         -- FIXME: wrong highlights sometimes (cursor line, column line, indent markers, ...)
         --   removing ~/.cache/nvim/github-theme/github* and restarting nvim seems to fix this
-        'projekt0n/github-nvim-theme',
+        "projekt0n/github-nvim-theme",
         dependencies = {
             {
                 -- Add indentation guides even on blank lines
-                'lukas-reineke/indent-blankline.nvim',
+                "lukas-reineke/indent-blankline.nvim",
                 opts = {},
 
                 -- -- See `:help indent_blankline.txt`
@@ -91,7 +91,7 @@ return {
                 -- dependencies = {
                 --     'nvim-treesitter/nvim-treesitter',
                 -- },
-            }
+            },
         },
 
         lazy = false,
@@ -101,11 +101,7 @@ return {
             options = {
                 transparent = false,
 
-                darken = {
-                    sidebars = {
-                        enable = false,
-                    },
-                },
+                darken = { sidebars = { enable = false } },
 
                 modules_default = false,
 
@@ -126,22 +122,16 @@ return {
                     whichkey = true,
                     diagnostic = {
                         -- background = true,
-                        enable = true
+                        enable = true,
                     },
-                    native_lsp = {
-                        background = true,
-                        enable = true
-                    },
+                    native_lsp = { background = true, enable = true },
                 },
 
-                styles = {
-                    comments = 'italic',
-                },
+                styles = { comments = "italic" },
             },
 
             palettes = {
-                all = {
-                },
+                all = {},
                 -- github_light = {
                 -- },
             },
@@ -263,7 +253,7 @@ return {
                         -- hash_fg = 'gray.bright',
                     },
                     lsp = {
-                        inlay_hint_bg = 'none',
+                        inlay_hint_bg = "none",
                         -- FIXME: since update to v1.0, can't reference styles or colors like this in "groups":  `{ style = 'lsp.inlay_hint_style' }`
                         -- inlay_hint_style = 'italic',
                         --
@@ -272,57 +262,86 @@ return {
                         -- document_highlight_write_bg = 'accent.subtle',
                     },
                     nvim_tree = {
-                        bg = 'none',
+                        bg = "none",
                         -- indent_marker_fg = 'neutral.muted',
                     },
-                }
+                },
             },
 
             groups = {
                 all = {
-                    fugitiveHash = { fg = 'palette.gray.bright' },
-                    fugitiveHeader = { fg = 'palette.gray.bright' },
+                    fugitiveHash = { fg = "palette.gray.bright" },
+                    fugitiveHeader = { fg = "palette.gray.bright" },
                     -- fugitiveHash = { fg = 'fugitive.hash_fg' },
                     -- fugitiveHeader = { fg = 'fugitive.header_fg' },
-                    fugitiveStagedHeading = { fg = 'git.add' },
-                    fugitiveUnstagedHeading = { fg = 'git.changed' },
-                    IblIndent = { fg = 'palette.neutral.subtle' },
-                    IblScope = { fg = 'palette.accent.muted' },
-                    LspInlayHint = { fg = 'fg3', bg = 'lsp.inlay_hint_bg', style = 'italic' },
-                    LspReferenceText = { bg = 'palette.accent.subtle' },
-                    LspReferenceRead = { bg = 'palette.accent.subtle' },
-                    LspReferenceWrite = { bg = 'palette.accent.subtle', style = 'italic' },
-                    LspSignatureActiveParameter = { style = 'bold,underline' },
-                    NvimTreeIndentMarker = { fg = 'palette.neutral.muted' },
+                    fugitiveStagedHeading = { fg = "git.add" },
+                    fugitiveUnstagedHeading = { fg = "git.changed" },
+                    IblIndent = { fg = "palette.neutral.subtle" },
+                    IblScope = { fg = "palette.accent.muted" },
+                    LspInlayHint = {
+                        fg = "fg3",
+                        bg = "lsp.inlay_hint_bg",
+                        style = "italic",
+                    },
+                    LspReferenceText = { bg = "palette.accent.subtle" },
+                    LspReferenceRead = { bg = "palette.accent.subtle" },
+                    LspReferenceWrite = {
+                        bg = "palette.accent.subtle",
+                        style = "italic",
+                    },
+                    LspSignatureActiveParameter = { style = "bold,underline" },
+                    NvimTreeIndentMarker = { fg = "palette.neutral.muted" },
                     -- NvimTreeIndentMarker = { fg = 'nvim_tree.indent_marker_fg' },
                     -- NvimTreeModifiedIcon = { fg = 'palette.nvim_tree.modified_fg' },
-                    NvimTreeEndOfBuffer = { bg = 'nvim_tree.bg' },
-                    NvimTreeNormal = { bg = 'nvim_tree.bg' },
-                    NvimTreeVertSplit = { bg = 'nvim_tree.bg' },
-                    TabLineSel = { bg = '#31353f', fg = '#999999' },
-                    TabLine = { bg = '#31353f', fg = '#555555' },
-                }
-            }
-        },
+                    NvimTreeEndOfBuffer = { bg = "nvim_tree.bg" },
+                    NvimTreeNormal = { bg = "nvim_tree.bg" },
+                    NvimTreeVertSplit = { bg = "nvim_tree.bg" },
+                    TabLineSel = { bg = "#31353f", fg = "#999999" },
+                    TabLine = { bg = "#31353f", fg = "#555555" },
 
+                    -- llama_hl_info = { link = "DiagnosticVirtualTextInfo", style = "italic" },
+                    llama_hl_info = {
+                        link =
+                        "lualine_transitional_lualine_b_insert_to_lualine_c_insert",
+                        style = "italic",
+                    },
+                    llama_hl_hint = { fg = "fg3", style = "" },
+
+                    ["@module.python"] = { link = "@variable" },
+
+                    TelescopePromptTitle = { link = "@type" },
+                    TelescopePromptBorder = { link = "@type" },
+                    TelescopeBorder = { fg = "palette.accent.fg" },
+                },
+            },
+        },
         ---@param opts GhTheme.Config
         config = function(_, opts)
-            require('github-theme').setup(opts)
+            require("github-theme").setup(opts)
             vim.cmd.colorscheme(colorscheme_name);
 
-            vim.api.nvim_create_user_command('TransparentToggle', function()
-                local is_transparent = require('github-theme.config').options.transparent
+            local toggle_cmd_name = "TransparentToggle"
+
+            -- toggle transparent background
+            vim.api.nvim_create_user_command(toggle_cmd_name, function()
+                local is_transparent = require("github-theme.config").options
+                    .transparent
                 opts.options.transparent = not is_transparent
-                require('github-theme').setup(opts)
+                require("github-theme").setup(opts)
 
                 vim.cmd.colorscheme(colorscheme_name)
             end, { desc = "Toggle transparent background" })
-        end
+
+            -- vim.keymap.set({ "n", "v" }, "<leader>t",
+            --     function() vim.cmd(toggle_cmd_name) end,
+            --     { desc = "Toggle [T]ransparent background" }
+            -- )
+        end,
     },
 
     {
         -- Set lualine as statusline
-        'nvim-lualine/lualine.nvim',
+        "nvim-lualine/lualine.nvim",
         -- See `:help lualine.txt`
         opts = {
             options = {
@@ -349,15 +368,10 @@ return {
                     -- },
                     -- 'branch',
                 },
-                lualine_b = {
-                    'diagnostics',
-                },
+                lualine_b = { "diagnostics" },
                 -- lualine_b = { 'branch', 'diff', 'diagnostics' },
                 lualine_c = {
-                    {
-                        'filename',
-                        path = 3,
-                    },
+                    { "filename", path = 3 },
                     -- {
                     --     'diff',
                     --     -- colored = false,
@@ -366,11 +380,10 @@ return {
                 lualine_x = {
                     -- codeium_status,
                     attached_lsp_clients_str,
-                    'filetype',
+                    "filetype",
                 },
-                lualine_y = { 'location' },
-                lualine_z = {
-                },
+                lualine_y = { "location" },
+                lualine_z = {},
             },
             tabline = {
                 -- lualine_a = { 'tabs' },

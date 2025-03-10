@@ -1,3 +1,5 @@
+# NOTE: see ./generated_config.zsh for more configurable environment variables
+
 # POWERLEVEL9K_CONFIG_FILE is set in $DOTFILES/zsh/path.zsh
 local generated_p10k_config="$POWERLEVEL9K_CONFIG_FILE"
 if [[ ! -f "$generated_p10k_config" ]]; then
@@ -364,8 +366,63 @@ config_git() {
   typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=$yellow
 }
 
+config_aws() {
+  #[ aws: aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) ]#
+  # Show aws only when the command you are typing invokes one of these tools.
+
+  # NOTE: POWERLEVEL9K_AWS_SHOW_ON_COMMAND restricts showing aws profile to
+  # when typing specific commands. Unset to always show.
+
+  # typeset -g POWERLEVEL9K_AWS_SHOW_ON_COMMAND='aws|awless|cdk|terraform|pulumi|terragrunt'
+  unset POWERLEVEL9K_AWS_SHOW_ON_COMMAND
+
+  # POWERLEVEL9K_AWS_CLASSES is an array with even number of elements. The first element
+  # in each pair defines a pattern against which the current AWS profile gets matched.
+  # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
+  # that gets matched. If you unset all POWERLEVEL9K_AWS_*CONTENT_EXPANSION parameters,
+  # you'll see this value in your prompt. The second element of each pair in
+  # POWERLEVEL9K_AWS_CLASSES defines the profile class. Patterns are tried in order. The
+  # first match wins.
+  #
+  # For example, given these settings:
+  #
+  #   typeset -g POWERLEVEL9K_AWS_CLASSES=(
+  #     '*prod*'  PROD
+  #     '*test*'  TEST
+  #     '*'       DEFAULT)
+  #
+  # If your current AWS profile is "company_test", its class is TEST
+  # because "company_test" doesn't match the pattern '*prod*' but does match '*test*'.
+  #
+  # You can define different colors, icons and content expansions for different classes:
+  #
+  #   typeset -g POWERLEVEL9K_AWS_TEST_FOREGROUND=28
+  #   typeset -g POWERLEVEL9K_AWS_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  #   typeset -g POWERLEVEL9K_AWS_TEST_CONTENT_EXPANSION='> ${P9K_CONTENT} <'
+  typeset -g POWERLEVEL9K_AWS_CLASSES=(
+      # '*prod*'  PROD    # These values are examples that are unlikely
+      # '*test*'  TEST    # to match your needs. Customize them as needed.
+      '*'       DEFAULT)
+  typeset -g POWERLEVEL9K_AWS_DEFAULT_FOREGROUND=208
+  # typeset -g POWERLEVEL9K_AWS_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # AWS segment format. The following parameters are available within the expansion.
+  #
+  # - P9K_AWS_PROFILE  The name of the current AWS profile.
+  # - P9K_AWS_REGION   The region associated with the current AWS profile.
+  typeset -g POWERLEVEL9K_AWS_CONTENT_EXPANSION='${P9K_AWS_PROFILE//\%/%%}${P9K_AWS_REGION:+ ${P9K_AWS_REGION//\%/%%}}'
+
+  # NOTE: this is a separate plugin from the `aws` plugin, it must be enabled separately
+  #[ aws_eb_env: aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/) ]#
+  # AWS Elastic Beanstalk environment color.
+  typeset -g POWERLEVEL9K_AWS_EB_ENV_FOREGROUND=70
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+}
+
 config_general_style
 config_segment_layout
 config_git
+config_aws
 
 

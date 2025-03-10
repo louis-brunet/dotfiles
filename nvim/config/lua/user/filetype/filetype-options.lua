@@ -11,14 +11,18 @@
 
 ---@type table<string, fun(opts: VimAucmdCallbackEvent):nil>
 local ft_handlers = {
-    qf = function()
+    qf = function(opts)
+        opts = opts or {}
+        if opts.buf == nil then
+            opts.buf = 0
+        end
         vim.keymap.set(
             'n',
             '<leader>qd',
             function()
                 require('user.utils.quickfix').delete_quickfix_current_line({ confirm = false })
             end,
-            { desc = '[q]uickfix: [d]elete current line', buffer = 0 }
+            { desc = '[q]uickfix: [d]elete current line', buffer = opts.buf }
         )
         vim.keymap.set(
             'x',
@@ -26,7 +30,7 @@ local ft_handlers = {
             function()
                 require('user.utils.quickfix').delete_quickfix_visual({ confirm = false })
             end,
-            { desc = '[q]uickfix: [d]elete selected lines', buffer = 0 }
+            { desc = '[q]uickfix: [d]elete selected lines', buffer = opts.buf }
         )
     end,
 }

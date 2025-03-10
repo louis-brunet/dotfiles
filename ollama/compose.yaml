@@ -1,0 +1,30 @@
+# NOTE: Apple Silicon GPUs are incompatible with Docker virtualization as of
+#  13/10/2024, install ollama locally instead
+
+services:
+  ollama:
+    # TODO: update version
+    image: 'ollama/ollama:0.3.12'
+    restart: 'no'
+    # restart: 'unless-stopped'
+    volumes:
+      - './volumes/ollama:/root/.ollama:cached'
+    ports:
+      - '11434:11434'
+    environment:
+      # OLLAMA_DEBUG: "1" #              Show additional debug information (e.g. OLLAMA_DEBUG=1)
+      # OLLAMA_HOST: "" #               IP Address for the ollama server (default 127.0.0.1:11434)
+      OLLAMA_KEEP_ALIVE: "4h" #         The duration that models stay loaded in memory (default "5m")
+      # OLLAMA_MAX_LOADED_MODELS: "" #  Maximum number of loaded models per GPU
+      # OLLAMA_MAX_QUEUE: "" #          Maximum number of queued requests
+      # OLLAMA_MODELS: "" #             The path to the models directory
+      OLLAMA_NUM_PARALLEL: "8" #       Maximum number of parallel requests
+      # OLLAMA_NOPRUNE: "" #            Do not prune model blobs on startup
+      # OLLAMA_ORIGINS: "" #            A comma separated list of allowed origins
+      # OLLAMA_SCHED_SPREAD: "" #       Always schedule model across all GPUs
+      # OLLAMA_TMPDIR: "" #             Location for temporary files
+      # OLLAMA_FLASH_ATTENTION: "" #    Enabled flash attention
+      # OLLAMA_LLM_LIBRARY: "" #        Set LLM library to bypass autodetection
+      # OLLAMA_GPU_OVERHEAD: "" #       Reserve a portion of VRAM per GPU (bytes)
+      # OLLAMA_LOAD_TIMEOUT: "" #       How long to allow model loads to stall before giving up (default "5m")
+

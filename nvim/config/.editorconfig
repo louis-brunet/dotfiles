@@ -1,3 +1,4 @@
+# https://editorconfig.org/
 root = true
 
 [*]
@@ -5,7 +6,39 @@ charset = utf-8
 end_of_line = lf
 trim_trailing_whitespace = true
 
+# See below template for options used by LuaLS, default values and documentation
+# https://github.com/CppCXY/EmmyLuaCodeStyle/blob/master/lua.template.editorconfig
+# https://github.com/CppCXY/EmmyLuaCodeStyle/blob/master/docs/format_config_EN.md
 [*.lua]
 indent_style = space
 indent_size = 4
+continuation_indent = 4
+quote_style = double
+max_line_length = 80
+break_all_list_when_line_exceed = true
+auto_collapse_lines = true
+call_arg_parentheses = keep
+trailing_table_separator = smart
+space_around_table_field_list = true
+space_before_attribute = true
+space_before_inline_comment = 2
+ignore_spaces_inside_function_call = false
+align_call_args = false
+align_function_params = false
+align_continuous_assign_statement = true
+align_continuous_rect_table_field = true
+align_if_branch = true
+align_array_table = true
+line_space_after_function_statement = fixed(2)
+line_space_after_if_statement = max(2)
+line_space_after_do_statement = max(2)
+line_space_after_while_statement = max(2)
+line_space_after_repeat_statement = max(2)
+line_space_after_for_statement = max(2)
+line_space_after_local_or_assign_statement = max(2)
+line_space_after_expression_statement = max(2)
+line_space_after_comment = max(2)
 
+[*.json]
+indent_size = space
+indent_size = 2

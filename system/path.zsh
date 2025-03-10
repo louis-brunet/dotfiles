@@ -1,4 +1,4 @@
-local system_bin="$HOME/bin:$DOTFILES/bin:$HOME/.local/bin"
+local system_bin="$HOME/bin:${DOTFILES:-$HOME/code/dotfiles}/bin:$HOME/.local/bin"
 
 case ":${PATH}:" in
     *:"$system_bin":*)
@@ -14,3 +14,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+
+# Proposed standard to disable telemetry in TUI apps
+# https://consoledonottrack.com/
+export DO_NOT_TRACK=1

@@ -7,8 +7,10 @@ return {
     ---@type notify.Config
     opts = {
         fps = 60,
-        stages = 'fade'
+        stages = 'slide',
+        timeout = 1500, -- milliseconds
 
+        -- DEFAULTS:
         -- background_colour = "NotifyBackground",
         -- fps = 30,
         -- icons = {
@@ -31,6 +33,31 @@ return {
     },
 
     config = function(_, opts)
-        vim.notify = require('notify')
+        local nvim_notify = require('notify')
+        nvim_notify.setup(opts)
+
+        vim.notify = function(msg, level, notify_opts)
+            notify_opts = notify_opts or {}
+            notify_opts.animate = false -- turn off the first stage of animation, start timeout immediately
+
+            nvim_notify(msg, level, notify_opts)
+        end
+
+        local has_which_key, which_key = pcall(require, 'which-key')
+        if has_which_key then
+            which_key.add({
+                { "<leader>n", group = "[n]otify" },
+            })
+        end
+        vim.keymap.set(
+            "n", "<leader>nd",
+            nvim_notify.dismiss,
+            { desc = "[d]ismiss notifications" }
+        )
+        vim.keymap.set(
+            "n", "<leader>ns",
+            require("telescope").extensions.notify.notify,
+            { desc = "[s]earch notifications" }
+        )
     end
 }

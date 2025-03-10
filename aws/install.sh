@@ -9,7 +9,7 @@ set -e
 set -x
 
 fail() {
-    echo $@
+    echo "$@"
     exit 1
 }
 
@@ -20,7 +20,7 @@ if ! which aws >/dev/null; then
 
     zip_file="/tmp/awscliv2.zip"
 
-    if [ -e "$zip_file"]; then
+    if [ -e "$zip_file" ]; then
         fail "file already exists, exiting... ($zip_file)"
     fi
 

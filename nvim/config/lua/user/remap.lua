@@ -3,17 +3,23 @@
 vim.keymap.set("n", "Q", "<nop>")
 
 -- See `:help vim.keymap.set()`
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
 -- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'",
+    { expr = true, silent = true })
+vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'",
+    { expr = true, silent = true })
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>qd', vim.diagnostic.setqflist, { desc = 'Open diagnostics quickfix list' })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev,
+    { desc = "Go to previous diagnostic message" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next,
+    { desc = "Go to next diagnostic message" })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float,
+    { desc = "Open floating diagnostic message" })
+vim.keymap.set("n", "<leader>qd", vim.diagnostic.setqflist,
+    { desc = "Open diagnostics quickfix list" })
 -- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- TODO: "move left/right" keybind that won't mess with "" (unnamed register for pastes)
@@ -28,28 +34,41 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page [U]p" })
 vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result" })
 vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result" })
 
-vim.keymap.set("x", "<leader>p", [["_dP]], { desc = 'Delete and [P]aste without yanking' })
+vim.keymap.set("x", "<leader>p", [["_dP]],
+    { desc = "Delete and [P]aste without yanking" })
 -- vim.keymap.set({"n", "v"}, "<leader>d", [["_d]], { desc = '[D]elete without yanking' })
 
-vim.keymap.set({"n", "v"}, "<leader>y", [["+y]], { desc = 'Yank to system clipboard' })
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]],
+    { desc = "Yank to system clipboard" })
 vim.keymap.set("n", "<leader>Y", [["+Y]])
-
 
 -- Alternate ways to get out of insert mode (<C-c>, ù)
 vim.keymap.set("i", "<C-c>", "<Esc>")
-vim.keymap.set({"i", "n", "v", "s"}, "ù", "<Esc>")
+vim.keymap.set({ "i", "n", "v", "s" }, "ù", "<Esc>")
 
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>", { desc = "New tmux session (tmux-sessionizer)" })
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "[F]ormat current buffer" })
+vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>",
+    { desc = "New tmux session (tmux-sessionizer)" })
+
+-- NOTE: use custom user command :Format
+vim.keymap.set("n", "<leader>f", function()
+        local ok = pcall(vim.cmd.Format)
+        if not ok then
+            vim.lsp.buf.format()
+        end
+    end,
+    { desc = "[F]ormat current buffer" })
 
 -- Navigate quickfix list (:h quickfix)
-for _, lhs in ipairs({']q', '<leader>qn'}) do
-    vim.keymap.set("n", lhs, "<cmd>cnext<CR>zz", { desc = "Next [q]uickfix item" })
+for _, lhs in ipairs({ "]q", "<leader>qn" }) do
+    vim.keymap.set("n", lhs, "<cmd>cnext<CR>zz",
+        { desc = "Next [q]uickfix item" })
 end
-for _, lhs in ipairs({'[q', '<leader>qp'}) do
-    vim.keymap.set("n", lhs, "<cmd>cprev<CR>zz", { desc = "Previous [q]uickfix item" })
+for _, lhs in ipairs({ "[q", "<leader>qp" }) do
+    vim.keymap.set("n", lhs, "<cmd>cprev<CR>zz",
+        { desc = "Previous [q]uickfix item" })
 end
-vim.keymap.set("n", '<leader>qr', ":cdo s///gc<Left><Left><Left><Left>", { desc = "[q]uickfix search and [r]eplace" })
+vim.keymap.set("n", "<leader>qr", ":cdo s///gc<Left><Left><Left><Left>",
+    { desc = "[q]uickfix search and [r]eplace" })
 
 -- -- Navigate location list (:h location-list)
 -- vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
@@ -63,18 +82,11 @@ vim.keymap.set("n", "<C-w>Q", vim.cmd.tabclose, { desc = "Close current tab" })
 vim.keymap.set("n", "<M-L>", vim.cmd.tabnext, { desc = "Next tab" })
 vim.keymap.set("n", "<M-H>", vim.cmd.tabprevious, { desc = "Previous tab" })
 
--- toggle transparent background
-vim.keymap.set({'n', 'v'}, '<leader>t',
-    function() vim.cmd('TransparentToggle') end,
-    { desc = 'Toggle [T]ransparent background' }
-)
-
 -- Alt-Backspace to delele word backwards (C-BS is captured by tmux as C-H)
 vim.keymap.set("i", "<M-BS>", "<C-W>", { desc = "Delete word backwards" })
 
 -- Better indenting
-vim.keymap.set('v', '<', '<gv', { desc = 'Indent left' })
-vim.keymap.set('v', '>', '>gv', { desc = 'Indent right' })
-vim.keymap.set('n', '<', '<<', { desc = 'Indent left' })
-vim.keymap.set('n', '>', '>>', { desc = 'Indent right' })
-
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
+vim.keymap.set("n", "<", "<<", { desc = "Indent left" })
+vim.keymap.set("n", ">", ">>", { desc = "Indent right" })

@@ -5,7 +5,7 @@ set -e
 set -x
 
 fail() {
-    echo $@
+    echo "$@"
     exit 1
 }
 
