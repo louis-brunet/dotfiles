@@ -14,3 +14,6 @@ require('user.remap');
 
 -- create new filetype associations
 require('user.filetype')
+
+-- WSL-specific configuration
+require('user.wsl')
