@@ -711,6 +711,10 @@ function M.on_attach(client, bufnr)
 
     -- Create a command `:Format` local to the LSP buffer
     vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
+        local function log_debug(message)
+            vim.notify(message, vim.log.levels.DEBUG, { title = ":Format" })
+        end
+
         local clients_to_ignore = {}
         local lsp_utils = require("user.utils.lsp")
         local attached_clients = lsp_utils.get_buffer_lsp_clients({
@@ -718,6 +722,7 @@ function M.on_attach(client, bufnr)
             method = vim.lsp.protocol.Methods.textDocument_formatting,
         })
         local should_ignore_ts_ls = lsp_utils.contains_any_client(
+            -- TODO: do the same thing with angularls?
                 attached_clients, { "eslint" }) and
             lsp_utils.contains_any_client(attached_clients,
                 { "ts_ls", "tsserver" })
@@ -727,8 +732,9 @@ function M.on_attach(client, bufnr)
             end
         end
 
-        vim.notify("Ignoring clients " .. vim.inspect(clients_to_ignore),
-            vim.log.levels.DEBUG)
+        if #clients_to_ignore then
+            log_debug("Ignoring clients " .. vim.inspect(clients_to_ignore))
+        end
 
         -- vim.tbl_contains(attached_clients, '')
         vim.lsp.buf.format({
