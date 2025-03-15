@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
-brew install llama.cpp
-brew install huggingface-cli
+set -e
 
+brew-install() {
+  brew install $*
+  echo "✅ installed $*"
+}
+
+brew-install llama.cpp
+brew-install huggingface-cli 

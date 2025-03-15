@@ -20,7 +20,7 @@ fail () {
 }
 
 sudo apt update
-sudo apt install -y git curl gcc
+sudo apt install -y git curl gcc jq
 
 install_topic_script_name="install.sh"
 
