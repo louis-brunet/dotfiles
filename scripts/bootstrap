@@ -13,50 +13,90 @@ set -e
 
 echo ''
 
-info () {
+info() {
   printf "\r  [\033[00;34minfo\033[0m] %s\n" "$1"
 }
 
-user () {
+user() {
   printf "\r  [ \033[0;33m??\033[0m ] %b\n" "$1"
 }
 
-success () {
+success() {
   printf "\r\033[2K  [ \033[00;32mOK\033[0m ] %s\n" "$1"
 }
 
-fail () {
+fail() {
   printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
   echo ''
   exit 1
 }
 
-setup_gitconfig () {
-  if ! [ -f "$GITCONFIG_FILE" ]
-  then
+setup_gitconfig() {
+  if ! [ -f "$GITCONFIG_FILE" ]; then
     info 'setup gitconfig'
-    if [ ! -f $GITCONFIG_TEMPLATE ]
-    then
+    if [ ! -f $GITCONFIG_TEMPLATE ]; then
       fail "could not find local gitconfig template '$GITCONFIG_TEMPLATE'"
     fi
 
     git_credential='cache'
 
-    user ' - What is your github author name?'
+    user ' - What is your git author name?'
     read -e git_authorname
-    user ' - What is your github author email?'
+    user ' - What is your git author email?'
     read -e git_authoremail
 
-    sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" "$GITCONFIG_TEMPLATE" > "$GITCONFIG_FILE"
+    gpg_sign=false
+    gpg_format=ssh
+    signing_key="$HOME/.ssh/id_ed25519.pub"
+
+    user ' - Sign commits? (y/N)'
+    read -e sign_commits
+    if [[ "$sign_commits" == 'y' ]] || [[ "$sign_commits" == 'Y' ]]; then
+      gpg_sign=true
+
+      user " - Which key format to use to sign commits? (ssh, openpgp) [$gpg_format]"
+      read -e signing_key_format
+      if [[ "$signing_key_format" = "" ]]; then
+        signing_key_format="$gpg_format"
+      fi
+      if [[ "$signing_key_format" = "openpgp" ]]; then
+        signing_key=""
+
+        user " - Which GPG key ID to use to sign commits?"
+        read -e signing_key
+      elif [[ "$signing_key_format" = "ssh" ]]; then
+        user " - Path to the SSH public key used to sign commits? [$signing_key]"
+        read -e signing_key_path
+        if [[ "$signing_key_path" = "" ]]; then
+          signing_key_path="$signing_key"
+        fi
+        if [[ ! -f "$signing_key_path" ]]; then
+          fail "could not find SSH public key file used to sign commits at '$signing_key_path'"
+        fi
+        signing_key="$signing_key_path"
+      else
+        fail "unrecognized key type: '$signing_key_format'"
+      fi
+      gpg_format="$signing_key_format"
+    fi
+
+    sed \
+      -e "s/AUTHORNAME/$git_authorname/g" \
+      -e "s/AUTHOREMAIL/$git_authoremail/g" \
+      -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" \
+      -e "s:SIGNING_KEY:$signing_key:g" \
+      -e "s/GPG_SIGN/$gpg_sign/g" \
+      -e "s/GPG_FORMAT/$gpg_format/g" \
+      "$GITCONFIG_TEMPLATE" >"$GITCONFIG_FILE"
     # echo "$GITCONFIG_FILE:.gitconfig" > git/symlinks.conf
 
     success 'gitconfig'
   fi
 }
 
-setup_symlinks () {
+setup_symlinks() {
   # install symlonk
-  if ! which symlonk >/dev/null; then 
+  if ! which symlonk >/dev/null; then
     fail "could not find symlonk executable: install https://github.com/louis-brunet/symlonk"
   fi
 
@@ -69,4 +109,3 @@ setup_symlinks
 
 echo ''
 echo '  All installed!'
-

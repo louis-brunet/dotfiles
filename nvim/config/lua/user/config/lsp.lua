@@ -441,6 +441,8 @@ M.lspconfig_servers = {
         },
     },
 
+    -- NOTE: also run `:MasonInstall shellcheck` and `:MasonInstall shfmt` for
+    -- more features
     bashls = {
         filetypes = {
             "zsh",
