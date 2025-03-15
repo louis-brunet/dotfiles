@@ -1,7 +1,8 @@
 ## Getting started
 
 ### Prerequisites
-- Tested on Ubuntu 22.04, uses `apt` for package management.
+- Tested on Ubuntu 24.04, uses `apt` for package management.
+  - or homebrew for macOS
 - Install symlonk for symlink management.
     ```bash
     # install Rust
