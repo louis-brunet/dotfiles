@@ -4,6 +4,8 @@
         signingkey = SIGNING_KEY
 [gpg]
         format = GPG_FORMAT
+[gpg.ssh]
+        allowedSignersFile = GPG_SSH_ALLOWED_SIGNERS_FILE
 [commit]
         gpgsign = GPG_SIGN
 [tag]

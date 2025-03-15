@@ -48,6 +48,7 @@ setup_gitconfig() {
     gpg_sign=false
     gpg_format=ssh
     signing_key="$HOME/.ssh/id_ed25519.pub"
+    gpg_ssh_allowed_signers_file="${XDG_CONFIG_HOME:-$HOME/.config}/git/allowed_signers_file"
 
     user ' - Sign commits? (y/N)'
     read -e sign_commits
@@ -74,6 +75,16 @@ setup_gitconfig() {
           fail "could not find SSH public key file used to sign commits at '$signing_key_path'"
         fi
         signing_key="$signing_key_path"
+
+        user " - Path to the file containing allowed signers' public keys and their committer emails? [$gpg_ssh_allowed_signers_file]"
+        read -e signers_file_path
+        if [[ "$signers_file_path" = "" ]]; then
+          signers_file_path="$gpg_ssh_allowed_signers_file"
+        fi
+        # if [[ ! -f "$signers_file_path" ]]; then
+        #   fail "could not find allowed signers used to verify SSH commit signatures at '$signers_file_path'"
+        # fi
+        gpg_ssh_allowed_signers_file="$signers_file_path"
       else
         fail "unrecognized key type: '$signing_key_format'"
       fi
@@ -87,8 +98,8 @@ setup_gitconfig() {
       -e "s:SIGNING_KEY:$signing_key:g" \
       -e "s/GPG_SIGN/$gpg_sign/g" \
       -e "s/GPG_FORMAT/$gpg_format/g" \
-      "$GITCONFIG_TEMPLATE" >"$GITCONFIG_FILE"
-    # echo "$GITCONFIG_FILE:.gitconfig" > git/symlinks.conf
+      -e "s:GPG_SSH_ALLOWED_SIGNERS_FILE:$gpg_ssh_allowed_signers_file:g" \
+      "$GITCONFIG_TEMPLATE" >"$GITCONFIG_FILE" || fail "could not replace local gitconfig placeholders"
 
     success 'gitconfig'
   fi
