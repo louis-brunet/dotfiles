@@ -71,11 +71,11 @@ install_llamacpp() {
 
   ls build/bin || return 1
 
-  "build/bin/$LLAMACPP_BUILD_TARGET" --version
+  "build/bin/$LLAMACPP_BUILD_TARGET" --version || return 1
   log "✅ built $LLAMACPP_BUILD_TARGET from source"
 
-  cp "build/bin/$LLAMACPP_BUILD_TARGET" "$LLAMACPP_INSTALL_DIR"
-  "$LLAMACPP_INSTALL_DIR/$LLAMACPP_BUILD_TARGET" --version
+  cp "build/bin/$LLAMACPP_BUILD_TARGET" "$LLAMACPP_INSTALL_DIR" || return 1
+  "$LLAMACPP_INSTALL_DIR/$LLAMACPP_BUILD_TARGET" --version || return 1
   log "✅ installed $LLAMACPP_INSTALL_DIR/$LLAMACPP_BUILD_TARGET"
 }
 
