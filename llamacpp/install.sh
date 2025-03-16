@@ -15,19 +15,20 @@ LLAMACPP_REPO=ggml-org/llama.cpp
 LLAMACPP_BUILD_JOBS=8
 LLAMACPP_BUILD_TARGET=llama-server
 LLAMACPP_INSTALL_DIR="$HOME/bin"
-LLAMACPP_DOWNLOAD_DIR="${LOCAL_LLAMACPP_DOWNLOAD_DIR:-$(mktemp -d)}"
+LLAMACPP_DOWNLOAD_DIR="${LOCAL_LLAMACPP_DOWNLOAD_DIR:-$HOME/code}"
+# LLAMACPP_DOWNLOAD_DIR="${LOCAL_LLAMACPP_DOWNLOAD_DIR:-$(mktemp -d)}"
 if [[ ! -d "$LLAMACPP_DOWNLOAD_DIR" ]]; then
   mkdir -p "$LLAMACPP_DOWNLOAD_DIR"
 fi
 log "created $LLAMACPP_DOWNLOAD_DIR"
 
 remove_temp_install_dir() {
-
-  cd - || return 1
-  log "TODO: rm -rf $LLAMACPP_DOWNLOAD_DIR" || return 1
-  #
-  # # rm -rf "$LLAMACPP_TEMP_INSTALL_DIR" || return 1
-  # # log "removed $LLAMACPP_TEMP_INSTALL_DIR" || return 1
+  true
+  # cd - || return 1
+  # log "TODO: rm -rf $LLAMACPP_DOWNLOAD_DIR" || return 1
+  # #
+  # # # rm -rf "$LLAMACPP_TEMP_INSTALL_DIR" || return 1
+  # # # log "removed $LLAMACPP_TEMP_INSTALL_DIR" || return 1
 }
 
 install_dependencies() {
