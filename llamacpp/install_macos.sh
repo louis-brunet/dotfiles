@@ -7,7 +7,7 @@ log() {
 }
 
 brew-install() {
-  brew install $* || return 1
+  brew install "$@" || return 1
   log "✅ installed $*" || return 1
 }
 
