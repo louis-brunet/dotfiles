@@ -1,8 +1,8 @@
 local LSP_METHODS = {
-    execute_command = "workspace/executeCommand",
-    definition = "textDocument/definition",
-    document_highlight = "textDocument/documentHighlight",
-    inlay_hint = "textDocument/inlayHint",
+    execute_command = vim.lsp.protocol.Methods.workspace_executeCommand,
+    definition = vim.lsp.protocol.Methods.textDocument_definition,
+    document_highlight = vim.lsp.protocol.Methods.textDocument_documentHighlight,
+    inlay_hint = vim.lsp.protocol.Methods.textDocument_inlayHint,
 }
 
 local LSP_WORKSPACE_COMMANDS = {
