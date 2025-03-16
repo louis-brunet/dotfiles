@@ -203,8 +203,6 @@ def setup_gitconfig(
         git_author_email=git_author_email,
     )
 
-    # die("TODO", logger=logger)
-
 
 def setup_symlinks(dotfiles_root: str):
     logger = module_logger.getChild(setup_symlinks.__name__)
@@ -262,6 +260,8 @@ def main():
         git_author_email=args["git_author_email"],
     )
     setup_symlinks(dotfiles_root=dotfiles_root)
+
+    logger.info("bootstrap completed")
 
 
 if __name__ == "__main__":
