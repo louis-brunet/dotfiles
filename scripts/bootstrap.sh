@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Initialize local git config and create symlinks in $HOME.
 #
@@ -14,19 +14,23 @@ set -e
 echo ''
 
 info() {
-  printf "\r  [\033[00;34minfo\033[0m] %s\n" "$1"
+  printf "\r  [\033[00;34minfo\033[0m] %s\n" "$*"
 }
 
 user() {
-  printf "\r  [ \033[0;33m??\033[0m ] %b\n" "$1"
+  printf "\r  [ \033[0;33m??\033[0m ] %b\n" "$*"
 }
 
 success() {
-  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] %s\n" "$1"
+  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] %s\n" "$*"
+}
+
+warn() {
+  printf "\r\033[2K  [\033[0;33mWARN\033[0m] %s\n" "$*"
 }
 
 fail() {
-  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
+  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$*"
   echo ''
   exit 1
 }
@@ -47,8 +51,14 @@ setup_gitconfig() {
 
     gpg_sign=false
     gpg_format=ssh
-    signing_key="$HOME/.ssh/id_ed25519.pub"
+    signing_key=
     gpg_ssh_allowed_signers_file="${XDG_CONFIG_HOME:-$HOME/.config}/git/allowed_signers_file"
+
+    default_ssh_signing_key="$HOME/.ssh/id_ed25519.pub"
+    if [[ -f "$default_ssh_signing_key" ]]; then
+      signing_key="$default_ssh_signing_key"
+    fi
+
 
     user ' - Sign commits? (y/N)'
     read -e sign_commits
@@ -66,7 +76,11 @@ setup_gitconfig() {
         user " - Which GPG key ID to use to sign commits?"
         read -e signing_key
       elif [[ "$signing_key_format" = "ssh" ]]; then
-        user " - Path to the SSH public key used to sign commits? [$signing_key]"
+        signing_key_path_prompt=" - Path to the SSH public key used to sign commits?"
+        if [[ -n "$signing_key" ]]; then
+          signing_key_path_prompt="$signing_key_path_prompt [$signing_key]"
+        fi
+        user "$signing_key_path_prompt"
         read -e signing_key_path
         if [[ "$signing_key_path" = "" ]]; then
           signing_key_path="$signing_key"
@@ -81,10 +95,23 @@ setup_gitconfig() {
         if [[ "$signers_file_path" = "" ]]; then
           signers_file_path="$gpg_ssh_allowed_signers_file"
         fi
-        # if [[ ! -f "$signers_file_path" ]]; then
-        #   fail "could not find allowed signers used to verify SSH commit signatures at '$signers_file_path'"
-        # fi
         gpg_ssh_allowed_signers_file="$signers_file_path"
+
+        # setup_git_allowed_signers "$signers_file_path" "$git_authoremail" "$signing_key_path"
+
+        new_allowed_signer_line="$git_authoremail $(cat "$signing_key_path")"
+
+        if ! grep -q "^$new_allowed_signer_line"'$' "$signers_file_path"; then
+          user " - Add the following line to the file '$signers_file_path'? (Y/n)\n$new_allowed_signer_line"
+          read -e add_new_allowed_signer_line
+          if [[ ! "$add_new_allowed_signer_line" = "n" ]] && [[ ! "$add_new_allowed_signer_line" = "N" ]]; then
+            mkdir -p "$(dirname "$signers_file_path")"
+            echo "$new_allowed_signer_line" >>"$signers_file_path"
+            success "added signing key '$signing_key_path' to '$signers_file_path'"
+          fi
+        else
+          success "signing key '$signing_key_path' is registered in '$signers_file_path'"
+        fi
       else
         fail "unrecognized key type: '$signing_key_format'"
       fi
@@ -101,7 +128,7 @@ setup_gitconfig() {
       -e "s:GPG_SSH_ALLOWED_SIGNERS_FILE:$gpg_ssh_allowed_signers_file:g" \
       "$GITCONFIG_TEMPLATE" >"$GITCONFIG_FILE" || fail "could not replace local gitconfig placeholders"
 
-    success 'gitconfig'
+    success 'gitconfig successfully set up'
   fi
 }
 
@@ -114,6 +141,10 @@ setup_symlinks() {
   # run symlonk
   symlonk create links "$DOTFILES_ROOT"/*/symlonk.toml --prune --verify
 }
+
+sleep_seconds=5
+warn 'DEPRECATED - use `python3 -m scripts.boostrap` instead.' "Sleeping for $sleep_seconds seconds..."
+sleep "$sleep_seconds"
 
 setup_gitconfig
 setup_symlinks

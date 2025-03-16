@@ -13,18 +13,20 @@
     cd "$path_to_symlonk"
     PATH="$HOME/.cargo/bin:$PATH" cargo build --release
 
-    mkdir ~/bin
-    cp ./target/release/symlonk ~/bin
+    SYMLONK_INSTALL_PATH=~/bin
+    mkdir -p "$SYMLONK_INSTALL_PATH"
+    cp ./target/release/symlonk "$SYMLONK_INSTALL_PATH"
     ```
 
 ### First install
 ```bash
 # create symlinks, prompt local git options if they are not set
-# might need PATH="$HOME/bin:$PATH" if zsh and symlinks are not configured yet
-./scripts/bootstrap
+# might need PATH="$SYMLONK_INSTALL_PATH:$PATH" if zsh and symlinks are not configured yet
+python3 -m scripts.bootstrap --help
+python3 -m scripts.bootstrap
 
 # run all ./*/install.sh scripts from topic folders
-# might need PATH="$HOME/bin:$HOME/.cargo/bin:$PATH"
+# might need PATH="$SYMLONK_INSTALL_PATH:$HOME/.cargo/bin:$PATH"
 ./scripts/install
 ```
 
