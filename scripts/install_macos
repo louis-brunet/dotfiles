@@ -33,7 +33,9 @@ find . -maxdepth 2 -name "$install_topic_script_name" -not -path './scripts/*' -
 do 
     info "Installing '$installer'"
     if [ -x "$installer" ]; then
-        "$installer"
+        "$installer" || {
+            fail "Running installer '$installer' resulted in an error"
+        }
     else 
         fail "Execution is not authorized for install script '$installer'"
     fi

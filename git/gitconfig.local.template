@@ -1,6 +1,16 @@
 [user]
         name = AUTHORNAME
         email = AUTHOREMAIL
+        signingkey = SIGNING_KEY
+[gpg]
+        format = GPG_FORMAT
+[gpg.ssh]
+        allowedSignersFile = GPG_SSH_ALLOWED_SIGNERS_FILE
+[commit]
+        gpgsign = GPG_SIGN
+[tag]
+        gpgSign = GPG_SIGN
 [credential]
         helper = GIT_CREDENTIAL_HELPER
 
+# vim:ft=git_config:

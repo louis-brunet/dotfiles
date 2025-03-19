@@ -40,7 +40,7 @@ if ! nvim --version; then
 fi
 echo "✅ installed nvim"
 
-sudo apt install ripgrep
+sudo apt install -y ripgrep
 rg --version
 echo "✅ installed ripgrep for Telescope"
 
@@ -61,5 +61,5 @@ fi
 # like ruff. Should only be needed for Ubuntu/Debian
 # WARN: assumes that WSL is running Ubuntu/Debian
 if python3 -mplatform | grep -qiE 'Ubuntu|Debian|WSL'; then
-    sudo apt install python3-venv
+    sudo apt install -y python3-venv
 fi

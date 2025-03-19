@@ -1,3 +1,4 @@
 symlonk-lock.toml
-**/.DS_Store
+.DS_Store
 .aider*
+__pycache__

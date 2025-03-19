@@ -10,33 +10,6 @@
 ./scripts/download_model.py --hf-repo "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF" --hf-files "qwen2.5-coder-7b-instruct-q5_k_m*.gguf" --merge --output-file-path "models/qwen2.5-coder-7b-instruct-q5_k_m.gguf"
 ```
 
-## Running for ggml-org/llama.vim plugin
-
-```bash
-# qwen2.5-coder-1.5b
-llama-server \
-    --hf-repo ggerganov/Qwen2.5-Coder-1.5B-Q8_0-GGUF \
-    --hf-file qwen2.5-coder-1.5b-q8_0.gguf \
-    --port 8012 \
-    --n-gpu-layers 99 --flash-attn \
-    --ubatch-size 512 --batch-size 1024 \
-    --defrag-thold 0.1 \
-    --cache-reuse 256
-
-# qwen2.5-coder-7b
-llama-server \
-    --hf-repo ggml-org/Qwen2.5-Coder-7B-Q8_0-GGUF \
-    --hf-file qwen2.5-coder-7b-q8_0.gguf \
-    --port 8012 \
-    --n-gpu-layers 99 --flash-attn \
-    --ubatch-size 512 --batch-size 1024 \
-    --defrag-thold 0.1 \
-    --cache-reuse 256
-```
-
-> [!NOTE]
-> use qwen2.5-coder, not qwen2.5-coder-instruct
-
 ## Manually
 From instructions in https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF :
 
@@ -60,6 +33,59 @@ llama-gguf-split --merge "$models_dir"/qwen2.5-coder-7b-instruct-q5_k_m-00001-of
 ```
 
 # Serve model
+
+## Running for ggml-org/llama.vim plugin
+
+> [!NOTE]
+> use qwen2.5-coder, not qwen2.5-coder-instruct
+
+### Using presets:
+
+```bash
+# With < 8GB VRAM
+llama-server --fim-qwen-1.5b-default
+
+# With < 16GB VRAM
+llama-server --fim-qwen-3b-default
+
+# With > 16GB VRAM
+llama-server --fim-qwen-7b-default
+
+## Speculative
+# use Qwen 2.5 Coder 7B + 0.5B draft for speculative decoding
+llama-server --fim-qwen-7b-spec                      
+
+# use Qwen 2.5 Coder 14B + 0.5B draft for speculative decoding
+llama-server --fim-qwen-14b-spec                     
+```
+
+### Manually:
+
+```bash
+# qwen2.5-coder-1.5b
+llama-server \
+    --hf-repo ggerganov/Qwen2.5-Coder-1.5B-Q8_0-GGUF \
+    --hf-file qwen2.5-coder-1.5b-q8_0.gguf \
+    --port 8012 \
+    --n-gpu-layers 99 --flash-attn \
+    --ubatch-size 512 --batch-size 1024 \
+    --defrag-thold 0.1 \
+    --cache-reuse 256
+
+# qwen2.5-coder-7b
+llama-server \
+    --hf-repo ggml-org/Qwen2.5-Coder-7B-Q8_0-GGUF \
+    --hf-file qwen2.5-coder-7b-q8_0.gguf \
+    --port 8012 \
+    --n-gpu-layers 99 --flash-attn \
+    --ubatch-size 512 --batch-size 1024 \
+    --defrag-thold 0.1 \
+    --cache-reuse 256
+```
+
+
+# WIP: python script
+
 ```bash
 ./scripts/serve_model.py --help
 
