@@ -80,12 +80,17 @@ install_llamacpp() {
   log "✅ installed $LLAMACPP_INSTALL_DIR/$LLAMACPP_BUILD_TARGET"
 }
 
-cd "$LLAMACPP_DOWNLOAD_DIR"
+if ! which "$LLAMACPP_BUILD_TARGET" >/dev/null
+then
+  cd "$LLAMACPP_DOWNLOAD_DIR"
 
-install_llamacpp ||  {
-  log "ERROR: could not install llama.cpp"
+  install_llamacpp ||  {
+    log "ERROR: could not install llama.cpp"
+    remove_temp_install_dir
+    exit 1
+  }
+
   remove_temp_install_dir
-  exit 1
-}
-
-remove_temp_install_dir
+else
+  log "$LLAMACPP_BUILD_TARGET is already installed"
+fi
