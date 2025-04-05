@@ -484,6 +484,14 @@ M.lspconfig_servers = {
     --     -- default is 'yaml.docker-compose'
     --     -- filetypes = { 'yaml.docker-compose' },
     -- },
+
+    dockerls = {
+        -- https://github.com/rcjsuen/dockerfile-language-server?tab=readme-ov-file#language-server-settings
+        settings = {
+            docker = { languageserver = { diagnostics = {}, formatter = {} } },
+        },
+    },
+
     angularls = {
         filetypes = {
             "angular.html",
@@ -505,9 +513,15 @@ M.lspconfig_servers = {
             redhat = { telemetry = { enabled = false } },
             yaml = {
                 schemas = {
-                    [".github/workflows/*.{yml,yaml}"] =
-                    "https://json.schemastore.org/github-workflow.json",
-                    -- ['*cloud-config.{yml,yaml}'] = 'https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json',
+                    -- ["https://json.schemastore.org/github-workflow.json"] = {
+                    --     ".github/workflows/*.{yaml,yml}",
+                    -- },
+                    -- ["https://json.schemastore.org/github-action.json"] = {
+                    --     ".github/actions/*.{yaml,yml}",
+                    --     "action.{yaml,yml}"
+                    -- },
+                    ["https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json"] =
+                    "*cloud-config.{yaml,yml}",
                 },
                 format = { enable = true, singleQuote = true, printWidth = 80 },
             },
