@@ -17,14 +17,15 @@ _download_llm_tools_asset() {
   local repo_owner=louis-brunet
   local repo_name=llm-tools
   local repo="$repo_owner/$repo_name"
-  local release_tag="ed7c823" # TODO: use latest once first release has been made
+  local release_tag="next" # FIXME: use latest once first release has been made
+  local asset_url="https://github.com/$repo/releases/download/$release_tag/$asset"
 
-  log "downloading $asset to $output_location"
+  log "downloading $asset_url to $output_location"
   curl \
     --output "$output_location" \
     --create-dirs \
     --silent --show-error --location \
-    "https://github.com/$repo/releases/download/$release_tag/$asset" || return 1
+    "$asset_url" || return 1
 }
 
 _install_llm_tools() {
@@ -47,6 +48,7 @@ _install_llm_tools() {
   tar -C "$temp_download_dir" -xvf "$curl_zsh_plugin_output" || return 1
   log "moving $temp_download_dir/$app_name to $zsh_plugins_dir"
   mv "$temp_download_dir/$app_name" "$zsh_plugins_dir" || return 1
+  rm -r "$temp_download_dir" || return 1
 
   log "installed $zsh_plugins_dir/$app_name"
 }
