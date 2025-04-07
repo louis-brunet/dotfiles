@@ -48,6 +48,7 @@ _install_llm_tools() {
   tar -C "$temp_download_dir" -xvf "$curl_zsh_plugin_output" || return 1
   log "moving $temp_download_dir/$app_name to $zsh_plugins_dir"
   mv "$temp_download_dir/$app_name" "$zsh_plugins_dir" || return 1
+  log "removing $temp_download_dir"
   rm -r "$temp_download_dir" || return 1
 
   log "installed $zsh_plugins_dir/$app_name"
