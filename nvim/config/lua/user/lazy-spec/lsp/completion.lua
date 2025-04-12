@@ -1,10 +1,10 @@
-local function get_llm_completion_module()
-    local llm_completion = require('llm.completion')
-    if not llm_completion then
-        vim.notify('[lsp/completion.lua] module llm.completion not found. Either install it or remove the relevant lines from lazy-spec/lsp/completion.lua', vim.log.levels.WARN)
-    end
-    return llm_completion
-end
+-- local function get_llm_completion_module()
+--     local llm_completion = require('llm.completion')
+--     if not llm_completion then
+--         vim.notify('[lsp/completion.lua] module llm.completion not found. Either install it or remove the relevant lines from lazy-spec/lsp/completion.lua', vim.log.levels.WARN)
+--     end
+--     return llm_completion
+-- end
 
 ---@type LazySpec
 local M = {

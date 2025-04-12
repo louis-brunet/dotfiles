@@ -665,8 +665,16 @@ function M.on_attach(client, bufnr)
     end
 
     nmap("<leader>rn", vim.lsp.buf.rename, "[r]e[n]ame")
-    nmap("<leader>ca", vim.lsp.buf.code_action, "[c]ode [a]ction")
-    nmap("<A-Enter>", vim.lsp.buf.code_action, "code action")
+
+    local ok, actions_preview = pcall(require,'actions-preview')
+    local code_action
+    if ok then
+        code_action = actions_preview.code_actions
+    else
+        code_action = vim.lsp.buf.code_action
+    end
+    nmap("<leader>ca", code_action, "[c]ode [a]ction")
+    nmap("<A-Enter>", code_action, "code action")
 
     local telescope_lsp_options = {
         layout_strategy = "vertical",

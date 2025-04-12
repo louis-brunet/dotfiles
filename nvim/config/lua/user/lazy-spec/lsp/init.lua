@@ -46,7 +46,7 @@ local M = {
             -- Additional lua configuration, makes nvim stuff amazing!
             "folke/neodev.nvim",
 
-            -- LSP dependencies in lua/user/plugins/lsp/*.lua (except init.lua)
+            -- LSP dependencies in lua/user/lazy-spec/lsp/*.lua (except init.lua)
             { import = "user.lazy-spec.lsp" },
         },
         config = function(_, _)
@@ -65,7 +65,10 @@ local M = {
             local servers = user_config.lspconfig_servers
             local common_on_attach = user_config.on_attach
 
-            mason_lspconfig.setup({ ensure_installed = vim.tbl_keys(servers) })
+            mason_lspconfig.setup({
+                automatic_installation = false,
+                ensure_installed = vim.tbl_keys(servers)
+            })
 
             mason_lspconfig.setup_handlers({
                 function(server_name)

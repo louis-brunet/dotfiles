@@ -87,27 +87,27 @@ local function format_diagnostic(diagnostic)
     return diagnostic.message .. format_diagnostic_code_suffix(diagnostic.code)
 end
 
--- local diagnostic_max_severity_for_virtual_lines = vim.diagnostic.severity.ERROR
-local diagnostic_max_severity_for_virtual_lines = -1
+-- -- local diagnostic_max_severity_for_virtual_lines = vim.diagnostic.severity.ERROR
+-- local diagnostic_max_severity_for_virtual_lines = -1
 ---@type vim.diagnostic.Opts
 local diagnostic_opts = {
     underline = true,
     severity_sort = true,  -- show higher severity diagnostics first
     update_in_insert = true,
-    virtual_lines = {
-        format = function(diagnostic)
-            if diagnostic.severity > diagnostic_max_severity_for_virtual_lines then
-                return ""
-            end
-            return format_diagnostic(diagnostic)
-        end,
-    },
+    -- virtual_lines = {
+    --     format = function(diagnostic)
+    --         if diagnostic.severity > diagnostic_max_severity_for_virtual_lines then
+    --             return ""
+    --         end
+    --         return format_diagnostic(diagnostic)
+    --     end,
+    -- },
     virtual_text = {
-        severity = {
-            vim.diagnostic.severity.ERROR,
-            vim.diagnostic.severity.WARN,
-            vim.diagnostic.severity.INFO,
-        },
+        -- severity = {
+        --     vim.diagnostic.severity.ERROR,
+        --     vim.diagnostic.severity.WARN,
+        --     vim.diagnostic.severity.INFO,
+        -- },
         virt_text_pos = "eol",
         source = false, -- "if_many",
         suffix = function(diagnostic)
