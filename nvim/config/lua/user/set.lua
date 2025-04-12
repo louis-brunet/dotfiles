@@ -8,7 +8,7 @@ vim.o.hlsearch = false
 vim.wo.number = true
 
 -- Enable mouse mode
-vim.o.mouse = 'a'
+vim.o.mouse = "a"
 
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -27,14 +27,14 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
+vim.wo.signcolumn = "yes"
 
 -- Decrease update time
-vim.o.updatetime = 50 -- 250
+vim.o.updatetime = 50  -- 250
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = "menuone,noselect"
 
 vim.o.termguicolors = true
 
@@ -69,23 +69,27 @@ vim.opt.colorcolumn = "80"
 
 vim.diagnostic.config({
     underline = true,
-    severity_sort = true, -- show higher severity diagnostics first
+    severity_sort = true,  -- show higher severity diagnostics first
     update_in_insert = true,
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = " ",
+            [vim.diagnostic.severity.WARN] = " ",
+            [vim.diagnostic.severity.INFO] = " ",
+            [vim.diagnostic.severity.HINT] = " ",
+        },
+        numhl = {
+            [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+            [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+            [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+            [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+        },
+        linehl = {},
+    },
 })
--- override default diagnostic signs
-local signs = {
-    -- Error = " ",
-    -- Warn = " ",
-    Hint = " ",
-    Info = " ",
-}
-for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
 
 -- Folding options
-vim.api.nvim_set_option_value('foldmethod', 'expr', {})
-vim.api.nvim_set_option_value('foldexpr', 'v:lua.vim.treesitter.foldexpr()', {})
-vim.api.nvim_set_option_value('foldtext', '', {}) -- show first line with regular buffer highlight
-vim.api.nvim_set_option_value('foldenable', false, {}) -- hide folds by default
+vim.api.nvim_set_option_value("foldmethod", "expr", {})
+vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.treesitter.foldexpr()", {})
+vim.api.nvim_set_option_value("foldtext", "", {})       -- show first line with regular buffer highlight
+vim.api.nvim_set_option_value("foldenable", false, {})  -- hide folds by default
