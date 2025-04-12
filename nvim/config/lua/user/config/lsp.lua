@@ -1,10 +1,3 @@
-local LSP_METHODS = {
-    execute_command = vim.lsp.protocol.Methods.workspace_executeCommand,
-    definition = vim.lsp.protocol.Methods.textDocument_definition,
-    document_highlight = vim.lsp.protocol.Methods.textDocument_documentHighlight,
-    inlay_hint = vim.lsp.protocol.Methods.textDocument_inlayHint,
-}
-
 local LSP_WORKSPACE_COMMANDS = {
     organize_imports = "_typescript.organizeImports",
     go_to_source_definition = "_typescript.goToSourceDefinition",
@@ -67,8 +60,8 @@ local typescript_commands = {
                 { title = LSP_WORKSPACE_COMMANDS.organize_imports })
         end
 
-        client.request(LSP_METHODS.execute_command, execute_command_params,
-            execute_command_callback)
+        client:request(vim.lsp.protocol.Methods.workspace_executeCommand,
+            execute_command_params, execute_command_callback)
         return true
     end,
 
@@ -102,8 +95,8 @@ local typescript_commands = {
         }
         local function execute_callback(...)
             local args = { ... }
-            local handler = client.handlers[LSP_METHODS.definition] or
-                vim.lsp.handlers[LSP_METHODS.definition]
+            local handler = client.handlers[vim.lsp.protocol.Methods.textDocument_definition] or
+                vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_definition]
             if not handler then
                 vim.notify(
                     "failed to go to source definition: could not resolve definition handler",
@@ -115,7 +108,7 @@ local typescript_commands = {
             local res = args[2] or ({})
             if vim.tbl_isempty(res) then
                 if opts.use_fallback == true then
-                    return client.request(LSP_METHODS.definition,
+                    return client:request(vim.lsp.protocol.Methods.textDocument_definition,
                         positional_params, handler, bufnr)
                 end
                 vim.notify(
@@ -128,8 +121,10 @@ local typescript_commands = {
             handler(unpack(args))
         end
 
-        client.request(LSP_METHODS.execute_command, execute_command_params,
-            execute_callback)
+        client:request(vim.lsp.protocol.Methods.workspace_executeCommand,
+            execute_command_params, execute_callback)
+        -- client.request(LSP_METHODS.execute_command, execute_command_params,
+        --     execute_callback)
         return true
     end,
 }
@@ -618,8 +613,8 @@ M.lspconfig_servers = {
                 --
                 server = {
                     workDir = vim.fs.joinpath(get_user_cache_dir(), "lemminx"),
-                    -- FIXME: cannot download schemas because of Netskope mitm
-                    -- malware-ass proxy's self-signed cert, not recognized by
+                    -- FIXME: cannot download schemas because of Netskope
+                    -- proxy's self-signed cert, not recognized by
                     -- Java/by the compiled lemminx binary.
                     -- Should probably try to install JRE and lemminx externally
                     -- to fix these issues
@@ -768,7 +763,7 @@ function M.on_attach(client, bufnr)
     local highlight_augroup_opts = function(callback)
         return { callback = callback, group = highlight_augroup, buffer = bufnr }
     end
-    if client.supports_method(LSP_METHODS.document_highlight) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
         vim.api.nvim_create_autocmd("CursorHold",
             highlight_augroup_opts(vim.lsp.buf.document_highlight))
         vim.api.nvim_create_autocmd("CursorHoldI",
@@ -780,8 +775,7 @@ function M.on_attach(client, bufnr)
     end
 
     -- Enable inlay hints
-    -- if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-    if client.supports_method(LSP_METHODS.inlay_hint) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
         if vim.lsp.inlay_hint and type(vim.lsp.inlay_hint.enable) == "function" then
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
