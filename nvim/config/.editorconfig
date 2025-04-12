@@ -5,6 +5,7 @@ root = true
 charset = utf-8
 end_of_line = lf
 trim_trailing_whitespace = true
+spelling_language = en-US
 
 # See below template for options used by LuaLS, default values and documentation
 # https://github.com/CppCXY/EmmyLuaCodeStyle/blob/master/lua.template.editorconfig
