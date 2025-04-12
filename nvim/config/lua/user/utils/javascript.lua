@@ -7,7 +7,7 @@ end
 
 local function find_nearest_package_json()
     local package_json_path = vim.fn.findfile("package.json", ".;")
-    vim.validate({ package_json_path = { package_json_path, "string" } })
+    vim.validate('package_json_path', package_json_path, 'string')
     return package_json_path
 end
 
