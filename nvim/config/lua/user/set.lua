@@ -27,7 +27,7 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = "yes"
+vim.wo.signcolumn = 'auto:1-4'
 
 -- Decrease update time
 vim.o.updatetime = 50  -- 250
@@ -67,10 +67,27 @@ vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80"
 
-vim.diagnostic.config({
+---@type vim.diagnostic.Opts
+local diagnostic_opts = {
     underline = true,
     severity_sort = true,  -- show higher severity diagnostics first
-    update_in_insert = true,
+    update_in_insert = false,
+    virtual_lines = true,
+    virtual_text = false,
+    -- virtual_text = {
+    --     virt_text_pos = 'eol',
+    --     suffix = function (diagnostic)
+    --         local code_str = diagnostic.code
+    --         if code_str == nil then
+    --             return ""
+    --         end
+    --         if type(code_str) ~= "string" then
+    --             code_str = vim.inspect(code_str)
+    --         end
+    --         return (" [%s]"):format(code_str)
+    --     end
+    -- },
+    float = { source = "if_many", severity_sort = true },
     signs = {
         text = {
             [vim.diagnostic.severity.ERROR] = " ",
@@ -86,7 +103,8 @@ vim.diagnostic.config({
         },
         linehl = {},
     },
-})
+}
+vim.diagnostic.config(diagnostic_opts)
 
 -- Folding options
 vim.api.nvim_set_option_value("foldmethod", "expr", {})

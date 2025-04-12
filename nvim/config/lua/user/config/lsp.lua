@@ -95,8 +95,10 @@ local typescript_commands = {
         }
         local function execute_callback(...)
             local args = { ... }
-            local handler = client.handlers[vim.lsp.protocol.Methods.textDocument_definition] or
-                vim.lsp.handlers[vim.lsp.protocol.Methods.textDocument_definition]
+            local handler = client.handlers
+                [vim.lsp.protocol.Methods.textDocument_definition] or
+                vim.lsp.handlers
+                [vim.lsp.protocol.Methods.textDocument_definition]
             if not handler then
                 vim.notify(
                     "failed to go to source definition: could not resolve definition handler",
@@ -108,7 +110,8 @@ local typescript_commands = {
             local res = args[2] or ({})
             if vim.tbl_isempty(res) then
                 if opts.use_fallback == true then
-                    return client:request(vim.lsp.protocol.Methods.textDocument_definition,
+                    return client:request(
+                        vim.lsp.protocol.Methods.textDocument_definition,
                         positional_params, handler, bufnr)
                 end
                 vim.notify(
@@ -387,12 +390,14 @@ M.lspconfig_servers = {
     lua_ls = {
         ---@class LuaLanguageServerSettings
         settings = {
-            ---https://github.com/LuaLS/lua-language-server/wiki/Settings
+            --- https://luals.github.io/wiki/settings/
             ---@class LuaLanguageServerSettingsLua
             Lua = {
                 telemetry = { enable = false },
 
                 codelens = { enable = true },
+
+                diagnostics = { enable = true },
 
                 hint = {
                     enable = true,
