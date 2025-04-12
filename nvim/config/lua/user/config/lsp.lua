@@ -804,6 +804,12 @@ function M.on_attach(client, bufnr)
         end
         vim.notify(message)
     end, "[t]oggle diagnostics")
+
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_foldingRange) then
+        local current_window = vim.api.nvim_get_current_win()
+        vim.api.nvim_set_option_value('foldmethod', 'expr', { win = current_window })
+        vim.api.nvim_set_option_value('foldexpr', 'v:lua.vim.lsp.foldexpr()', { win = current_window })
+    end
 end
 
 return M

@@ -93,7 +93,7 @@ local diagnostic_max_severity_for_virtual_lines = -1
 local diagnostic_opts = {
     underline = true,
     severity_sort = true,  -- show higher severity diagnostics first
-    update_in_insert = false,
+    update_in_insert = true,
     virtual_lines = {
         format = function(diagnostic)
             if diagnostic.severity > diagnostic_max_severity_for_virtual_lines then
