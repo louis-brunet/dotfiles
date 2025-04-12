@@ -73,6 +73,8 @@ local M = {
         event = 'VeryLazy',
         opts = {
             -- See `:help gitsigns.txt`
+            sign_priority = 50, -- set higher priority than diagnostic signs
+
             signs = {
                 -- add = { text = '+' },
                 -- change = { text = '~' },

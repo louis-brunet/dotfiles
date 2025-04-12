@@ -27,7 +27,7 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = 'auto:1-4'
+vim.wo.signcolumn = "auto:1-2"
 
 -- Decrease update time
 vim.o.updatetime = 50  -- 250
@@ -67,28 +67,56 @@ vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80"
 
+---@param diagnostic_code string|integer
+---@return string
+local function format_diagnostic_code_suffix(diagnostic_code)
+    local suffix = ""
+    local code_str = diagnostic_code
+    if code_str ~= nil then
+        if type(code_str) ~= "string" then
+            code_str = vim.inspect(code_str)
+        end
+        suffix = (" [%s]"):format(code_str)
+    end
+    return suffix
+end
+
+---@param diagnostic vim.Diagnostic
+---@return string
+local function format_diagnostic(diagnostic)
+    return diagnostic.message .. format_diagnostic_code_suffix(diagnostic.code)
+end
+
+-- local diagnostic_max_severity_for_virtual_lines = vim.diagnostic.severity.ERROR
+local diagnostic_max_severity_for_virtual_lines = -1
 ---@type vim.diagnostic.Opts
 local diagnostic_opts = {
     underline = true,
     severity_sort = true,  -- show higher severity diagnostics first
     update_in_insert = false,
-    virtual_lines = true,
-    virtual_text = false,
-    -- virtual_text = {
-    --     virt_text_pos = 'eol',
-    --     suffix = function (diagnostic)
-    --         local code_str = diagnostic.code
-    --         if code_str == nil then
-    --             return ""
-    --         end
-    --         if type(code_str) ~= "string" then
-    --             code_str = vim.inspect(code_str)
-    --         end
-    --         return (" [%s]"):format(code_str)
-    --     end
-    -- },
+    virtual_lines = {
+        format = function(diagnostic)
+            if diagnostic.severity > diagnostic_max_severity_for_virtual_lines then
+                return ""
+            end
+            return format_diagnostic(diagnostic)
+        end,
+    },
+    virtual_text = {
+        severity = {
+            vim.diagnostic.severity.ERROR,
+            vim.diagnostic.severity.WARN,
+            vim.diagnostic.severity.INFO,
+        },
+        virt_text_pos = "eol",
+        source = false, -- "if_many",
+        suffix = function(diagnostic)
+            return format_diagnostic_code_suffix(diagnostic.code)
+        end,
+    },
     float = { source = "if_many", severity_sort = true },
     signs = {
+        -- severity = {vim.diagnostic.severity.ERROR,vim.diagnostic.severity.WARN},
         text = {
             [vim.diagnostic.severity.ERROR] = " ",
             [vim.diagnostic.severity.WARN] = " ",
