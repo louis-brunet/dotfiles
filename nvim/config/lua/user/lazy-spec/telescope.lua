@@ -230,7 +230,7 @@ return {
     -- Fuzzy Finder (files, lsp, etc)
     {
         "nvim-telescope/telescope.nvim",
-        branch = "0.1.x",
+        -- branch = "0.1.x",
 
         -- NOTE: Loading Telescope on VeryLazy does not handle keymaps pressed before
         -- nvim was initialized (e.g. `$ nvim<Enter><Space>sf` in terminal)
