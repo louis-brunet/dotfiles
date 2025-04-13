@@ -60,16 +60,16 @@ local M = {
 
         keys = {
             -- { '<leader>g<Space>', ':Git<Space>',                                              desc = 'Start Fugitive command (:Git )' },
-            { "<leader>gg",  ":Git<CR>",                                desc = "Git status (fugitive)" },
+            { "<leader>gg", ":Git<CR>", desc = "Git status (fugitive)" },
             {
-                  "<leader>gmt",
-                                 function() vim.cmd "Git mergetool -y" end,
-                                                                            desc = "[g]it [m]erge[t]ool"
+                "<leader>gmt",
+                function() vim.cmd "Git mergetool -y" end,
+                desc = "[g]it [m]erge[t]ool",
             },
             {
-                  "<leader>gdt",
-                                 function() vim.cmd "Git difftool -y" end,
-                                                                            desc = "[g]it [d]iff[t]ool"
+                "<leader>gdt",
+                function() vim.cmd "Git difftool -y" end,
+                desc = "[g]it [d]iff[t]ool",
             },
         },
     },
@@ -160,6 +160,21 @@ local M = {
                     "[g]it [m]erge [c]onflicts quickfix"
                 )
             end,
+        },
+    },
+
+    {
+        "akinsho/git-conflict.nvim",
+        -- https://github.com/akinsho/git-conflict.nvim?tab=readme-ov-file#configuration
+        opts = {
+            -- default_mappings = true,  -- disable buffer local mapping created by this plugin
+            -- default_commands = true,  -- disable commands created by this plugin
+            disable_diagnostics = true,  -- This will disable the diagnostics in a buffer whilst it is conflicted
+            -- list_opener = "copen",    -- command or function to open the conflicts list
+            -- highlights = {            -- They must have background color, otherwise the default color will be used
+            --     incoming = "DiffAdd",
+            --     current = "DiffText",
+            -- },
         },
     },
 }
