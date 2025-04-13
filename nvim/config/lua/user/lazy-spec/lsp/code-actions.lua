@@ -31,12 +31,12 @@ return {
         opts = {
             autocmd = { enabled = true },
             code_lenses = true,
-            sign = { enabled = true },
+            sign = { enabled = true, text = "󰌵" },
             virtual_text = { enabled = false },
             float = { enabled = false },
 
-            -- -- Priority of the lightbulb for all handlers except float.
-            -- priority = 10,
+            -- Priority of the lightbulb for all handlers except float.
+            priority = 40,  -- default is 10; current custom gitsigns priority is 50 as of writing this
             --
             -- -- Whether or not to hide the lightbulb when the buffer is not focused.
             -- -- Only works if configured during NvimLightbulb.setup
