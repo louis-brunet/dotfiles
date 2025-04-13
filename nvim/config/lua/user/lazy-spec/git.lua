@@ -125,15 +125,15 @@ local M = {
                 end
             end
 
-            nmap({ "co", "<leader>gmh" }, "<Plug>(git-conflict-ours)",
+            nmap({ "<leader>gmh" }, "<Plug>(git-conflict-ours)",
                 "choose ours")
-            nmap({ "ct", "<leader>gml" }, "<Plug>(git-conflict-theirs)",
+            nmap({ "<leader>gml" }, "<Plug>(git-conflict-theirs)",
                 "choose theirs")
-            nmap({ "cb", "<leader>gmb" }, "<Plug>(git-conflict-base)",
+            nmap({ "<leader>gmb" }, "<Plug>(git-conflict-base)",
                 "choose base")
-            nmap({ "cb", "<leader>gmB" }, "<Plug>(git-conflict-both)",
+            nmap({ "<leader>gmB" }, "<Plug>(git-conflict-both)",
                 "choose both")
-            nmap({ "c0", "<leader>gm0" }, "<Plug>(git-conflict-none)",
+            nmap({ "<leader>gm0" }, "<Plug>(git-conflict-none)",
                 "choose none")
             nmap({ "[x", "<leader>gmn" }, "<Plug>(git-conflict-prev-conflict)",
                 "previous conflict")
@@ -172,58 +172,8 @@ local M = {
                         vim.notify(message)
 
                         if not git_utils.is_unmerged_file(conflict_file) then
-                            -- vim.notify(
-                            --     "[DEBUG] aborting, file is already merged")
                             return
                         end
-
-                        -- local choice_list = {
-                        --     {
-                        --         label = "Cancel",
-                        --         on_select = function()
-                        --         end,
-                        --     },
-                        --     {
-                        --         label = "Add entire file",
-                        --         on_select = function()
-                        --             local is_written = pcall(vim.cmd.write)
-                        --             if not is_written then
-                        --                 vim.notify(
-                        --                     "aborting git add, could not write to file: " ..
-                        --                     conflict_file, vim.log.levels.ERROR)
-                        --                 return
-                        --             end
-                        --             if git_utils.add_file(conflict_file) then
-                        --                 vim.notify("added file to git index: " ..
-                        --                     conflict_file)
-                        --             end
-                        --         end,
-                        --     },
-                        --     -- {
-                        --     --     -- value = "interactive",
-                        --     --     label = "Interactive",
-                        --     --     on_select = function ()
-                        --     --         vim.notify('TODO interactive add', vim.log.levels.ERROR)
-                        --     --     end,
-                        --     -- },
-                        -- }
-                        -- local prompt =
-                        --     ("All conflicts resolved! Add to git index? (%s)")
-                        --     :format(conflict_file)
-                        -- vim.ui.select(choice_list,
-                        --     {
-                        --         prompt = prompt,
-                        --         format_item =
-                        --             function(item) return item.label end,
-                        --     },
-                        --     function(chosen_item)
-                        --         if chosen_item == nil then
-                        --             return
-                        --         end
-                        --         vim.notify("chose item: " ..
-                        --             vim.inspect(chosen_item))
-                        --         chosen_item.on_select()
-                        --     end)
 
                         local ui = require("user.utils.ui")
                         ui.ui_confirm(
@@ -248,7 +198,7 @@ local M = {
                                 end,
                             },
                             {
-                                choices = { yes = "Add entire file", no = "Cancel", },
+                                choices = { yes = "Add entire file", no = "Cancel" },
                             }
                         )
                     end)
