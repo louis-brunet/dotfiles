@@ -7,7 +7,7 @@
   autocrlf = false
 
 [alias]
-  log-format-oneline = log --format=format:'%C(blue)%h%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset) %C(dim white)%ar%C(reset) %C(dim white)- %an%C(reset)'
+  log-format-oneline = log --format=format:'%C(brightblue)%h%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset) %C(dim white)%ar%C(reset) %C(dim white)- %an%C(reset)'
   l = log-format-oneline --graph --all
   last = log -n 1 --decorate --stat HEAD
 
@@ -15,7 +15,7 @@
   co = checkout
   mt = mergetool
   unstage = reset HEAD --
-  undo = reset --soft HEAD~1
+  uncommit = reset --soft HEAD~1
   alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ / | grep --color -E '^[^=]* ='
 
 [push]
@@ -23,14 +23,21 @@
 # for more information on different options of the below setting.
   default = simple
 
-# [format]
-#   pretty = format:%C(blue)%h%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset)\n%C(dim white)%ad%C(reset)\n%C(dim white)%an%C(reset)\n\n\t%s\n%b
-
 [color]
   diff = auto
   status = auto
   branch = auto
   ui = true
+
+[color.decorate]
+  branch = green bold
+  remoteBranch = brightred bold
+  tag = yellow
+  stash = brightgreen
+  HEAD = cyan bold
+
+[color.diff]
+  commit = brightblue
 
 [init]
   defaultBranch = main
