@@ -63,4 +63,7 @@
 [rerere]
   enabled = true
 
+[grep]
+  lineNumber = true
+
 # vim:ft=git_config:
