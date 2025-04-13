@@ -1,4 +1,5 @@
-local merge_conflict_pattern = [[/<<<<.*\n\(\(====\)\@!.*\n\)*====.*\n\(\(>>>>\)\@!.*\n\)*>>>>.*$/]]
+local merge_conflict_pattern =
+[[/<<<<.*\n\(\(====\)\@!.*\n\)*====.*\n\(\(>>>>\)\@!.*\n\)*>>>>.*$/]]
 
 -- ---@param flags { nojump: boolean|nil, global: boolean|nil, fuzzy: boolean|nil } | nil
 -- ---@return string
@@ -16,14 +17,14 @@ local merge_conflict_pattern = [[/<<<<.*\n\(\(====\)\@!.*\n\)*====.*\n\(\(>>>>\)
 ---@param opts { filenames: string|nil, loclist: boolean|nil, open: boolean|nil }|nil
 local function list_merge_conflicts(opts)
     opts = opts or {}
-    opts.filenames = opts.filenames or '%'
+    opts.filenames = opts.filenames or "%"
     local pattern = merge_conflict_pattern
 
-    local list_cmd = 'vimgrep'
-    local open_cmd = 'copen'
+    local list_cmd = "vimgrep"
+    local open_cmd = "copen"
     if opts.loclist then
-        list_cmd = 'lvimgrep'
-        open_cmd = 'lopen'
+        list_cmd = "lvimgrep"
+        open_cmd = "lopen"
     end
 
     local ok, _ = pcall(
@@ -36,7 +37,8 @@ local function list_merge_conflicts(opts)
         {}
     )
     if not ok then
-        vim.notify('[list_merge_conflicts]  no merge conflicts', vim.log.levels.INFO)
+        vim.notify("[list_merge_conflicts]  no merge conflicts",
+            vim.log.levels.INFO)
         return
     end
 
@@ -49,7 +51,7 @@ end
 ---@type LazySpec
 local M = {
     {
-        'tpope/vim-fugitive',
+        "tpope/vim-fugitive",
 
         -- Load immediately to enable `nvim -c 'Git mergetool'`
         lazy = false,
@@ -58,9 +60,17 @@ local M = {
 
         keys = {
             -- { '<leader>g<Space>', ':Git<Space>',                                              desc = 'Start Fugitive command (:Git )' },
-            { '<leader>gg',  ':Git<CR>',                                desc = 'Git status (fugitive)' },
-            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[g]it [m]erge[t]ool' },
-            { '<leader>gdt', function() vim.cmd 'Git difftool -y' end, desc = '[g]it [d]iff[t]ool' },
+            { "<leader>gg",  ":Git<CR>",                                desc = "Git status (fugitive)" },
+            {
+                  "<leader>gmt",
+                                 function() vim.cmd "Git mergetool -y" end,
+                                                                            desc = "[g]it [m]erge[t]ool"
+            },
+            {
+                  "<leader>gdt",
+                                 function() vim.cmd "Git difftool -y" end,
+                                                                            desc = "[g]it [d]iff[t]ool"
+            },
         },
     },
 
@@ -69,11 +79,11 @@ local M = {
 
     {
         -- Adds git related signs to the gutter, as well as utilities for managing changes
-        'lewis6991/gitsigns.nvim',
-        event = 'VeryLazy',
+        "lewis6991/gitsigns.nvim",
+        event = "VeryLazy",
         opts = {
             -- See `:help gitsigns.txt`
-            sign_priority = 50, -- set higher priority than diagnostic signs
+            sign_priority = 50,  -- set higher priority than diagnostic signs
 
             signs = {
                 -- add = { text = '+' },
@@ -86,42 +96,41 @@ local M = {
             -- Executed when attaching to new git file
             on_attach = function(bufnr)
                 local function nmap(lhs, rhs, desc)
-                    vim.keymap.set('n', lhs, rhs, { buffer = bufnr, desc = desc })
+                    vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = desc })
                 end
 
                 -- Gitsigns mappings
                 nmap(
-                    '<leader>ghp',
-                    function() require('gitsigns').nav_hunk('prev') end,
-                    '[g]it: [h]unk [p]revious'
+                    "<leader>ghp",
+                    function() require("gitsigns").nav_hunk("prev") end,
+                    "[g]it: [h]unk [p]revious"
                 )
                 nmap(
-                    '[g',
-                    function() require('gitsigns').nav_hunk('prev') end,
-                    '[g]it: Previous Hunk'
+                    "[g",
+                    function() require("gitsigns").nav_hunk("prev") end,
+                    "[g]it: Previous Hunk"
                 )
 
                 nmap(
-                    '<leader>ghn',
-                    function() require('gitsigns').nav_hunk('next') end,
-                    '[g]it: [h]unk [n]ext'
+                    "<leader>ghn",
+                    function() require("gitsigns").nav_hunk("next") end,
+                    "[g]it: [h]unk [n]ext"
                 )
                 nmap(
-                    ']g',
-                    function() require('gitsigns').nav_hunk('next') end,
-                    '[g]it: Next Hunk'
+                    "]g",
+                    function() require("gitsigns").nav_hunk("next") end,
+                    "[g]it: Next Hunk"
                 )
                 nmap(
-                    '<leader>ghr',
-                    function() require('gitsigns').reset_hunk() end,
-                    '[g]it: [h]unk [r]eset'
+                    "<leader>ghr",
+                    function() require("gitsigns").reset_hunk() end,
+                    "[g]it: [h]unk [r]eset"
                 )
                 nmap(
-                    '<leader>ghd',
-                    function() require('gitsigns').preview_hunk_inline() end,
-                    '[g]it: Preview [h]unk [d]iff'
+                    "<leader>ghd",
+                    function() require("gitsigns").preview_hunk_inline() end,
+                    "[g]it: Preview [h]unk [d]iff"
                 )
-
 
                 -- Other mappings only used in a git buffer
                 -- TODO: more generic diffget keybinds, the handlers should check:
@@ -130,25 +139,25 @@ local M = {
                 --
                 -- assumes nvimdiff3 layout (LOCAL BASE REMOTE / MERGED), or (LOCAL MERGED REMOTE)
                 nmap(
-                    '<leader>gmh',
+                    "<leader>gmh",
                     function() vim.cmd.diffget(vim.fn.tabpagebuflist()[1]) end,
-                    '[g]it [m]erge diffget left (LOCAL) '
+                    "[g]it [m]erge diffget left (LOCAL) "
                 )
                 nmap(
-                    '<leader>gmk',
+                    "<leader>gmk",
                     function() vim.cmd.diffget(vim.fn.tabpagebuflist()[2]) end,
-                    '[g]it [m]erge diffget middle (BASE)'
+                    "[g]it [m]erge diffget middle (BASE)"
                 )
                 nmap(
-                    '<leader>gml',
+                    "<leader>gml",
                     function() vim.cmd.diffget(vim.fn.tabpagebuflist()[3]) end,
-                    '[g]it [m]erge diffget right (REMOTE)'
+                    "[g]it [m]erge diffget right (REMOTE)"
                 )
 
                 nmap(
-                    '<leader>gmc',
+                    "<leader>gmc",
                     function() list_merge_conflicts({ open = true }) end,
-                    '[g]it [m]erge [c]onflicts quickfix'
+                    "[g]it [m]erge [c]onflicts quickfix"
                 )
             end,
         },

@@ -664,17 +664,24 @@ function M.on_attach(client, bufnr)
         map("i", keys, func, desc)
     end
 
-    nmap("<leader>rn", vim.lsp.buf.rename, "[r]e[n]ame")
+    for _, keymap_lhs in ipairs({ "grn", "<leader>rn" }) do
+        nmap(keymap_lhs,
+            vim.lsp.buf.rename,
+            "[r]e[n]ame")
+    end
 
-    local ok, actions_preview = pcall(require,'actions-preview')
+    local ok, actions_preview = pcall(require, "actions-preview")
     local code_action
     if ok then
         code_action = actions_preview.code_actions
     else
         code_action = vim.lsp.buf.code_action
     end
-    nmap("<leader>ca", code_action, "[c]ode [a]ction")
-    nmap("<A-Enter>", code_action, "code action")
+    for _, keymap_lhs in ipairs({ "<A-Enter>", "gra", "<leader>ca" }) do
+        nmap(keymap_lhs,
+            code_action,
+            "code [a]ction")
+    end
 
     local telescope_lsp_options = {
         layout_strategy = "vertical",
@@ -688,17 +695,19 @@ function M.on_attach(client, bufnr)
             require("telescope.builtin").lsp_definitions(
                 telescope_lsp_options)
         end, "[G]oto [D]efinition")
-    nmap("gr",
+    nmap("grr",
         function()
             require("telescope.builtin").lsp_references(
                 telescope_lsp_options)
         end, "[G]oto [R]eferences")
-    nmap("gI",
-        function()
-            require("telescope.builtin").lsp_implementations(
-                telescope_lsp_options)
-        end,
-        "[G]oto [I]mplementation")
+    for _, implementation_keymap_lhs in ipairs({ "gI", "gri" }) do
+        nmap(implementation_keymap_lhs,
+            function()
+                require("telescope.builtin").lsp_implementations(
+                    telescope_lsp_options)
+            end,
+            "[G]oto [I]mplementation")
+    end
     nmap("<leader>D",
         function()
             require("telescope.builtin").lsp_type_definitions(
@@ -815,8 +824,10 @@ function M.on_attach(client, bufnr)
 
     if client:supports_method(vim.lsp.protocol.Methods.textDocument_foldingRange) then
         local current_window = vim.api.nvim_get_current_win()
-        vim.api.nvim_set_option_value('foldmethod', 'expr', { win = current_window })
-        vim.api.nvim_set_option_value('foldexpr', 'v:lua.vim.lsp.foldexpr()', { win = current_window })
+        vim.api.nvim_set_option_value("foldmethod", "expr",
+            { win = current_window })
+        vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()",
+            { win = current_window, })
     end
 end
 
