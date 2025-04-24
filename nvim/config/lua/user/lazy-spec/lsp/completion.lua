@@ -8,33 +8,42 @@
 
 ---@type LazySpec
 local M = {
+    -- "folke/neodev.nvim",
+    {
+        -- Additional lua configuration, replacement for folke/neodev.nvim
+        "folke/lazydev.nvim",
+        ft = "lua",
+        ---@type lazydev.Config require("lazydev")
+        opts = { library = { vim.env.VIMRUNTIME } },
+    },
+
     {
         -- Autocompletion
-        'hrsh7th/nvim-cmp',
-        event = 'VeryLazy',
+        "hrsh7th/nvim-cmp",
+        event = "VeryLazy",
         dependencies = {
             -- Snippet Engine & its associated nvim-cmp source
-            'L3MON4D3/LuaSnip',
-            'saadparwaiz1/cmp_luasnip',
+            "L3MON4D3/LuaSnip",
+            "saadparwaiz1/cmp_luasnip",
 
             -- Adds LSP completion capabilities
-            'hrsh7th/cmp-nvim-lsp',
+            "hrsh7th/cmp-nvim-lsp",
 
             -- Adds LSP signature help
-            'hrsh7th/cmp-nvim-lsp-signature-help',
+            "hrsh7th/cmp-nvim-lsp-signature-help",
 
-            'hrsh7th/cmp-buffer',
-            'hrsh7th/cmp-path',
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
 
             -- Adds a number of user-friendly snippets
-            'rafamadriz/friendly-snippets',
+            "rafamadriz/friendly-snippets",
         },
         config = function(_, _)
             -- [[ Configure nvim-cmp ]]
             -- See `:help cmp`
-            local cmp = require 'cmp'
-            local luasnip = require 'luasnip'
-            require('luasnip.loaders.from_vscode').lazy_load()
+            local cmp = require "cmp"
+            local luasnip = require "luasnip"
+            require("luasnip.loaders.from_vscode").lazy_load()
             luasnip.config.setup {}
 
             cmp.setup {
@@ -43,31 +52,47 @@ local M = {
                         luasnip.lsp_expand(args.body)
                     end,
                 },
+                sources = cmp.config.sources({
+                    {
+                        name = "lazydev",
+                        group_index = 0,  -- set group index to 0 to skip loading LuaLS completions
+                    },
+                    { name = "nvim_lsp_signature_help" },
+                    { name = "nvim_lsp" },
+                    { name = "luasnip" },
+                    { name = "path" },
+                }, {
+                    { name = "buffer" },
+                }),
                 mapping = cmp.mapping.preset.insert {
-                    ['<C-n>'] = function()
+                    ["<C-n>"] = function()
                         if cmp.visible() then
-                            cmp.select_next_item({ behavior = cmp.SelectBehavior.Insert })
+                            cmp.select_next_item({
+                                behavior = cmp.SelectBehavior.Insert,
+                            })
                         else
                             cmp.complete()
                         end
                     end,
-                    ['<C-p>'] = function()
+                    ["<C-p>"] = function()
                         if cmp.visible() then
-                            cmp.select_prev_item({ behavior = cmp.SelectBehavior.Insert })
+                            cmp.select_prev_item({
+                                behavior = cmp.SelectBehavior.Insert,
+                            })
                         else
                             cmp.complete()
                         end
                     end,
-                    ['<C-e>'] = cmp.mapping.abort(),
-                    ['<C-y>'] = cmp.mapping.confirm({ select = false }),
-                    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-                    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-                    ['<C-Space>'] = cmp.mapping.complete {},
-                    ['<CR>'] = cmp.mapping.confirm {
+                    ["<C-e>"] = cmp.mapping.abort(),
+                    ["<C-y>"] = cmp.mapping.confirm({ select = false }),
+                    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+                    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+                    ["<C-Space>"] = cmp.mapping.complete {},
+                    ["<CR>"] = cmp.mapping.confirm {
                         behavior = cmp.ConfirmBehavior.Replace,
                         select = true,
                     },
-                    ['<Tab>'] = cmp.mapping(function(fallback)
+                    ["<Tab>"] = cmp.mapping(function(fallback)
                         -- local llm_completion = get_llm_completion_module()
                         --
                         -- if llm_completion and llm_completion.suggestion then
@@ -80,8 +105,8 @@ local M = {
                         else
                             fallback()
                         end
-                    end, { 'i', 's' }),
-                    ['<S-Tab>'] = cmp.mapping(function(fallback)
+                    end, { "i", "s" }),
+                    ["<S-Tab>"] = cmp.mapping(function(fallback)
                         -- local llm_completion = get_llm_completion_module()
                         --
                         -- if llm_completion and llm_completion.suggestion then
@@ -95,19 +120,11 @@ local M = {
                         else
                             fallback()
                         end
-                    end, { 'i', 's' }),
+                    end, { "i", "s" }),
                 },
-                sources = cmp.config.sources({
-                    { name = "nvim_lsp_signature_help" },
-                    { name = "nvim_lsp" },
-                    { name = "path" },
-                    { name = "luasnip" },
-                }, {
-                    { name = "buffer" },
-                })
             }
-        end
-    }
+        end,
+    },
 }
 
 return M

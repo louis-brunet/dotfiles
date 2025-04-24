@@ -7,12 +7,13 @@ return {
         keys = require('user.config.dap').dapui_keys,
 
         dependencies = {
-            {
-                'folke/neodev.nvim',
-                opts = {
-                    library = { plugins = { 'nvim-dap-ui' }, types = true },
-                },
-            },
+            -- TODO: replace with folke/lazydev.nvim configuration?
+            -- {
+            --     'folke/neodev.nvim',
+            --     opts = {
+            --         library = { plugins = { 'nvim-dap-ui' }, types = true },
+            --     },
+            -- },
             'nvim-neotest/nvim-nio'
         },
 
