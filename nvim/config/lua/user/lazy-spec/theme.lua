@@ -312,6 +312,17 @@ return {
                     TelescopePromptTitle = { link = "@type" },
                     TelescopePromptBorder = { link = "@type" },
                     TelescopeBorder = { fg = "palette.accent.fg" },
+
+                    -- remove fg highlights for Diff* highlights to keep syntax
+                    -- highlighting
+                    DiffAdd = { style = "bold", fg = nil, bg = "#2e4b2e" },
+                    DiffDelete = { style = "bold", fg = nil, bg = "#4c1e15" },
+                    DiffChange = { style = "bold", fg = nil, bg = "#45565c" },
+                    DiffText = { style = "bold", fg = nil, bg = "#996d74" },
+
+                    -- Added = { link = "DiffAdd" },
+                    -- Removed = { link = "DiffDelete" },
+                    -- Changed = { link = "DiffChange" },
                 },
             },
         },
