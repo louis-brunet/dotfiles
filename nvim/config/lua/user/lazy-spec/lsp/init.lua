@@ -43,16 +43,10 @@ local M = {
             -- Useful status updates for LSP
             { "j-hui/fidget.nvim",          tag = "legacy", opts = {} },
 
-            -- Additional lua configuration, makes nvim stuff amazing!
-            "folke/neodev.nvim",
-
-            -- LSP dependencies in lua/user/plugins/lsp/*.lua (except init.lua)
+            -- LSP dependencies in lua/user/lazy-spec/lsp/*.lua (except init.lua)
             { import = "user.lazy-spec.lsp" },
         },
         config = function(_, _)
-            -- Setup neovim lua configuration
-            require("neodev").setup()
-
             -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = require("cmp_nvim_lsp").default_capabilities(
@@ -65,7 +59,10 @@ local M = {
             local servers = user_config.lspconfig_servers
             local common_on_attach = user_config.on_attach
 
-            mason_lspconfig.setup({ ensure_installed = vim.tbl_keys(servers) })
+            mason_lspconfig.setup({
+                automatic_installation = false,
+                ensure_installed = vim.tbl_keys(servers)
+            })
 
             mason_lspconfig.setup_handlers({
                 function(server_name)

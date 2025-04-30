@@ -5,6 +5,13 @@ local function sort_alphabetical(string1, string2)
     return string1:lower() < string2:lower()
 end
 
+local function find_nearest_package_json()
+    local package_json_path = vim.fn.findfile("package.json", ".;")
+    vim.validate('package_json_path', package_json_path, 'string')
+    return package_json_path
+end
+
+
 ---@class UserUtilsJavascript
 local M = {}
 
@@ -52,8 +59,7 @@ function M.parse_package_json()
     end
 
     -- Find the nearest package.json file
-    local package_json_path = vim.fn.findfile("package.json", ".;")
-    vim.validate({ package_json_path = { package_json_path, "string" } })
+    local package_json_path = find_nearest_package_json()
 
     if package_json_path ~= nil and package_json_path ~= "" then
         -- Read the contents of package.json
@@ -259,6 +265,15 @@ function M.run_package_json_script(opts)
     end)
     opts.on_done(nil)
     return nil
+end
+
+function M.open_package_json()
+    local package_json_path = find_nearest_package_json()
+    if not package_json_path or package_json_path == "" then
+        vim.notify("No package.json found", vim.log.levels.WARN, { title = "open_package_json" })
+        return
+    end
+    vim.cmd.edit(package_json_path)
 end
 
 return M

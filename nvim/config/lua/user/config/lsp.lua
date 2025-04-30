@@ -1,10 +1,3 @@
-local LSP_METHODS = {
-    execute_command = vim.lsp.protocol.Methods.workspace_executeCommand,
-    definition = vim.lsp.protocol.Methods.textDocument_definition,
-    document_highlight = vim.lsp.protocol.Methods.textDocument_documentHighlight,
-    inlay_hint = vim.lsp.protocol.Methods.textDocument_inlayHint,
-}
-
 local LSP_WORKSPACE_COMMANDS = {
     organize_imports = "_typescript.organizeImports",
     go_to_source_definition = "_typescript.goToSourceDefinition",
@@ -67,8 +60,8 @@ local typescript_commands = {
                 { title = LSP_WORKSPACE_COMMANDS.organize_imports })
         end
 
-        client.request(LSP_METHODS.execute_command, execute_command_params,
-            execute_command_callback)
+        client:request(vim.lsp.protocol.Methods.workspace_executeCommand,
+            execute_command_params, execute_command_callback)
         return true
     end,
 
@@ -102,8 +95,10 @@ local typescript_commands = {
         }
         local function execute_callback(...)
             local args = { ... }
-            local handler = client.handlers[LSP_METHODS.definition] or
-                vim.lsp.handlers[LSP_METHODS.definition]
+            local handler = client.handlers
+                [vim.lsp.protocol.Methods.textDocument_definition] or
+                vim.lsp.handlers
+                [vim.lsp.protocol.Methods.textDocument_definition]
             if not handler then
                 vim.notify(
                     "failed to go to source definition: could not resolve definition handler",
@@ -115,7 +110,8 @@ local typescript_commands = {
             local res = args[2] or ({})
             if vim.tbl_isempty(res) then
                 if opts.use_fallback == true then
-                    return client.request(LSP_METHODS.definition,
+                    return client:request(
+                        vim.lsp.protocol.Methods.textDocument_definition,
                         positional_params, handler, bufnr)
                 end
                 vim.notify(
@@ -128,8 +124,10 @@ local typescript_commands = {
             handler(unpack(args))
         end
 
-        client.request(LSP_METHODS.execute_command, execute_command_params,
-            execute_callback)
+        client:request(vim.lsp.protocol.Methods.workspace_executeCommand,
+            execute_command_params, execute_callback)
+        -- client.request(LSP_METHODS.execute_command, execute_command_params,
+        --     execute_callback)
         return true
     end,
 }
@@ -392,12 +390,14 @@ M.lspconfig_servers = {
     lua_ls = {
         ---@class LuaLanguageServerSettings
         settings = {
-            ---https://github.com/LuaLS/lua-language-server/wiki/Settings
+            --- https://luals.github.io/wiki/settings/
             ---@class LuaLanguageServerSettingsLua
             Lua = {
                 telemetry = { enable = false },
 
                 codelens = { enable = true },
+
+                diagnostics = { enable = true },
 
                 hint = {
                     enable = true,
@@ -484,6 +484,14 @@ M.lspconfig_servers = {
     --     -- default is 'yaml.docker-compose'
     --     -- filetypes = { 'yaml.docker-compose' },
     -- },
+
+    dockerls = {
+        -- https://github.com/rcjsuen/dockerfile-language-server?tab=readme-ov-file#language-server-settings
+        settings = {
+            docker = { languageserver = { diagnostics = {}, formatter = {} } },
+        },
+    },
+
     angularls = {
         filetypes = {
             "angular.html",
@@ -505,9 +513,15 @@ M.lspconfig_servers = {
             redhat = { telemetry = { enabled = false } },
             yaml = {
                 schemas = {
-                    [".github/workflows/*.{yml,yaml}"] =
-                    "https://json.schemastore.org/github-workflow.json",
-                    -- ['*cloud-config.{yml,yaml}'] = 'https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json',
+                    -- ["https://json.schemastore.org/github-workflow.json"] = {
+                    --     ".github/workflows/*.{yaml,yml}",
+                    -- },
+                    -- ["https://json.schemastore.org/github-action.json"] = {
+                    --     ".github/actions/*.{yaml,yml}",
+                    --     "action.{yaml,yml}"
+                    -- },
+                    ["https://raw.githubusercontent.com/canonical/cloud-init/refs/heads/main/cloudinit/config/schemas/schema-cloud-config-v1.json"] =
+                    "*cloud-config.{yaml,yml}",
                 },
                 format = { enable = true, singleQuote = true, printWidth = 80 },
             },
@@ -553,7 +567,7 @@ M.lspconfig_servers = {
                     WrongQuotes = false,
                     LongSentences = false,
                     RepeatedWords = true,
-                    Spaces = true,
+                    Spaces = false,
                     Matcher = true,
                     CorrectNumberSuffix = true,
                     ToDoHyphen = false,
@@ -604,8 +618,8 @@ M.lspconfig_servers = {
                 --
                 server = {
                     workDir = vim.fs.joinpath(get_user_cache_dir(), "lemminx"),
-                    -- FIXME: cannot download schemas because of Netskope mitm
-                    -- malware-ass proxy's self-signed cert, not recognized by
+                    -- FIXME: cannot download schemas because of Netskope
+                    -- proxy's self-signed cert, not recognized by
                     -- Java/by the compiled lemminx binary.
                     -- Should probably try to install JRE and lemminx externally
                     -- to fix these issues
@@ -650,9 +664,24 @@ function M.on_attach(client, bufnr)
         map("i", keys, func, desc)
     end
 
-    nmap("<leader>rn", vim.lsp.buf.rename, "[r]e[n]ame")
-    nmap("<leader>ca", vim.lsp.buf.code_action, "[c]ode [a]ction")
-    nmap("<A-Enter>", vim.lsp.buf.code_action, "code action")
+    for _, keymap_lhs in ipairs({ "grn", "<leader>rn" }) do
+        nmap(keymap_lhs,
+            vim.lsp.buf.rename,
+            "[r]e[n]ame")
+    end
+
+    local ok, actions_preview = pcall(require, "actions-preview")
+    local code_action
+    if ok then
+        code_action = actions_preview.code_actions
+    else
+        code_action = vim.lsp.buf.code_action
+    end
+    for _, keymap_lhs in ipairs({ "<A-Enter>", "gra", "<leader>ca" }) do
+        nmap(keymap_lhs,
+            code_action,
+            "code [a]ction")
+    end
 
     local telescope_lsp_options = {
         layout_strategy = "vertical",
@@ -666,17 +695,19 @@ function M.on_attach(client, bufnr)
             require("telescope.builtin").lsp_definitions(
                 telescope_lsp_options)
         end, "[G]oto [D]efinition")
-    nmap("gr",
+    nmap("grr",
         function()
             require("telescope.builtin").lsp_references(
                 telescope_lsp_options)
         end, "[G]oto [R]eferences")
-    nmap("gI",
-        function()
-            require("telescope.builtin").lsp_implementations(
-                telescope_lsp_options)
-        end,
-        "[G]oto [I]mplementation")
+    for _, implementation_keymap_lhs in ipairs({ "gI", "gri" }) do
+        nmap(implementation_keymap_lhs,
+            function()
+                require("telescope.builtin").lsp_implementations(
+                    telescope_lsp_options)
+            end,
+            "[G]oto [I]mplementation")
+    end
     nmap("<leader>D",
         function()
             require("telescope.builtin").lsp_type_definitions(
@@ -754,7 +785,7 @@ function M.on_attach(client, bufnr)
     local highlight_augroup_opts = function(callback)
         return { callback = callback, group = highlight_augroup, buffer = bufnr }
     end
-    if client.supports_method(LSP_METHODS.document_highlight) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
         vim.api.nvim_create_autocmd("CursorHold",
             highlight_augroup_opts(vim.lsp.buf.document_highlight))
         vim.api.nvim_create_autocmd("CursorHoldI",
@@ -766,8 +797,7 @@ function M.on_attach(client, bufnr)
     end
 
     -- Enable inlay hints
-    -- if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-    if client.supports_method(LSP_METHODS.inlay_hint) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
         if vim.lsp.inlay_hint and type(vim.lsp.inlay_hint.enable) == "function" then
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
@@ -791,6 +821,14 @@ function M.on_attach(client, bufnr)
         end
         vim.notify(message)
     end, "[t]oggle diagnostics")
+
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_foldingRange) then
+        local current_window = vim.api.nvim_get_current_win()
+        vim.api.nvim_set_option_value("foldmethod", "expr",
+            { win = current_window })
+        vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()",
+            { win = current_window, })
+    end
 end
 
 return M

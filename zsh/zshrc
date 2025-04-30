@@ -118,14 +118,16 @@ load_ohmyzsh() {
       # gcloud
       # kubectl
 
-      # custom plugins (added in $ZSH_CUSTOM/plugins)
+      ### custom plugins (added in $ZSH_CUSTOM/plugins)
       zsh-autosuggestions
       # zsh-yarn-completions
+      llm-tools
   )
 
   ### Custom plugin configuration
   ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#4a465c"
-  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+  # ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+  ZSH_AUTOSUGGEST_STRATEGY=(llm_tools history completion)
   ### End custom plugin configuration
 
   source "$ZSH/oh-my-zsh.sh"
@@ -148,7 +150,7 @@ export PROJECTS=~/code
 # of your main dotfiles repository (which may be public, like this one), but
 # you'll have access to them in your scripts.
 #
-# NOTE: use the conventional prefix LOCAL_* for env vars possibly defined in 
+# NOTE: use the conventional prefix LOCAL_* for env vars possibly defined in
 #       ~/.localrc
 if [[ -a ~/.localrc ]]
 then

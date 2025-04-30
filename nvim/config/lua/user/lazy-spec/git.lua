@@ -1,55 +1,8 @@
-local merge_conflict_pattern = [[/<<<<.*\n\(\(====\)\@!.*\n\)*====.*\n\(\(>>>>\)\@!.*\n\)*>>>>.*$/]]
-
--- ---@param flags { nojump: boolean|nil, global: boolean|nil, fuzzy: boolean|nil } | nil
--- ---@return string
--- local function merge_conflict_pattern_with_flags(flags)
---     flags = flags or {}
---     local flags_str = ''
---
---     if flags.fuzzy then flags_str = flags_str .. 'f' end
---     if flags.global then flags_str = flags_str .. 'g' end
---     if flags.nojump then flags_str = flags_str .. 'j' end
---
---     return merge_conflict_pattern .. flags_str
--- end
-
----@param opts { filenames: string|nil, loclist: boolean|nil, open: boolean|nil }|nil
-local function list_merge_conflicts(opts)
-    opts = opts or {}
-    opts.filenames = opts.filenames or '%'
-    local pattern = merge_conflict_pattern
-
-    local list_cmd = 'vimgrep'
-    local open_cmd = 'copen'
-    if opts.loclist then
-        list_cmd = 'lvimgrep'
-        open_cmd = 'lopen'
-    end
-
-    local ok, _ = pcall(
-        vim.api.nvim_cmd,
-        {
-            cmd = list_cmd,
-            args = { pattern, opts.filenames },
-            mods = { silent = true },
-        },
-        {}
-    )
-    if not ok then
-        vim.notify('[list_merge_conflicts]  no merge conflicts', vim.log.levels.INFO)
-        return
-    end
-
-    if opts.open then
-        vim.cmd(open_cmd)
-    end
-end
-
 --- [ Git related plugins ]
 ---@type LazySpec
 local M = {
     {
-        'tpope/vim-fugitive',
+        "tpope/vim-fugitive",
 
         -- Load immediately to enable `nvim -c 'Git mergetool'`
         lazy = false,
@@ -58,9 +11,17 @@ local M = {
 
         keys = {
             -- { '<leader>g<Space>', ':Git<Space>',                                              desc = 'Start Fugitive command (:Git )' },
-            { '<leader>gg',  ':Git<CR>',                                desc = 'Git status (fugitive)' },
-            { '<leader>gmt', function() vim.cmd 'Git mergetool -y' end, desc = '[g]it [m]erge[t]ool' },
-            { '<leader>gdt', function() vim.cmd 'Git difftool -y' end, desc = '[g]it [d]iff[t]ool' },
+            { "<leader>gg", ":Git<CR>", desc = "Git status (fugitive)" },
+            {
+                "<leader>gmt",
+                function() vim.cmd "Git mergetool -y" end,
+                desc = "[g]it [m]erge[t]ool",
+            },
+            {
+                "<leader>gdt",
+                function() vim.cmd "Git difftool -y" end,
+                desc = "[g]it [d]iff[t]ool",
+            },
         },
     },
 
@@ -69,10 +30,12 @@ local M = {
 
     {
         -- Adds git related signs to the gutter, as well as utilities for managing changes
-        'lewis6991/gitsigns.nvim',
-        event = 'VeryLazy',
+        "lewis6991/gitsigns.nvim",
+        event = "VeryLazy",
         opts = {
             -- See `:help gitsigns.txt`
+            sign_priority = 50,  -- set higher priority than diagnostic signs
+
             signs = {
                 -- add = { text = '+' },
                 -- change = { text = '~' },
@@ -84,72 +47,167 @@ local M = {
             -- Executed when attaching to new git file
             on_attach = function(bufnr)
                 local function nmap(lhs, rhs, desc)
-                    vim.keymap.set('n', lhs, rhs, { buffer = bufnr, desc = desc })
+                    vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = desc })
                 end
 
                 -- Gitsigns mappings
                 nmap(
-                    '<leader>ghp',
-                    function() require('gitsigns').nav_hunk('prev') end,
-                    '[g]it: [h]unk [p]revious'
+                    "<leader>ghp",
+                    function() require("gitsigns").nav_hunk("prev") end,
+                    "[g]it: [h]unk [p]revious"
                 )
                 nmap(
-                    '[g',
-                    function() require('gitsigns').nav_hunk('prev') end,
-                    '[g]it: Previous Hunk'
-                )
-
-                nmap(
-                    '<leader>ghn',
-                    function() require('gitsigns').nav_hunk('next') end,
-                    '[g]it: [h]unk [n]ext'
-                )
-                nmap(
-                    ']g',
-                    function() require('gitsigns').nav_hunk('next') end,
-                    '[g]it: Next Hunk'
-                )
-                nmap(
-                    '<leader>ghr',
-                    function() require('gitsigns').reset_hunk() end,
-                    '[g]it: [h]unk [r]eset'
-                )
-                nmap(
-                    '<leader>ghd',
-                    function() require('gitsigns').preview_hunk_inline() end,
-                    '[g]it: Preview [h]unk [d]iff'
-                )
-
-
-                -- Other mappings only used in a git buffer
-                -- TODO: more generic diffget keybinds, the handlers should check:
-                --  1. how many buffers ?
-                --  2. which layout ? (why different in desktop ~/code/test/mergeconflict vs neoxia ~/code/test/merge*_nobase ?)
-                --
-                -- assumes nvimdiff3 layout (LOCAL BASE REMOTE / MERGED), or (LOCAL MERGED REMOTE)
-                nmap(
-                    '<leader>gmh',
-                    function() vim.cmd.diffget(vim.fn.tabpagebuflist()[1]) end,
-                    '[g]it [m]erge diffget left (LOCAL) '
-                )
-                nmap(
-                    '<leader>gmk',
-                    function() vim.cmd.diffget(vim.fn.tabpagebuflist()[2]) end,
-                    '[g]it [m]erge diffget middle (BASE)'
-                )
-                nmap(
-                    '<leader>gml',
-                    function() vim.cmd.diffget(vim.fn.tabpagebuflist()[3]) end,
-                    '[g]it [m]erge diffget right (REMOTE)'
+                    "[g",
+                    function() require("gitsigns").nav_hunk("prev") end,
+                    "[g]it: Previous Hunk"
                 )
 
                 nmap(
-                    '<leader>gmc',
-                    function() list_merge_conflicts({ open = true }) end,
-                    '[g]it [m]erge [c]onflicts quickfix'
+                    "<leader>ghn",
+                    function() require("gitsigns").nav_hunk("next") end,
+                    "[g]it: [h]unk [n]ext"
+                )
+                nmap(
+                    "]g",
+                    function() require("gitsigns").nav_hunk("next") end,
+                    "[g]it: Next Hunk"
+                )
+                nmap(
+                    "<leader>ghr",
+                    function() require("gitsigns").reset_hunk() end,
+                    "[g]it: [h]unk [r]eset"
+                )
+                nmap(
+                    "<leader>ghd",
+                    function() require("gitsigns").preview_hunk_inline() end,
+                    "[g]it: Preview [h]unk [d]iff"
                 )
             end,
         },
+    },
+
+    {
+        "akinsho/git-conflict.nvim",
+        -- event = "VeryLazy", NOTE: plugin seems broken when loaded on VeryLazy
+        -- https://github.com/akinsho/git-conflict.nvim?tab=readme-ov-file#configuration
+        ---@type GitConflictUserConfig
+        opts = {
+            default_mappings = false,    -- disable buffer local mapping created by this plugin
+            -- default_commands = true,  -- disable commands created by this plugin
+            disable_diagnostics = true,  -- This will disable the diagnostics in a buffer whilst it is conflicted
+            -- list_opener = "copen",    -- command or function to open the conflicts list
+            highlights = {
+                -- incoming = "DiffAdd",
+                -- current = "DiffText",
+                incoming = "DiffChange",
+                current = "DiffAdd",
+                ancestor = "DiffDelete",
+            },
+        },
+        config = function(self, opts)
+            local git_conflict = require("git-conflict")
+            git_conflict.setup(opts)
+
+            ---@param lhs string[]|string
+            ---@param rhs string|function
+            ---@param description? string|nil
+            local function nmap(lhs, rhs, description)
+                description = description or
+                    ((type(rhs) == "string" and rhs) or nil)
+                if type(description) == "string" then
+                    description = "conflict: " .. description
+                end
+                if type(lhs) == "string" then
+                    lhs = { lhs }
+                end
+                for _, lhs_item in ipairs(lhs) do
+                    vim.keymap.set("n", lhs_item, rhs, { desc = description })
+                end
+            end
+
+            nmap({ "<leader>gmh" }, "<Plug>(git-conflict-ours)",
+                "choose ours")
+            nmap({ "<leader>gml" }, "<Plug>(git-conflict-theirs)",
+                "choose theirs")
+            nmap({ "<leader>gmb" }, "<Plug>(git-conflict-base)",
+                "choose base")
+            nmap({ "<leader>gmB" }, "<Plug>(git-conflict-both)",
+                "choose both")
+            nmap({ "<leader>gm0" }, "<Plug>(git-conflict-none)",
+                "choose none")
+            nmap({ "[x", "<leader>gmn" }, "<Plug>(git-conflict-prev-conflict)",
+                "previous conflict")
+            nmap({ "]x", "<leader>gmp" }, "<Plug>(git-conflict-next-conflict)",
+                "next conflict")
+            nmap("<leader>gmq", function()
+                vim.cmd.cexpr("[]")
+                -- vim.cmd("GitConflictRefresh")
+                vim.cmd("GitConflictListQf")
+            end, "send to quickfix")
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "GitConflictDetected",
+                callback = function()
+                    local bufnr = 0
+                    local conflict_count = git_conflict.conflict_count(bufnr)
+                    local message = ("Conflict detected in %s (%d conflicts)")
+                        :format(vim.fn.expand("%"), conflict_count)
+                    vim.schedule(function()
+                        vim.notify(message, vim.log.levels.WARN)
+                    end)
+                end,
+                group = vim.api.nvim_create_augroup(
+                    "GitConflictDetected_augroup",
+                    { clear = true }),
+            })
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "GitConflictResolved",
+                callback = function()
+                    local git_utils = require("user.utils.git")
+                    local conflict_file = vim.fn.expand("%")
+                    local message = ("Conflict resolved in %s")
+                        :format(conflict_file)
+                    vim.schedule(function()
+                        vim.notify(message)
+
+                        if not git_utils.is_unmerged_file(conflict_file) then
+                            return
+                        end
+
+                        local ui = require("user.utils.ui")
+                        ui.ui_confirm(
+                            ("All conflicts resolved! Add to git index? (%s)")
+                            :format(conflict_file),
+                            {
+                                on_accept = function()
+                                    local is_written = pcall(vim.cmd.write)
+                                    if not is_written then
+                                        vim.notify(
+                                            "aborting git add, could not write to file: " ..
+                                            conflict_file, vim.log.levels.ERROR)
+                                        return
+                                    end
+                                    if git_utils.add_file(conflict_file) then
+                                        vim.notify("added file to git index: " ..
+                                            conflict_file)
+                                    end
+                                end,
+                                on_deny = function()
+                                    vim.notify("denied git add")
+                                end,
+                            },
+                            {
+                                choices = { yes = "Add entire file", no = "Cancel" },
+                            }
+                        )
+                    end)
+                end,
+                group = vim.api.nvim_create_augroup(
+                    "GitConflictResolved_augroup",
+                    { clear = true }),
+            })
+        end,
     },
 }
 

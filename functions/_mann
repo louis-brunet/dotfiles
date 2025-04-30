@@ -1,0 +1,7 @@
+#compdef mann
+
+_mann() {
+  _man "$@"
+}
+
+_mann "$@"
