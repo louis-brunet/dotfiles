@@ -115,6 +115,8 @@ load_ohmyzsh() {
       # poetry
       pyenv
       aws # Available commands documentation: $ZSH/plugins/aws/README.md (asp, asr, aws_profiles, ...)
+      # gcloud
+      # kubectl
 
       # custom plugins (added in $ZSH_CUSTOM/plugins)
       zsh-autosuggestions
@@ -226,3 +228,6 @@ fi
 unset PERF_TIME_ZSH
 unset zshrc_end_ms
 unset zshrc_start_ms
+
+# added by Snowflake SnowSQL installer v1.2
+export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH
