@@ -827,7 +827,7 @@ function M.on_attach(client, bufnr)
         vim.api.nvim_set_option_value("foldmethod", "expr",
             { win = current_window })
         vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()",
-            { win = current_window, })
+            { win = current_window })
     end
 end
 
