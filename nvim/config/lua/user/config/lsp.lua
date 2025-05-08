@@ -1,7 +1,7 @@
 ---@class UserLspConfig
 local M = {}
 
-M.servers_to_enable = {
+M.servers = {
     "angularls",
     "bashls",
     "dockerls",
@@ -79,19 +79,19 @@ function M.on_attach(client, bufnr)
         function()
             require("telescope.builtin").lsp_definitions(
                 telescope_lsp_options)
-        end, "[G]oto [D]efinition")
+        end, "[g]oto [d]efinition")
     nmap("grr",
         function()
             require("telescope.builtin").lsp_references(
                 telescope_lsp_options)
-        end, "[G]oto [R]eferences")
+        end, "[g]oto [r]eferences")
     for _, implementation_keymap_lhs in ipairs({ "gI", "gri" }) do
         nmap(implementation_keymap_lhs,
             function()
                 require("telescope.builtin").lsp_implementations(
                     telescope_lsp_options)
             end,
-            "[G]oto [I]mplementation")
+            "[g]oto [I]mplementation")
     end
     nmap("<leader>D",
         function()
@@ -104,28 +104,28 @@ function M.on_attach(client, bufnr)
             require("telescope.builtin").lsp_document_symbols(
                 telescope_lsp_options)
         end,
-        "[D]ocument [S]ymbols")
+        "[d]ocument [s]ymbols")
     nmap("<leader>ws",
         function()
             require("telescope.builtin").lsp_dynamic_workspace_symbols(
                 telescope_lsp_options)
         end,
-        "[W]orkspace [S]ymbols")
+        "[w]orkspace [s]ymbols")
 
     -- See `:help K` for why this keymap
     nmap("K", vim.lsp.buf.hover, "Hover Documentation")
-    nmap("<C-s>", vim.lsp.buf.signature_help, "[S]ignature Documentation")
-    imap("<C-s>", vim.lsp.buf.signature_help, "[S]ignature Documentation")
+    nmap("<C-s>", vim.lsp.buf.signature_help, "[s]ignature documentation")
+    imap("<C-s>", vim.lsp.buf.signature_help, "[s]ignature documentation")
 
     -- Lesser used LSP functionality
-    nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+    nmap("gD", vim.lsp.buf.declaration, "[g]oto [D]eclaration")
     nmap("<leader>wa", vim.lsp.buf.add_workspace_folder,
-        "[W]orkspace [A]dd Folder")
+        "[w]orkspace [a]dd Folder")
     nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder,
-        "[W]orkspace [R]emove Folder")
+        "[w]orkspace [r]emove Folder")
     nmap("<leader>wl", function()
         print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, "[W]orkspace [L]ist Folders")
+    end, "[w]orkspace [l]ist Folders")
 
     -- Create a command `:Format` local to the LSP buffer
     vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
@@ -157,8 +157,10 @@ function M.on_attach(client, bufnr)
         -- vim.tbl_contains(attached_clients, '')
         vim.lsp.buf.format({
             filter = function(format_client)
-                return not vim.tbl_contains(clients_to_ignore, format_client
-                    .name)
+                return not vim.tbl_contains(
+                    clients_to_ignore,
+                    format_client.name
+                )
             end,
         })
     end, { desc = "Format current buffer with LSP" })
@@ -192,6 +194,7 @@ function M.on_attach(client, bufnr)
         end, "toggle [i]nlay hints")
     end
 
+    -- toggle diagnostics
     nmap("<leader>lt", function()
         ---@type vim.diagnostic.Filter
         local diagnostic_filter = { bufnr = 0 }
@@ -207,6 +210,7 @@ function M.on_attach(client, bufnr)
         vim.notify(message)
     end, "[t]oggle diagnostics")
 
+    -- use LSP foldexpr, see `:h fold-expr`
     if client:supports_method(vim.lsp.protocol.Methods.textDocument_foldingRange) then
         local current_window = vim.api.nvim_get_current_win()
         vim.api.nvim_set_option_value("foldmethod", "expr",
