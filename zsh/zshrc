@@ -121,13 +121,13 @@ load_ohmyzsh() {
       ### custom plugins (added in $ZSH_CUSTOM/plugins)
       zsh-autosuggestions
       # zsh-yarn-completions
-      llm-tools
+      # llm-tools
   )
 
   ### Custom plugin configuration
   ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#4a465c"
-  # ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-  ZSH_AUTOSUGGEST_STRATEGY=(llm_tools history completion)
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+  # ZSH_AUTOSUGGEST_STRATEGY=(llm_tools history completion)
   ### End custom plugin configuration
 
   source "$ZSH/oh-my-zsh.sh"
