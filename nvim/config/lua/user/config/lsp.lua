@@ -213,6 +213,15 @@ function M.on_attach(client, bufnr)
         vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()",
             { win = current_window })
     end
+
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentColor) then
+        -- NOTE: vim.lsp.document_color is set to be released in nvim 0.12.
+        -- It is disabled by default like inlay hints.
+        local enable_document_color = (vim.lsp.document_color or {}).enable
+        if type(enable_document_color) == "function" then
+            enable_document_color(true, bufnr)
+        end
+    end
 end
 
 return M
