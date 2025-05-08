@@ -58,6 +58,8 @@ local M = {
             },
             ---@type wk.Spec
             spec = {
+                { "gr",         group = "LSP" },
+
                 { "z",          group = "fold" },
 
                 { "ys",         group = "[s]urround" },
