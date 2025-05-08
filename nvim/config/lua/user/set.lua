@@ -139,3 +139,8 @@ vim.api.nvim_set_option_value("foldmethod", "expr", {})
 vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.treesitter.foldexpr()", {})
 vim.api.nvim_set_option_value("foldtext", "", {})       -- show first line with regular buffer highlight
 vim.api.nvim_set_option_value("foldenable", false, {})  -- hide folds by default
+
+-- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
+-- instead raise a dialog asking if you wish to save the current file(s)
+-- See `:help 'confirm'`
+vim.opt.confirm = true
