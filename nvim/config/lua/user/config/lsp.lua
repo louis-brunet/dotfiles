@@ -785,7 +785,7 @@ function M.on_attach(client, bufnr)
     local highlight_augroup_opts = function(callback)
         return { callback = callback, group = highlight_augroup, buffer = bufnr }
     end
-    if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
         vim.api.nvim_create_autocmd("CursorHold",
             highlight_augroup_opts(vim.lsp.buf.document_highlight))
         vim.api.nvim_create_autocmd("CursorHoldI",
@@ -797,7 +797,7 @@ function M.on_attach(client, bufnr)
     end
 
     -- Enable inlay hints
-    if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
         if vim.lsp.inlay_hint and type(vim.lsp.inlay_hint.enable) == "function" then
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
         end
@@ -822,7 +822,7 @@ function M.on_attach(client, bufnr)
         vim.notify(message)
     end, "[t]oggle diagnostics")
 
-    if client.supports_method(vim.lsp.protocol.Methods.textDocument_foldingRange) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_foldingRange) then
         local current_window = vim.api.nvim_get_current_win()
         vim.api.nvim_set_option_value("foldmethod", "expr",
             { win = current_window })
