@@ -63,46 +63,31 @@ local M = {
             local mason_lspconfig = require("mason-lspconfig")
 
             local user_config = require("user.config.lsp")
-            local servers = user_config.lspconfig_servers
             local common_on_attach = user_config.on_attach
 
             mason_lspconfig.setup({
-                automatic_enable = false, -- this is done manually with vim.lsp.enable(server_name)
-                ensure_installed = vim.tbl_keys(servers),
+                automatic_enable = false,                          -- this is done manually with vim.lsp.enable(server_name)
+                ensure_installed = user_config.servers_to_enable,  -- install the servers that will be enabled
             })
 
-            vim.lsp.config(
-                "*",
-                ---@type vim.lsp.ClientConfig
-                { capabilities = capabilities, }
-            )
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("user.lsp.common_on_attach",
+                    {}),
+                callback = function(args)
+                    local client_id = args.data.client_id
+                    local client = assert(vim.lsp.get_client_by_id(client_id))
+                    common_on_attach(client, args.buf)
+                end,
+            })
 
-            for server_name, server_config in pairs(servers) do
-                ---@type (fun(client: vim.lsp.Client, bufnr: integer): nil)[]
-                local server_on_attach = {
-                    common_on_attach,
-                }
-                if type(server_config.on_attach) == "function" then
-                    table.insert(server_on_attach, server_config.on_attach)
-                end
+            -- common config applied to all servers by default
+            -- Server-specific configs can go in
+            -- `<config_root>/after/lsp/<server_name>.lua`
+            ---@type vim.lsp.Config
+            local common_config = { capabilities = capabilities }
+            vim.lsp.config("*", common_config)
 
-                ---@type vim.lsp.Config
-                local client_config = {
-                    on_attach = server_on_attach,
-                    settings = server_config.settings,
-                    filetypes = server_config.filetypes,
-                    init_options = server_config.init_options,
-                    -- workspace_required = false,
-                    -- root_markers =
-                    -- root_dir = function(filename, bufnr) end,
-                    -- autostart = true,
-                    cmd = server_config.cmd,
-                    -- handlers = {},
-                    -- on_new_config = function (new_config, new_root_dir) end,
-                }
-                vim.lsp.config(server_name, client_config)
-                vim.lsp.enable(server_name, true)
-            end
+            vim.lsp.enable(user_config.servers_to_enable)
         end,
     },
 }
