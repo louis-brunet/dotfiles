@@ -9,6 +9,7 @@ M.servers_to_enable = {
     "harper_ls",
     "html",
     "jsonls",
+    -- "lemminx",
     "lua_ls",
     "pyright",
     "ruff",
