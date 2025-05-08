@@ -41,19 +41,12 @@ local M = {
         event = "BufReadPre",
         dependencies = {
             -- Useful status updates for LSP
-            { "j-hui/fidget.nvim",          tag = "legacy", opts = {} },
+            { "j-hui/fidget.nvim",          opts = {} },
 
             -- LSP dependencies in lua/user/lazy-spec/lsp/*.lua (except init.lua)
             { import = "user.lazy-spec.lsp" },
         },
         config = function(_, _)
-            ---@class UserLspServerConfig
-            ---@field cmd string[]|nil
-            ---@field filetypes string[]|nil
-            ---@field init_options table<string, string|table|boolean>|nil
-            ---@field on_attach nil|fun(client: vim.lsp.Client, bufnr: integer):nil
-            ---@field settings table<string, string|table|boolean>|nil
-
             -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = require("cmp_nvim_lsp").default_capabilities(
