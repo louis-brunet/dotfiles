@@ -41,64 +41,43 @@ local M = {
         event = "BufReadPre",
         dependencies = {
             -- Useful status updates for LSP
-            { "j-hui/fidget.nvim",          tag = "legacy", opts = {} },
+            { "j-hui/fidget.nvim",          opts = {} },
 
             -- LSP dependencies in lua/user/lazy-spec/lsp/*.lua (except init.lua)
             { import = "user.lazy-spec.lsp" },
         },
         config = function(_, _)
+            local lsp_config = require("user.config.lsp")
+
             -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = require("cmp_nvim_lsp").default_capabilities(
-                capabilities)
+                capabilities
+            )
 
-            -- Ensure the servers above are installed
-            local mason_lspconfig = require("mason-lspconfig")
-
-            local user_config = require("user.config.lsp")
-            local servers = user_config.lspconfig_servers
-            local common_on_attach = user_config.on_attach
-
-            mason_lspconfig.setup({
-                automatic_installation = false,
-                ensure_installed = vim.tbl_keys(servers)
+            -- Ensure the LSP servers are installed
+            require("mason-lspconfig").setup({
+                automatic_enable = false,
+                ensure_installed = lsp_config.servers,  -- install the servers that will be enabled
             })
+            vim.lsp.enable(lsp_config.servers)
 
-            mason_lspconfig.setup_handlers({
-                function(server_name)
-                    ---@class UserLspServerConfig
-                    ---@field cmd string[]|nil
-                    ---@field filetypes string[]|nil
-                    ---@field init_options table<string, string|table|boolean>|nil
-                    ---@field on_attach nil|fun(client: vim.lsp.Client, bufnr: integer):nil
-                    ---@field settings table<string, string|table|boolean>|nil
-                    local server_config = servers[server_name] or {}
-
-                    local server_on_attach = function(client, bufnr)
-                        common_on_attach(client, bufnr)
-
-                        if type(server_config.on_attach) == "function" then
-                            server_config.on_attach(client, bufnr)
-                        end
-                    end
-
-                    -- :h lspconfig-setup
-                    require("lspconfig")[server_name].setup({
-                        capabilities = capabilities,
-                        on_attach = server_on_attach,
-                        settings = server_config.settings,
-                        filetypes = server_config.filetypes,
-                        init_options = server_config.init_options,
-                        -- commands = server_config.commands, NOTE: commands is deprecated
-                        -- root_dir = function(filename, bufnr) end, -- :h lspconfig-root-detection
-                        -- single_file_support = nil,
-                        -- autostart = true,
-                        cmd = server_config.cmd,
-                        -- handlers = {},
-                        -- on_new_config = function (new_config, new_root_dir) end,
-                    })
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("user.lsp.common_on_attach",
+                    {}),
+                callback = function(args)
+                    local client_id = args.data.client_id
+                    local client = assert(vim.lsp.get_client_by_id(client_id))
+                    lsp_config.on_attach(client, args.buf)
                 end,
             })
+
+            -- common config applied to all servers by default
+            -- Server-specific configs can go in
+            -- `<config_root>/after/lsp/<server_name>.lua`
+            ---@type vim.lsp.Config
+            local common_config = { capabilities = capabilities }
+            vim.lsp.config("*", common_config)
         end,
     },
 }

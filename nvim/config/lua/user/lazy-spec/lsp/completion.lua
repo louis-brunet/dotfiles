@@ -6,9 +6,8 @@
 --     return llm_completion
 -- end
 
----@type LazySpec
+---@type LazySpec require("lazy")
 local M = {
-    -- "folke/neodev.nvim",
     {
         -- Additional lua configuration, replacement for folke/neodev.nvim
         "folke/lazydev.nvim",

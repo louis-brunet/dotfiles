@@ -207,8 +207,12 @@ bindsym $mod+r mode $modeResize
 default_border pixel 1
 
 # starting window gaps
-# gaps inner 8
+# padding
+gaps inner 8
+# # margin
 # gaps outer 8
+# no gaps when there is only one window
+smart_gaps on
 
 ######################################
 # color settings for bar and windows #
@@ -223,12 +227,12 @@ set $white		#ffffff
 set $black		#000000
 set $purple		#e345ff
 set $darkgrey		#383c4a
-set $grey #878787	
+set $grey               #878787
 set $mediumgrey		#8b8b8b
 set $yellowbrown	#e1b700
-set $cyan #00dede
-set $warm #ebdbb2
-set $gruvDrk  #1e1e1e
+set $cyan               #00dede
+set $warm               #ebdbb2
+set $gruvDrk            #1e1e1e
 set $gruvDrkLock  1e1e1e
 
 # define colors for windows:
@@ -270,7 +274,7 @@ client.urgent		    	$urgentred	$urgentred	$white		$yellowbrown $yellowbrown
 #                 focused_workspace  $gruvDrk   $warm        $gruvDrk
 #                 inactive_workspace $gruvDrk   $gruvDrk     $darkgrey
 #
-#                 # active = unfocused but displayed (e.g. multi-monitor) 
+#                 # active = unfocused but displayed (e.g. multi-monitor)
 #                 active_workspace   $gruvDrk   $gruvDrk   $darkgrey
 #                 urgent_workspace   $urgentred $urgentred $white
 #                 # binding_mode uses settings from urgent_workspace by default
@@ -330,10 +334,10 @@ exec --no-startup-id nm-applet
 # exec_always --no-startup-id xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal
 # exec_always --no-startup-id xrandr --output DisplayPort-0 --off --output DisplayPort-1 --off --output DisplayPort-2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI-A-0 --mode 1920x1080 --pos 0x230 --rotate normal
 
-# background wallpaper 
+# background wallpaper
 exec --no-startup-id feh --randomize --bg-scale ~/Pictures/wallpaper
 
-# compton window compositor 
+# compton window compositor
 exec --no-startup-id compton
 
 # exec --no-startup-id xset dpms 0 0 0
