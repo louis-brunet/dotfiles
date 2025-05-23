@@ -1,16 +1,3 @@
-local function toggle_auto_pairs()
-    vim.g.minipairs_disable = not vim.g.minipairs_disable
-    if vim.g.minipairs_disable then
-        vim.notify("disabled auto pairs", vim.log.levels.WARN,
-            { title = "mini.pairs" })
-        -- LazyVim.warn("Disabled auto pairs", { title = "Option" })
-    else
-        vim.notify("enabled auto pairs", vim.log.levels.INFO,
-            { title = "mini.pairs" })
-        -- LazyVim.info("Enabled auto pairs", { title = "Option" })
-    end
-end
-
 local M = {
     -- auto pairs
     {
@@ -26,14 +13,20 @@ local M = {
                 },
             },
         },
-        keys = {
-            -- {
-            --     "<leader>mp",
-            --     toggle_auto_pairs,
-            --     desc = "Toggle Auto Pairs",
-            -- },
-        },
         config = function(_, opts)
+            local function toggle_auto_pairs()
+                vim.g.minipairs_disable = not vim.g.minipairs_disable
+                if vim.g.minipairs_disable then
+                    vim.notify("disabled auto pairs", vim.log.levels.WARN,
+                        { title = "mini.pairs" })
+                    -- LazyVim.warn("Disabled auto pairs", { title = "Option" })
+                else
+                    vim.notify("enabled auto pairs", vim.log.levels.INFO,
+                        { title = "mini.pairs" })
+                    -- LazyVim.info("Enabled auto pairs", { title = "Option" })
+                end
+            end
+
             vim.api.nvim_create_user_command("ToggleAutoPairs", toggle_auto_pairs,
                 { desc = "Toggle Auto Pairs" })
 
@@ -58,6 +51,8 @@ local M = {
             },
             ---@type wk.Spec
             spec = {
+                { "gr",         group = "LSP" },
+
                 { "z",          group = "fold" },
 
                 { "ys",         group = "[s]urround" },
@@ -236,6 +231,7 @@ local M = {
 
     {
         "danymat/neogen",
+        event = "VeryLazy",
         opts = { snippet_engine = "luasnip" },
         config = function(_, opts)
             require("neogen").setup(opts)

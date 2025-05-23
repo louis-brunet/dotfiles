@@ -47,21 +47,20 @@ local M = {
             { import = "user.lazy-spec.lsp" },
         },
         config = function(_, _)
+            local lsp_config = require("user.config.lsp")
+
             -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = require("cmp_nvim_lsp").default_capabilities(
-                capabilities)
+                capabilities
+            )
 
-            -- Ensure the servers above are installed
-            local mason_lspconfig = require("mason-lspconfig")
-
-            local user_config = require("user.config.lsp")
-            local common_on_attach = user_config.on_attach
-
-            mason_lspconfig.setup({
-                automatic_enable = false,                          -- this is done manually with vim.lsp.enable(server_name)
-                ensure_installed = user_config.servers_to_enable,  -- install the servers that will be enabled
+            -- Ensure the LSP servers are installed
+            require("mason-lspconfig").setup({
+                automatic_enable = false,
+                ensure_installed = lsp_config.servers,  -- install the servers that will be enabled
             })
+            vim.lsp.enable(lsp_config.servers)
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 group = vim.api.nvim_create_augroup("user.lsp.common_on_attach",
@@ -69,7 +68,7 @@ local M = {
                 callback = function(args)
                     local client_id = args.data.client_id
                     local client = assert(vim.lsp.get_client_by_id(client_id))
-                    common_on_attach(client, args.buf)
+                    lsp_config.on_attach(client, args.buf)
                 end,
             })
 
@@ -79,8 +78,6 @@ local M = {
             ---@type vim.lsp.Config
             local common_config = { capabilities = capabilities }
             vim.lsp.config("*", common_config)
-
-            vim.lsp.enable(user_config.servers_to_enable)
         end,
     },
 }
