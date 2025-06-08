@@ -137,7 +137,7 @@ return {
         preferences = {
             quotePreference = "single",
 
-            includeInlayParameterNameHints = "literals",      -- 'none' | 'literals' | 'all';
+            includeInlayParameterNameHints = "literals",  -- 'none' | 'literals' | 'all';
             includeInlayParameterNameHintsWhenArgumentMatchesName = false,
             includeInlayFunctionParameterTypeHints = true,
             includeInlayVariableTypeHints = true,
@@ -145,6 +145,9 @@ return {
             includeInlayPropertyDeclarationTypeHints = true,
             includeInlayFunctionLikeReturnTypeHints = true,
             includeInlayEnumMemberValueHints = true,
+
+            importModuleSpecifierPreference = "relative",
+            importModuleSpecifierEnding = "minimal",
         },
     },
 
