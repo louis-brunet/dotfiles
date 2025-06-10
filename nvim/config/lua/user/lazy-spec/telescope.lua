@@ -5,7 +5,7 @@
 ---@return table<string, TelescopePickerKeymap>
 local function create_telescope_keymaps()
     local telescope_builtin = require("telescope.builtin")
-    local telescope_utils  = require("user.utils.telescope")
+    local telescope_utils   = require("user.utils.telescope")
 
     return {
         ["<leader>sf"] = {
@@ -29,8 +29,11 @@ local function create_telescope_keymaps()
             desc = "search [F]iles (hidden, gitignored)",
         },
         ["<leader>?"] = {
-            telescope_builtin.oldfiles,
-            desc = "[?] Find recently opened files",
+            function()
+                telescope_builtin.oldfiles({ only_cwd = true })
+            end
+            ,
+            desc = "[?] Find recently opened files (cwd)",
         },
         ["<leader><space>"] = {
             telescope_builtin.buffers,
@@ -75,7 +78,10 @@ local function create_telescope_keymaps()
         --     end,
         --     desc = "search with [g]rep",
         -- },
-        ["<leader>sg"] = { telescope_utils.multigrep, desc = "search with multi [g]rep" },
+        ["<leader>sg"] = {
+            telescope_utils.multigrep,
+            desc = "search with multi [g]rep",
+        },
         ["<leader>sd"] = {
             telescope_builtin.diagnostics,
             desc = "search [d]iagnostics",
