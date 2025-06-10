@@ -6,6 +6,7 @@ M.servers = {
     "bashls",
     "dockerls",
     "eslint",
+    "emmet_ls",
     "harper_ls",
     "html",
     "jsonls",

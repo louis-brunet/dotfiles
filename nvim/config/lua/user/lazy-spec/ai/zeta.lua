@@ -1,0 +1,56 @@
+---@type LazySpec
+return {
+    -- {
+    --     "boltlessengineer/zeta.nvim",
+    --
+    --     -- use local directory located in the configured dev.path (see lazy config)
+    --     dev = true,
+    --
+    --     dependencies = {
+    --         -- TODO: add dependencies
+    --         "nvim-lua/plenary.nvim",
+    --     },
+    --
+    --     ---@type zeta.Opts
+    --     opts = {
+    --         backend = "openai",
+    --         backend_config = {
+    --             -- openai = { url = "http://localhost:7000/v1/completions", },
+    --             -- zed = {},
+    --         },
+    --         -- cancel_pending_requests = true,
+    --     },
+    --
+    --     ---@diagnostic disable-next-line: unused-local
+    --     config = function(_self, opts)
+    --         local zeta = require("zeta")
+    --         local zeta_autocmd = require("zeta.autocmd")
+    --         local zeta_api = require("zeta.api")
+    --
+    --         zeta.setup(opts)
+    --         -- zeta_autocmd.setup()
+    --
+    --         vim.keymap.set("n",
+    --             "<leader>za",
+    --             zeta_api.accept,
+    --             {
+    --                 desc = "zeta: accept"
+    --             })
+    --         vim.keymap.set("n",
+    --             "<leader>zl",
+    --             function() vim.cmd.edit(require("zeta.log").get_logfile()) end,
+    --             {
+    --                 desc = "zeta: open log file"
+    --             })
+    --
+    --         vim.api.nvim_create_user_command("ZetaLog", function()
+    --             local zeta_log = require("zeta.log")
+    --             local log_file = zeta_log.get_logfile()
+    --             vim.cmd.edit(log_file)
+    --         end, {})
+    --         vim.api.nvim_create_user_command("ZetaPredict", function()
+    --             require("zeta.common").request_predict_completion()
+    --         end, {})
+    --     end,
+    -- },
+}
