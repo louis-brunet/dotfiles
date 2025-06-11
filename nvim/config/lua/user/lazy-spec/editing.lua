@@ -131,47 +131,56 @@ local M = {
         },
     },
 
-    -- "gc" to comment visual regions/lines
+    -- enhances neovim's native comments, supports different commentstrings for
+    -- different treesitter node types, e.g. for tsx files
     {
-        "numToStr/Comment.nvim",
+        "folke/ts-comments.nvim",
+        opts = {},
         event = "VeryLazy",
-        ---@type CommentConfig
-        opts = {
-            -- DEFAULTS:
-            -- padding = true,
-            -- sticky = true,
-            -- ignore = nil,
-            toggler = { line = "gcc", block = "gbc" },
-            opleader = { line = "gc", block = "gb" },
-            -- extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
-            -- mappings = { basic = true, extra = true },
-            -- pre_hook = nil,
-            -- post_hook = nil,
-        },
-        -- keys = {
-        --     { '<leader>cc', '<Plug>(comment_toggle_linewise_current)', mode = 'n', desc = '[C]omment toggle linewise' },
-        --     { '<leader>c',  '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = '[C]omment toggle linewise' },
-        -- },
-        config = function(_, opts)
-            local comment = require("Comment")
-            local comment_filetype = require("Comment.ft")
-
-            comment.setup(opts)
-
-            -- add commentstring for pug templating engine
-            comment_filetype.set("pug", "// %s")
-            comment_filetype.set("git_config", "# %s")
-
-            vim.keymap.set(
-                "n", "<leader>cc", "<Plug>(comment_toggle_linewise_current)",
-                { desc = "[C]omment toggle linewise" }
-            )
-            vim.keymap.set(
-                "v", "<leader>c", "<Plug>(comment_toggle_linewise_visual)",
-                { desc = "[C]omment toggle linewise" }
-            )
-        end,
+        enabled = vim.fn.has("nvim-0.10.0") == 1,
     },
+
+    -- -- "gc" to comment visual regions/lines
+    -- {
+    --     "numToStr/Comment.nvim",
+    --     event = "VeryLazy",
+    --     ---@type CommentConfig
+    --     opts = {
+    --         -- DEFAULTS:
+    --         -- padding = true,
+    --         -- sticky = true,
+    --         -- ignore = nil,
+    --         toggler = { line = "gcc", block = "gbc" },
+    --         opleader = { line = "gc", block = "gb" },
+    --         -- extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
+    --         -- mappings = { basic = true, extra = true },
+    --         -- pre_hook = nil,
+    --         -- post_hook = nil,
+    --     },
+    --     -- keys = {
+    --     --     { '<leader>cc', '<Plug>(comment_toggle_linewise_current)', mode = 'n', desc = '[C]omment toggle linewise' },
+    --     --     { '<leader>c',  '<Plug>(comment_toggle_linewise_visual)',  mode = 'v', desc = '[C]omment toggle linewise' },
+    --     -- },
+    --     config = function(_, opts)
+    --         local comment = require("Comment")
+    --         local comment_filetype = require("Comment.ft")
+    --
+    --         comment.setup(opts)
+    --
+    --         -- add commentstring for pug templating engine
+    --         comment_filetype.set("pug", "// %s")
+    --         comment_filetype.set("git_config", "# %s")
+    --
+    --         vim.keymap.set(
+    --             "n", "<leader>cc", "<Plug>(comment_toggle_linewise_current)",
+    --             { desc = "[C]omment toggle linewise" }
+    --         )
+    --         vim.keymap.set(
+    --             "v", "<leader>c", "<Plug>(comment_toggle_linewise_visual)",
+    --             { desc = "[C]omment toggle linewise" }
+    --         )
+    --     end,
+    -- },
 
     {
         "kylechui/nvim-surround",
