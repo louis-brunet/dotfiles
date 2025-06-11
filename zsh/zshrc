@@ -115,7 +115,7 @@ load_ohmyzsh() {
       # poetry
       pyenv
       aws # Available commands documentation: $ZSH/plugins/aws/README.md (asp, asr, aws_profiles, ...)
-      # gcloud
+      gcloud
       # kubectl
 
       ### custom plugins (added in $ZSH_CUSTOM/plugins)

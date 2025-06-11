@@ -98,6 +98,7 @@ return {
     {
         -- Highlight, edit, and navigate code
         'nvim-treesitter/nvim-treesitter',
+        branch = "master", -- NOTE: treesitter has deprecated its "master" branch, TODO: use "main" branch
         event = 'VeryLazy',
         dependencies = {
             -- manipulate treesitter objects (parameter names, functions, properties, etc.)
@@ -109,6 +110,9 @@ return {
         main = 'nvim-treesitter.configs',
         opts = treesitter_opts,
         config = function (_, opts)
+            -- TODO: when migrating to nvim-treesitter's "main" branch, change
+            -- the line below
+            -- require("nvim-treesitter.config").setup(opts)
             require("nvim-treesitter.configs").setup(opts)
 
             -- local ft_to_parser = require"nvim-treesitter.parsers".filetype_to_parsername
