@@ -4,6 +4,7 @@ local M = {}
 M.servers = {
     "angularls",
     "bashls",
+    "cssls",
     "dockerls",
     "eslint",
     "emmet_ls",
