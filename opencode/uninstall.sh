@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
 npm uninstall -g opencode-ai
-rm --verbose -r "$HOME/.config/opencode" "$HOME/.local/share/opencode"
+
+for dir in "$HOME/.config/opencode" "$HOME/.local/share/opencode"; do
+    [[ -d "$dir" ]] && rm --verbose -r "$dir"
+done
