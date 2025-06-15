@@ -5,5 +5,5 @@ extends = "../symlonk-config.toml"
 source_dir = "."
 
 [symlinks]
-# ".config/opencode/config" = "config/tui.toml"
+".config/opencode/config" = "config/tui.toml"
 # "opencode.jsonc" = "config/opencode.jsonc"

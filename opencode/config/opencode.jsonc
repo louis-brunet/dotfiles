@@ -8,9 +8,12 @@
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "qwen3:8b": {}
-        // "deepseek-r1": {},
-        // "llama2": {}
+        // "qwen3:8b": {},
+        // "qwen3:14b": {},
+        // "devstral:24b": {},
+        "llama3.1:8b": {},
+        // "mistral:7b": {},
+        // // "llama2": {}
       }
     }
   }
