@@ -3,7 +3,7 @@
 set -e
 
 # Terminate already running bar instances
-# If all your bars have ipc enabled, you can use 
+# If all your bars have ipc enabled, you can use
 polybar-msg cmd quit || echo "No running bars to terminate"
 # Otherwise you can use the nuclear option:
 # killall -q polybar
