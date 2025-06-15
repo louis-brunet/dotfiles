@@ -4,27 +4,52 @@
 services:
   ollama:
     # TODO: update version
-    image: 'ollama/ollama:0.3.12'
+    # NOTE: using -rocm for AMD GPU.
+    # Should use base image otherwise
+    # image: 'ollama/ollama:0.9.1'
+    # image: 'ollama/ollama:0.9.1-rocm'
+    image: 'ollama/ollama:rocm'
     restart: 'no'
     # restart: 'unless-stopped'
     volumes:
       - './volumes/ollama:/root/.ollama:cached'
+      # - /home/username/.ollama:/root/.ollama
+      # - /home/username/ollama/models:/usr/share/ollama
     ports:
       - '11434:11434'
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    ipc: host
+    group_add:
+      - video
+      # - render
     environment:
+      # NOTE: to find the correct value of HSA_OVERRIDE_GFX_VERSION, run 'rocminfo | grep -A 10 "Agent 2"' and use the numbers AA.B.C in "Name: gfxAABC"
+      HSA_OVERRIDE_GFX_VERSION: 10.3.0  # Adjust based on your GPU
+      # HSA_OVERRIDE_GFX_VERSION: 10.3.2  # Adjust based on your GPU
+      # HIP_VISIBLE_DEVICES: 0
+      ROC_ENABLE_PRE_VEGA: 1
+      HIP_VISIBLE_DEVICES: 0
+      ROCR_VISIBLE_DEVICES: 0
+      GPU_FORCE_64BIT_PTR: 1
       # OLLAMA_DEBUG: "1" #              Show additional debug information (e.g. OLLAMA_DEBUG=1)
       # OLLAMA_HOST: "" #               IP Address for the ollama server (default 127.0.0.1:11434)
       OLLAMA_KEEP_ALIVE: "4h" #         The duration that models stay loaded in memory (default "5m")
       # OLLAMA_MAX_LOADED_MODELS: "" #  Maximum number of loaded models per GPU
       # OLLAMA_MAX_QUEUE: "" #          Maximum number of queued requests
       # OLLAMA_MODELS: "" #             The path to the models directory
-      OLLAMA_NUM_PARALLEL: "8" #       Maximum number of parallel requests
+      OLLAMA_NUM_PARALLEL: 1 # "8" #       Maximum number of parallel requests
       # OLLAMA_NOPRUNE: "" #            Do not prune model blobs on startup
       # OLLAMA_ORIGINS: "" #            A comma separated list of allowed origins
       # OLLAMA_SCHED_SPREAD: "" #       Always schedule model across all GPUs
       # OLLAMA_TMPDIR: "" #             Location for temporary files
-      # OLLAMA_FLASH_ATTENTION: "" #    Enabled flash attention
+      OLLAMA_FLASH_ATTENTION: "1" #    Enabled flash attention
       # OLLAMA_LLM_LIBRARY: "" #        Set LLM library to bypass autodetection
       # OLLAMA_GPU_OVERHEAD: "" #       Reserve a portion of VRAM per GPU (bytes)
       # OLLAMA_LOAD_TIMEOUT: "" #       How long to allow model loads to stall before giving up (default "5m")
-
+      OLLAMA_CONTEXT_LENGTH: 16384
