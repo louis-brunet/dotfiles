@@ -142,9 +142,17 @@ setup_symlinks() {
   symlonk create links "$DOTFILES_ROOT"/*/symlonk.toml --prune --verify
 }
 
-sleep_seconds=5
-warn 'DEPRECATED - use `python3 -m scripts.boostrap` instead.' "Sleeping for $sleep_seconds seconds..."
-sleep "$sleep_seconds"
+handle_deprecation() {
+  deprecation_msg='DEPRECATED - use `python3 -m scripts.boostrap` instead.'
+  if [[ -z "$DOTFILES_BOOTSTRAP_IGNORE_DEPRECATION" ]]; then
+    fail "$deprecation_msg"
+  fi
+  local sleep_seconds=10
+  warn "$deprecation_msg" "Sleeping for $sleep_seconds seconds..."
+  sleep "$sleep_seconds"
+}
+
+handle_deprecation
 
 setup_gitconfig
 setup_symlinks
