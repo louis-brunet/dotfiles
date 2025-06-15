@@ -143,7 +143,7 @@ setup_symlinks() {
 }
 
 handle_deprecation() {
-  deprecation_msg='DEPRECATED - use `python3 -m scripts.boostrap` instead.'
+  deprecation_msg='DEPRECATED - use `python3 -m scripts.bootstrap` instead.'
   if [[ -z "$DOTFILES_BOOTSTRAP_IGNORE_DEPRECATION" ]]; then
     fail "$deprecation_msg"
   fi
