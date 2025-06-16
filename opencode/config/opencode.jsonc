@@ -1,6 +1,19 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "mcp": {},
+  "mcp": {
+    // EXAMPLES FROM README:
+    // "localmcp": {
+    //   "type": "local",
+    //   "command": ["bun", "x", "my-mcp-command"],
+    //   "environment": {
+    //     "MY_ENV_VAR": "my_env_var_value"
+    //   }
+    // },
+    // "remotemcp": {
+    //   "type": "remote",
+    //   "url": "https://my-mcp-server.com"
+    // }
+  },
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -8,13 +21,11 @@
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "llama2": {
-          // "qwen3:8b": {},
-          // "qwen3:14b": {},
-          // "devstral:24b": {},
-          "llama3.1:8b": {},
-          // "mistral:7b": {},
-        }
+        // "qwen3:8b": {},
+        // "qwen3:14b": {},
+        // "devstral:24b": {},
+        // "mistral:7b": {},
+        "llama3.1:8b": {}
       }
     }
   }
