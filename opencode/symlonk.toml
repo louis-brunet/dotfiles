@@ -6,4 +6,5 @@ source_dir = "."
 
 [symlinks]
 ".config/opencode/config" = "config/tui.toml"
+".config/opencode/providers" = "config/providers"
 # "opencode.jsonc" = "config/opencode.jsonc"

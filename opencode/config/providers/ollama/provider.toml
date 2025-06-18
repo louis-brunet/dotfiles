@@ -1,0 +1,8 @@
+[provider]
+# id = "ollama"
+name = "Ollama"
+env = ["OLLAMA_API_KEY"]
+npm = "@ai-sdk/openai-compatible"
+
+[options]
+baseURL = "http://localhost:11343/v1"
