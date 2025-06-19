@@ -17,6 +17,10 @@ return {
                     url =
                     "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json",
                 },
+                {
+                    fileMatch = { "opencode.json", "opencode.jsonc" },
+                    url = "https://opencode.ai/config.json",
+                },
                 -- {
                 --     fileMatch = "nest-cli.json",
                 --     url = "https://json.schemastore.org/nest-cli"

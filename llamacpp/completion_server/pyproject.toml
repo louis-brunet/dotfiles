@@ -2,7 +2,7 @@
 name = "completion-server"
 version = "0.1.0"
 description = ""
-authors = ["Louis Brunet <lbrunet@neoxia.deloitte.fr>"]
+authors = ["Louis Brunet <louis.jc.brunet@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
