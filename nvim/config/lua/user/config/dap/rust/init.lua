@@ -6,11 +6,7 @@ local function config_rust()
         port = "${port}",
         host = "127.0.0.1",
         executable = {
-            -- command = 'codelldb',
-            -- TODO: 💀 Make sure to update this path to point to your installation
-            command = require("mason-registry").get_package("codelldb")
-                :get_install_path()
-                .. "/codelldb",
+            command = vim.fn.exepath("codelldb"),
             args = {
                 -- '--liblldb', liblldb_path,
                 "--port",

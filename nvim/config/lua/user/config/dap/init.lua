@@ -1,3 +1,4 @@
+---@type table<string, string|[string, string, string]>
 local icons = {
     Stopped             = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
     Breakpoint          = " ",
@@ -85,9 +86,11 @@ function M.dap_config()
             { desc = "DAP: " .. user_cmd.desc })
     end
 
-    require('user.config.dap.js').configure()
-    require('user.config.dap.rust').configure();
+    require("user.config.dap.js").configure()
+    require("user.config.dap.rust").configure()
 end
+
+-- require("lazy")
 
 --- keymaps used to lazy-load nvim-dap
 ---@type LazyKeysSpec[]
