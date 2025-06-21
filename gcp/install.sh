@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ "$LOCAL_ENV" != "neoxia" ]]
+if [[ "$LOCAL_ENV" != "neoxia" && "$LOCAL_INSTALL_GCLOUD" != "true" ]]
 then
     exit 0
 fi
 
 set -e
-set -x
+# set -x
 
 # fail() {
 #     echo $@
