@@ -206,17 +206,42 @@ function M.ignore_clients_if_present_filter(
     primary_formatting_client_names,
     ignore_client_names
 )
-    local should_ignore_clients =
-        M.contains_any_client(attached_clients, primary_formatting_client_names) and
-        M.contains_any_client(attached_clients, ignore_client_names)
-    if should_ignore_clients then
-        vim.notify("ignoring clients " .. vim.inspect(ignore_client_names),
-            vim.log.levels.DEBUG, {
-            title = "ignore_clients_if_present_filter"
-        })
-        ---@param format_client vim.lsp.Client
-        return function(format_client)
-            return not vim.tbl_contains(ignore_client_names, format_client.name)
+    ------@param message string
+    ---local function log_debug(message)
+    ---    vim.notify(
+    ---        message,
+    ---        vim.log.levels.DEBUG, { title = "ignore_clients_if_present_filter" }
+    ---    )
+    ---end
+    ---@type string[]
+    local attached_client_names = vim.iter(attached_clients):map(function(client)
+        return client.name
+    end):totable()
+    -- log_debug("attached_client_names " .. vim.inspect(attached_client_names))
+
+    local is_primary_client_attached = vim.iter(attached_client_names)
+        :any(function(name)
+            return vim.tbl_contains(primary_formatting_client_names, name)
+        end)
+
+    -- log_debug("is_primary_client_attached (" ..
+        -- vim.inspect(primary_formatting_client_names) ..
+        -- ") " .. vim.inspect(is_primary_client_attached))
+
+    if is_primary_client_attached then
+        ---@type string[]
+        local attached_clients_to_ignore = vim.iter(ignore_client_names)
+            :filter(function(name)
+                return vim.tbl_contains(attached_client_names, name)
+            end)
+            :totable()
+        -- log_debug("ignoring clients " .. vim.inspect(attached_clients_to_ignore))
+        vim.notify(
+            "ignoring clients " .. vim.inspect(attached_clients_to_ignore),
+            vim.log.levels.DEBUG, { title = "ignore_clients_if_present_filter" }
+        )
+        return function(client)
+            return not vim.tbl_contains(attached_clients_to_ignore, client.name)
         end
     end
     return nil

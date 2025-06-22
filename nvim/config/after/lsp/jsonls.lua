@@ -21,6 +21,10 @@ return {
                     fileMatch = { "opencode.json", "opencode.jsonc" },
                     url = "https://opencode.ai/config.json",
                 },
+                {
+                    fileMatch = { ".prettierrc", ".prettierrc.json" },
+                    url = "https://json.schemastore.org/prettierrc",
+                },
                 -- {
                 --     fileMatch = "nest-cli.json",
                 --     url = "https://json.schemastore.org/nest-cli"
