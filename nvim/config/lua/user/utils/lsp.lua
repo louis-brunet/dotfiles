@@ -16,7 +16,8 @@ local function get_rename_file_workspace_edits(client, old_name, new_name)
     -- log.debug("Sending workspace/willRenameFiles request", will_rename_params)
     local timeout_ms = 6000
     local success, resp = pcall(function()
-        return client:request_sync(vim.lsp.protocol.Methods.workspace_willRenameFiles,
+        return client:request_sync(
+            vim.lsp.protocol.Methods.workspace_willRenameFiles,
             will_rename_params, timeout_ms)
     end
     )
@@ -118,8 +119,11 @@ local M = {
                 if will_rename ~= nil then
                     local filters = will_rename.filters or {}
                     if matches_file_operation_filters(filters, old_name) then
-                        local edit = get_rename_file_workspace_edits(client, old_name,
-                            new_name)
+                        local edit = get_rename_file_workspace_edits(
+                            client,
+                            old_name,
+                            new_name
+                        )
                         if edit ~= nil then
                             vim.lsp.util.apply_workspace_edit(edit,
                                 client.offset_encoding)
@@ -153,7 +157,10 @@ local M = {
                                 },
                             },
                         }
-                        client:notify(vim.lsp.protocol.Methods.workspace_didRenameFiles, params)
+                        client:notify(
+                            vim.lsp.protocol.Methods.workspace_didRenameFiles,
+                            params
+                        )
                     end
                 end
             end
@@ -188,6 +195,45 @@ function M.contains_any_client(clients, client_names)
     return vim.tbl_contains(clients, function(c)
         return vim.tbl_contains(client_names, c.name)
     end, { predicate = true })
+end
+
+---@param attached_clients vim.lsp.Client[]
+---@param primary_formatting_client_names string[]
+---@param ignore_client_names string[]
+---@return (fun(client: vim.lsp.Client): nil)|nil
+function M.ignore_clients_if_present_filter(
+    attached_clients,
+    primary_formatting_client_names,
+    ignore_client_names
+)
+    local should_ignore_clients =
+        M.contains_any_client(attached_clients, primary_formatting_client_names) and
+        M.contains_any_client(attached_clients, ignore_client_names)
+    if should_ignore_clients then
+        vim.notify("ignoring clients " .. vim.inspect(ignore_client_names),
+            vim.log.levels.DEBUG, {
+            title = "ignore_clients_if_present_filter"
+        })
+        ---@param format_client vim.lsp.Client
+        return function(format_client)
+            return not vim.tbl_contains(ignore_client_names, format_client.name)
+        end
+    end
+    return nil
+end
+
+---@param bufnr integer
+function M.format(bufnr)
+    local attached_clients = M.get_buffer_lsp_clients({
+        bufnr = bufnr,
+        method = vim.lsp.protocol.Methods.textDocument_formatting,
+    })
+    vim.lsp.buf.format({
+        timeout_ms = 2000,
+        filter = M.ignore_clients_if_present_filter(attached_clients,
+            { "eslint" },
+            { "ts_ls", "tsserver", "angularls" }),
+    })
 end
 
 return M
