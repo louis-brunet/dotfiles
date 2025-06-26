@@ -6,6 +6,11 @@
   "autoupdate": false,
   "disabled_providers": [],
   "mcp": {
+    "context7": {
+      "type": "local",
+      "command": ["npx", "-y","@upstash/context7-mcp"],
+      "environment": {}
+    }
   },
   "provider": {
     "ollama": {
