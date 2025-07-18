@@ -9,6 +9,11 @@ return {
         opts = {
             file_types = render_markdown_filetypes,
             pipe_table = { style = "normal", preset = "double" },
+            code = {
+                conceal_delimiters = false,
+                -- language = false,
+                border = "none",
+            },
             heading = {
                 -- sign = false,
                 width = "block",
