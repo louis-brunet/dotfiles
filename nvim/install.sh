@@ -74,6 +74,7 @@ download_nvim_and_verify_checksum() {
     if ! asset_jq_filter="$(build_jq_filter "nvim-linux-x86_64.appimage")"; then
         fail "build jq filter"
     fi
+    # API documentation: https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#get-a-release
     local latest_release_url="https://api.github.com/repos/neovim/neovim/releases/tags/stable"
     echo "🌐 getting latest release info from $latest_release_url"
     local asset_info_json
