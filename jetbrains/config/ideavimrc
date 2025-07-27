@@ -1,2 +1,3 @@
 noremap ù <Esc>
 noremap! ù <Esc>
+vnoremap! ù <Esc>
