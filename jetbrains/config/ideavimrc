@@ -1,3 +1,39 @@
+" Adapted from:
+" https://github.com/JetBrains/ideavim/discussions/303#discussioncomment-12591982"
+
+let mapleader=" "
+set scrolloff=8          " Minimal number of lines above and below the cursor
+set incsearch            " Show where search pattern typed so far matches
+set visualbell           " No bleep sound
+set which-key            " Enable Which-Key plugin
+set notimeout            " Do not hide Which-Key popup
+set hls                  " Enable search highlighting
+set ignorecase smartcase " Case-insensitive search
+set relativenumber       " Relative line numbers by default
+" set peekaboo             " Show contents in the registers (IDEA plugin required)
+
+" Remap escape
 noremap ù <Esc>
 noremap! ù <Esc>
-vnoremap! ù <Esc>
+vnoremap ù <Esc>
+
+" Action list for IdeaVim plugin: https://gist.github.com/zchee/9c78f91cc5ad771c1f5d
+map <leader>f <Action>(ReformatCode)
+
+nmap gcc <Action>(CommentByLineComment)
+vmap gc <Action>(CommentByLineComment)
+
+map <Leader>sf <Action>(GotoFile)
+map <leader>? <Action>(RecentFiles)
+map <leader>ws <Action>(GotoSymbol)
+map <leader>sg <Action>(FindInPath)
+
+nmap <Leader>rn <Action>(RenameElement)
+
+map grr <Action>(ShowUsages)
+map grR <Action>(FindUsages)
+map grt <Action>(GotoTypeDeclaration)
+map grd <Action>(GotoDeclaration)
+map gri <Action>(GotoImplementation)
+map ]g <Action>(VcsShowNextChangeMarker)
+map [g <Action>(VcsShowPrevChangeMarker)
