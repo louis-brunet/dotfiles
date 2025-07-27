@@ -10,6 +10,9 @@ ANSI_NC='\033[0m' # No Color
 
 SCRIPT_PATH=$(readlink -f "$0")
 
+# NOTE: $HOME/bin should be in PATH
+NVIM_EXECUTABLE_PATH="$HOME/bin/nvim"
+
 print_error() {
     # Check if stderr is a TTY (interactive terminal) to enable color output
     if [ -t 2 ]; then
@@ -57,40 +60,76 @@ get_dependencies() {
     fi
 }
 
-download_nvim_and_verify_checksum() {
-    # download latest stable appimage, save it as $HOME/bin/nvim with execution permissions
-    echo "🌐 pulling latest stable nvim appimage"
-
-    nvim_release_url="https://github.com/neovim/neovim/releases/download/stable"
-    nvim_download_path="${nvim_path}.downloading"
-    nvim_download_url="${nvim_release_url}/nvim-linux-x86_64.appimage"
-    nvim_shasum_txt_download_path="${nvim_path}.shasum.txt"
-    nvim_shasum_txt_download_url="${nvim_release_url}/shasum.txt"
-
-    mkdir -p "$(dirname "$nvim_path")"
-
-    if ! curl -o "$nvim_download_path" -L "$nvim_download_url"; then
-        fail "could not download $nvim_download_url to $nvim_download_path"
+build_jq_filter() {
+    local asset_name="$1"
+    if [[ -z "$asset_name" ]]; then
+        fail "[build_jq_filter] missing asset name parameter"
     fi
-    if ! curl -o "$nvim_shasum_txt_download_path" -L "$nvim_shasum_txt_download_url"; then
-        fail "could not download $nvim_shasum_txt_download_url to $nvim_shasum_txt_download_path"
-    fi
-
-    nvim_download_path_sha256=$(sha256sum "$nvim_download_path" | awk '{print $1}')
-    grep --quiet "$nvim_download_path_sha256" "$nvim_shasum_txt_download_path" || {
-        rm "$nvim_shasum_txt_download_path"
-        fail "invalid checksum for ${nvim_download_path}: could not find checksum '$nvim_download_path_sha256' in file '$nvim_shasum_txt_download_path'"
-    }
-    print_success "Validated checksum for $nvim_download_path"
-    rm "$nvim_shasum_txt_download_path"
-
-    mv "$nvim_download_path" "$nvim_path"
-    chmod u+x "$nvim_path"
+    echo '.assets[] | select(.name == "'"$asset_name"'") | {download_url: .browser_download_url, sha_digest: .digest}'
 }
 
-# NOTE: $HOME/bin should be in PATH
-nvim_path="$HOME/bin/nvim"
-if [[ ! -x "$nvim_path" ]] || [[ -n "$DOTFILES_ALWAYS_UPDATE_NVIM" ]]; then
+# download latest stable appimage, save it as $HOME/bin/nvim with execution permissions
+download_nvim_and_verify_checksum() {
+    local asset_jq_filter
+    if ! asset_jq_filter="$(build_jq_filter "nvim-linux-x86_64.appimage")"; then
+        fail "build jq filter"
+    fi
+    local latest_release_url="https://api.github.com/repos/neovim/neovim/releases/tags/stable"
+    echo "🌐 getting latest release info from $latest_release_url"
+    local asset_info_json
+    if ! asset_info_json=$(curl --location \
+        --header "Accept: application/vnd.github.v3+json" \
+        --header "X-GitHub-Api-Version: 2022-11-28" \
+        "$latest_release_url" |
+        jq -r "$asset_jq_filter"); then
+        fail "[download_nvim_and_verify_checksum] could not find asset download url and SHA digest"
+    fi
+    local asset_download_url
+    asset_download_url="$(jq --raw-output '.download_url' <<<"$asset_info_json")"
+    local asset_sha
+    asset_sha="$(jq --raw-output '.sha_digest' <<<"$asset_info_json")"
+
+    if [[ -z "$asset_download_url" ]]; then
+        fail "could not find asset download URL"
+    fi
+    print_success "found asset download URL: $asset_download_url"
+
+    if [[ -z "$asset_sha" ]]; then
+        fail "could not find asset SHA digest"
+    fi
+    print_success "found asset SHA digest: $asset_sha"
+
+    nvim_download_path="${NVIM_EXECUTABLE_PATH}.downloading"
+    nvim_download_url="$asset_download_url"
+    nvim_sha_digest="$asset_sha"
+
+    # Download the file
+    echo "🌐 pulling latest stable nvim appimage from $nvim_download_url"
+    curl --output "$nvim_download_path" --location "$nvim_download_url"
+
+    # Extract just the hash value (remove "sha256:" prefix)
+    expected_hash="${nvim_sha_digest#sha256:}"
+
+    # Calculate the SHA256 of the downloaded file
+    actual_hash=$(sha256sum "$nvim_download_path" | cut -d' ' -f1)
+
+    # Verify the hashes match
+    if [ "$expected_hash" = "$actual_hash" ]; then
+        print_success "SHA256 verification successful (expected: $expected_hash, actual: $actual_hash)"
+    else
+        fail "✗ SHA256 verification failed! (expected: $expected_hash, actual: $actual_hash)"
+    fi
+
+    # Install the downloaded file as the global "nvim" command
+    mv "$nvim_download_path" "$NVIM_EXECUTABLE_PATH"
+
+    # Make the AppImage executable
+    chmod +x "$NVIM_EXECUTABLE_PATH"
+}
+
+# # NOTE: $HOME/bin should be in PATH
+# nvim_path="$HOME/bin/nvim"
+if [[ ! -x "$NVIM_EXECUTABLE_PATH" ]] || [[ -n "$DOTFILES_ALWAYS_UPDATE_NVIM" ]]; then
     download_nvim_and_verify_checksum
 fi
 
