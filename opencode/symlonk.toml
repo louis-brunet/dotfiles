@@ -6,3 +6,4 @@ source_dir = "."
 
 [symlinks]
 ".config/opencode/config.json" = "config/config.json"
+# ".config/opencode/themes" = "config/themes"
