@@ -12,7 +12,7 @@ then
         npm install -g tree-sitter-cli
         echo "✅ installed tree-sitter CLI to install languages (latex) from grammar"
     else
-        echo "WARN: missing npm to install tree-sitter-cli to compile from grammar"
+        echo "⚠️: missing npm to install tree-sitter-cli to compile from grammar"
     fi
 
 fi
