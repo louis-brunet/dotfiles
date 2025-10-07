@@ -1,7 +1,7 @@
 local M = {
     -- auto pairs
     {
-        "echasnovski/mini.pairs",
+        "nvim-mini/mini.pairs",
         event = "VeryLazy",
         opts = {
             mappings = {
