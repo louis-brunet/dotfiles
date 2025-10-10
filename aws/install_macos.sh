@@ -21,18 +21,6 @@ if ! which aws >/dev/null; then
     echo "✅ installed aws CLI"
 fi
 
-# Install Terraform CLI
-if ! which terraform >/dev/null; then
-    echo "Installing Terraform CLI"
-
-    brew tap hashicorp/tap
-    brew install hashicorp/tap/terraform
-
-    # terraform -help
-
-    echo "✅ installed terraform"
-fi
-
 # # Install CDK for Terraform
 # if ! which cdktf >/dev/null; then
 #     npm install --global cdktf-cli@latest
