@@ -1,10 +1,15 @@
-export PYENV_ROOT="$HOME/.pyenv"
-export PYENV_BIN="$PYENV_ROOT/bin"
-[[ -d "$PYENV_BIN" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+### UV CONFIG
+export UV_NATIVE_TLS=true
 
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+### PYENV CONFIG
+# export PYENV_ROOT="$HOME/.pyenv"
+# export PYENV_BIN="$PYENV_ROOT/bin"
+# [[ -d "$PYENV_BIN" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+#
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
 
+### POETRY CONFIG
 # On macOS, poetry config dir ignores XDG_CONFIG_HOME and defaults to
 # "~/Library/Application Support/pypoetry".
 #
@@ -15,6 +20,7 @@ eval "$(pyenv virtualenv-init -)"
 # https://github.com/tox-dev/platformdirs/issues/4
 export POETRY_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/pypoetry"
 
+### TLS CONFIG
 # if [ "$LOCAL_ENV" = "neoxia" ]; then
 #     # NOTE: will not work when not on macOS
 #     if which security >/dev/null; then
