@@ -17,10 +17,10 @@ brew install hashicorp/tap/terraform
 
 echo "✅ installed terraform"
 
-# # Install CDK for Terraform
+# Install CDK for Terraform
 # if ! which cdktf >/dev/null; then
-#     npm install --global cdktf-cli@latest
-#     cdktf --version
-#     echo "✅ installed cdktf (CDK for Terraform)"
+    npm install --global cdktf-cli@latest
+    cdktf --version
+    echo "✅ installed cdktf (CDK for Terraform)"
 # fi
 

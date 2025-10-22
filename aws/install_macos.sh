@@ -21,10 +21,3 @@ if ! which aws >/dev/null; then
     echo "✅ installed aws CLI"
 fi
 
-# # Install CDK for Terraform
-# if ! which cdktf >/dev/null; then
-#     npm install --global cdktf-cli@latest
-#     cdktf --version
-#     echo "✅ installed cdktf (CDK for Terraform)"
-# fi
-
