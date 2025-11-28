@@ -10,14 +10,17 @@ fail() {
 }
 
 # Install AWS CLI
-if ! which aws >/dev/null; then
-    # Uninstallation instructions
-    # https://docs.aws.amazon.com/cli/latest/userguide/uninstall.html
+# if ! which aws >/dev/null; then
 
-    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-    sudo installer -pkg AWSCLIV2.pkg -target /
-    rm AWSCLIV2.pkg
+# Uninstallation instructions
+# https://docs.aws.amazon.com/cli/latest/userguide/uninstall.html
 
-    echo "✅ installed aws CLI"
-fi
+curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+sudo installer -pkg AWSCLIV2.pkg -target /
+rm AWSCLIV2.pkg
+aws --version
+
+echo "✅ installed aws CLI"
+
+# fi
 
