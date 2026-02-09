@@ -8,7 +8,7 @@ M.servers = {
     "dockerls",
     "eslint",
     "emmet_ls",
-    "harper_ls",
+    -- "harper_ls",
     "html",
     "jsonls",
     -- "lemminx",
