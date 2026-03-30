@@ -10,6 +10,16 @@ function M.multigrep(opts)
     opts = opts or {}
     opts.cwd = opts.cwd or vim.uv.cwd()
 
+    -- Exclusions
+    local globs_to_exclude = {
+        "!**/.git/info/",
+        "!**/.git/logs/",
+        "!**/.git/objects/",
+        "!**/.git/refs/",
+        "!**/.git/rr-cache/",
+    }
+
+
     local finder = telescope_finders.new_async_job({
         command_generator = function(prompt)
             if not prompt or prompt == "" then
@@ -44,9 +54,15 @@ function M.multigrep(opts)
             --     end
             -- end
 
+            -- Inclusions
+            local globs_to_include = {}
             if #pieces > 1 then
+                table.insert(globs_to_include, pieces[#pieces])
+            end
+
+            for glob in vim.iter({ globs_to_exclude, globs_to_include }):flatten() do
                 table.insert(args, "--glob")
-                table.insert(args, pieces[#pieces])
+                table.insert(args, glob)
             end
 
             args = vim.iter({
