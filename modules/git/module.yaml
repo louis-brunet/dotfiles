@@ -1,0 +1,12 @@
+name: git
+description: "Git configuration and aliases"
+version: "1.0.0"
+depends:
+  - base
+provides:
+  - git
+tags:
+  - config
+  - vcs
+health_check: |
+  git --version

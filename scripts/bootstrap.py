@@ -1,10 +1,11 @@
 import argparse
 import logging
 import os.path
+import shutil
 import subprocess
 import sys
-import shutil
 from typing import NoReturn, TypedDict
+
 from .colored_logger import (
     prompt_required,
     prompt_yes_no,
@@ -112,9 +113,7 @@ def configure_commit_signature(config_values: GitConfig) -> None:
             default=config_values["SIGNING_KEY"],
         )
         if not os.path.isfile(config_values["SIGNING_KEY"]):
-            raise ValueError(
-                f"could not find SSH key file at '{config_values['SIGNING_KEY']}'"
-            )
+            raise ValueError(f"could not find SSH key file at '{config_values['SIGNING_KEY']}'")
 
         config_values["GPG_SSH_ALLOWED_SIGNERS_FILE"] = prompt_required(
             "git: path to the file containing allowed signers' public keys and their committer emails",
@@ -127,9 +126,7 @@ def configure_commit_signature(config_values: GitConfig) -> None:
             "git: GPG key ID",
         )
     else:
-        raise ValueError(
-            f"unrecognized GPG format value '{config_values['GPG_FORMAT']}'"
-        )
+        raise ValueError(f"unrecognized GPG format value '{config_values['GPG_FORMAT']}'")
 
 
 def create_local_gitconfig(
@@ -208,9 +205,7 @@ def setup_symlinks(dotfiles_root: str):
     logger = module_logger.getChild(setup_symlinks.__name__)
     symlonk_executable = "symlonk"
     if not shutil.which(symlonk_executable):
-        die(
-            "could not find symlonk executable: install https://github.com/louis-brunet/symlonk"
-        )
+        die("could not find symlonk executable: install https://github.com/louis-brunet/symlonk")
 
     subprocess.check_call(
         [

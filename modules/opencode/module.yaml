@@ -1,0 +1,14 @@
+name: opencode
+description: "OpenCode CLI tool"
+version: "1.0.0"
+platforms:
+  - linux
+depends:
+  - base
+provides:
+  - opencode
+tags:
+  - ai
+  - development
+health_check: |
+  opencode --version

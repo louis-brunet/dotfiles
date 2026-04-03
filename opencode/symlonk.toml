@@ -1,9 +1,0 @@
-#:schema ../symlonk-schema.json
-
-[config]
-extends = "../symlonk-config.toml"
-source_dir = "."
-
-[symlinks]
-".config/opencode/config.json" = "config/config.json"
-# ".config/opencode/themes" = "config/themes"

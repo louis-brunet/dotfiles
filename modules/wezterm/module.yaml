@@ -1,0 +1,6 @@
+name: wezterm
+description: "Wezterm terminal emulator configuration"
+version: "1.0.0"
+tags:
+  - config
+  - terminal

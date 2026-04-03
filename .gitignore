@@ -2,4 +2,11 @@ symlonk-lock.toml
 .DS_Store
 .aider*
 __pycache__
-amdgpu-install*.deb
+amdgpu-install*.deb*
+.venv/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/

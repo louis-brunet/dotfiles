@@ -1,0 +1,8 @@
+name: windows
+description: "Windows configuration data (settings, etc.) - for reference/cross-platform"
+version: "1.0.0"
+
+tags:
+  - config
+  - data
+  - windows

@@ -1,0 +1,20 @@
+name: angular
+description: "Angular CLI and development environment"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends:
+  - node
+
+provides:
+  - ng
+
+tags:
+  - frontend
+  - development
+  - javascript
+
+health_check: |
+  ng version

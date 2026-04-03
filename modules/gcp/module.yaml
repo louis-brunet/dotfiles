@@ -1,0 +1,14 @@
+name: gcp
+description: "Google Cloud Platform CLI tools"
+version: "1.0.0"
+platforms:
+  - linux
+depends:
+  - base
+provides:
+  - gcloud
+tags:
+  - cloud
+  - devops
+health_check: |
+  gcloud --version

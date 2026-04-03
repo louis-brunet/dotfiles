@@ -1,0 +1,23 @@
+name: base
+description: "Base system dependencies - core tools required for all other modules"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends: []
+
+provides:
+  - system-packages
+
+requires:
+  commands:
+    - git
+    - curl
+
+tags:
+  - required
+  - system
+
+health_check: |
+  git --version && curl --version | head -1

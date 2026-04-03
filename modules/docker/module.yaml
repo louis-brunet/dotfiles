@@ -1,0 +1,20 @@
+name: docker
+description: "Docker and Docker Compose installation"
+version: "1.0.0"
+
+platforms:
+  - linux
+  - macos
+
+depends:
+  - base
+
+provides:
+  - docker
+
+tags:
+  - container
+  - devops
+
+health_check: |
+  docker --version

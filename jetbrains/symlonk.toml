@@ -1,8 +1,0 @@
-#:schema ../symlonk-schema.json
-
-[config]
-extends = "../symlonk-config.toml"
-source_dir = "."
-
-[symlinks]
-".ideavimrc" = "config/ideavimrc"

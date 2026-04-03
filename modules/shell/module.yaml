@@ -1,0 +1,25 @@
+name: shell
+description: "Shell configuration - zsh, oh-my-zsh, and powerlevel10k theme"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends:
+  - base
+
+provides:
+  - shell
+  - zsh
+
+requires:
+  commands:
+    - git
+    - zsh
+
+tags:
+  - shell
+  - ui
+
+health_check: |
+  echo $ZSH_VERSION

@@ -1,0 +1,10 @@
+name: macos
+description: "macOS-specific setup and configuration"
+version: "1.0.0"
+platforms:
+  - macos
+depends:
+  - base
+tags:
+  - system
+  - macos-only

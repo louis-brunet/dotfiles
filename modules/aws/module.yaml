@@ -1,0 +1,24 @@
+name: aws
+description: "AWS CLI v2 and CDK"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends:
+  - base
+  - shell
+
+provides:
+  - aws
+
+requires:
+  commands:
+    - unzip
+
+tags:
+  - cloud
+  - devops
+
+health_check: |
+  aws --version

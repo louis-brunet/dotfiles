@@ -1,0 +1,20 @@
+name: qmk
+description: "QMK firmware keyboard tooling"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends:
+  - base
+  - python
+
+provides:
+  - qmk
+
+tags:
+  - firmware
+  - keyboards
+
+health_check: |
+  qmk --version 2>/dev/null || echo "qmk not installed"
