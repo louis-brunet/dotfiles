@@ -98,33 +98,40 @@ return {
     {
         -- Highlight, edit, and navigate code
         'nvim-treesitter/nvim-treesitter',
-        branch = "master", -- NOTE: treesitter has deprecated its "master" branch, TODO: use "main" branch
-        event = 'VeryLazy',
+        branch = "main",
+        lazy = false,
         dependencies = {
             -- manipulate treesitter objects (parameter names, functions, properties, etc.)
-            'nvim-treesitter/nvim-treesitter-textobjects',
+            {
+              "nvim-treesitter/nvim-treesitter-textobjects",
+              branch = "main",
+              init = function()
+                -- Disable entire built-in ftplugin mappings to avoid conflicts.
+                -- See https://github.com/neovim/neovim/tree/master/runtime/ftplugin for built-in ftplugins.
+                vim.g.no_plugin_maps = true
+
+                -- Or, disable per filetype (add as you like)
+                -- vim.g.no_python_maps = true
+                -- vim.g.no_ruby_maps = true
+                -- vim.g.no_rust_maps = true
+                -- vim.g.no_go_maps = true
+              end,
+              config = function()
+                -- put your config here
+              end,
+            },
             -- keep context of cursor position (e.g. fn name) sticky at the top
             'nvim-treesitter/nvim-treesitter-context',
         },
         build = ':TSUpdate',
-        main = 'nvim-treesitter.configs',
         opts = treesitter_opts,
         config = function (_, opts)
-            -- TODO: when migrating to nvim-treesitter's "main" branch, change
-            -- the line below
-            -- require("nvim-treesitter.config").setup(opts)
-            require("nvim-treesitter.configs").setup(opts)
+            require("nvim-treesitter").setup(opts)
 
-            -- local ft_to_parser = require"nvim-treesitter.parsers".filetype_to_parsername
-            -- ft_to_parser.ejs = "html"
             vim.treesitter.language.register('html', 'ejs')
             vim.treesitter.language.register('html', 'handlebars')
 
             vim.treesitter.language.register('angular', 'angular.html')
-
-            -- vim.treesitter.language.register('terraform-vars', 'terraform')
-
-            -- vim.treesitter.language.register('http', 'httpResult')
         end
     },
 }
