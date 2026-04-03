@@ -189,12 +189,8 @@ function M.on_attach(client, bufnr)
     end
 
     if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentColor) then
-        -- NOTE: vim.lsp.document_color is set to be released in nvim 0.12.
-        -- It is disabled by default like inlay hints.
-        local enable_document_color = (vim.lsp.document_color or {}).enable
-        if type(enable_document_color) == "function" then
-            enable_document_color(true, bufnr)
-        end
+        vim.lsp.document_color.enable(true, { client_id = client.id })
+        nmap("<leader>lc", vim.lsp.document_color.color_presentation, "select [c]olor representation")
     end
 end
 
