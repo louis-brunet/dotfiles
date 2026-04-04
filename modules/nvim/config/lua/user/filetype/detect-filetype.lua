@@ -7,6 +7,10 @@ vim.filetype.add({
         -- tfvars = 'terraform-vars',
         tf = 'terraform',
         http = 'http',
+
+        -- https://alphatab.net/docs/alphatex/lsp
+        atex = 'alphatex',
+        alphatex = "alphatex"
     },
     pattern = {
         ['.*%.component%.html'] = 'angular.html',

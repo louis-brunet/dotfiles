@@ -60,7 +60,11 @@ local M = {
                 automatic_enable = false,
                 ensure_installed = lsp_config.servers,  -- install the servers that will be enabled
             })
-            vim.lsp.enable(lsp_config.servers)
+            -- vim.lsp.enable(lsp_config.servers)
+            vim.lsp.enable(vim.list_extend(
+                vim.deepcopy(lsp_config.servers),
+                lsp_config.custom_servers or {}
+            ))
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 group = vim.api.nvim_create_augroup("user.lsp.common_on_attach",

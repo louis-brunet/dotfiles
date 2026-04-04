@@ -1,6 +1,7 @@
 ---@class UserLspConfig
 local M = {}
 
+---Only mason-lspconfig known servers
 M.servers = {
     "angularls",
     "bashls",
@@ -21,6 +22,9 @@ M.servers = {
     "ts_ls",
     "yamlls",
 }
+
+---Custom servers managed separately
+M.custom_servers = { "alphatab" }
 
 ---@param client vim.lsp.Client
 ---@param bufnr integer
