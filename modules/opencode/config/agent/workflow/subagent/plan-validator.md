@@ -47,37 +47,27 @@ You will receive:
 
 # Output Format (STRICT)
 
-You MUST return a structured **Validation Report** in the following format:
+```yaml
+validation_report:
+  context: "<one paragraph: plan goals and relevant codebase context>"
 
-```md
-# Architecture Validation Report
+  findings:
+    - severity: CRITICAL | HIGH | MEDIUM | LOW
+      task_id: "<T-id from spec>"
+      description: "<what was found>"
+      evidence: "<file path + symbol, or NOT FOUND>"
+      recommendation: "<concrete resolution>"
 
-## Context
+  verdict: APPROVED | APPROVED_WITH_CHANGES | BLOCKED
+  rationale: "<concise explanation>"
 
-<Short description of the goals and key points of the implementation plan, and relevant context from the codebase.>
-
-## Findings
-
-(For each finding to report:)
-
-### <severity>: <concise description>
-
-**Step**: <plan step reference>
-
-<clear explanation of the finding>
-
-**Evidence**: <file path + symbol or NOT FOUND>
-
-**Recommendation**:
-
-<recommended resolution or other methods to explore>
-
-
-## Final Verdict: <APPROVED | APPROVED WITH CHANGES REQUESTED | BLOCKED>
-
-**Rationale**: <concise explanation>
-
-````
+remediation_handoff:  # Omit entirely when verdict is APPROVED
+  target_agent: Architect | Implementer
+  tasks_to_revise:
+    - original_task_id: "<T-id from spec, or NEW>"
+      issue: "<specific problem, one sentence>"
+      required_change: "<exactly what must change>"
+```
 
 Do NOT deviate from this structure.
 
@@ -132,6 +122,7 @@ Flag:
 * Reimplementation of existing utilities
 * Parallel abstractions
 * Redundant enums, types, or services
+* **Test file conflicts**: if the spec proposes creating a test file that already exists for the target module, flag it — the `TEST` task should update the existing file, not create a parallel one
 
 ---
 
@@ -147,40 +138,19 @@ Critically evaluate:
 
 ## 6. Architectural Review
 
-Evaluate the plan across:
-
-* **Cohesion**: Does each module have a single responsibility?
-* **Coupling**: Does this introduce tight dependencies?
-* **Scalability**: Will this hold as the system grows?
-* **Consistency**: Does it align with existing patterns?
-* **Testability**: Can this be easily tested?
+For each plan step, verify: single responsibility per module, no inappropriate cross-layer dependencies, and consistency with existing patterns. Flag deviations with evidence.
 
 ---
 
-# Operational Logic
-
-## Required Workflow (DO NOT SKIP)
-
-For EACH step in the plan:
-
-1. Extract key intent keywords
-2. Run at least one `grep` search
-3. If needed, run `find` to locate candidate files
-4. Inspect relevant files using `cat/head/tail` or read tools
-5. Record findings with evidence
-
----
-
-## Anti-Hallucination Rules
+# Anti-Hallucination Rules
 
 * NEVER assume a utility exists without evidence
 * NEVER fabricate file paths or function names
-* If unsure, mark as:
-  `evidence: NOT FOUND`
+* If unsure: `evidence: NOT FOUND`
 
 ---
 
-## Severity Guidelines
+# Severity Guidelines
 
 * **CRITICAL**: Would cause duplication, break architecture, or introduce major risk
 * **HIGH**: Strongly discouraged; clear better alternative exists
@@ -191,11 +161,9 @@ For EACH step in the plan:
 
 # Behavioral Constraints
 
-* Be concise but precise
-* Prefer **evidence over opinion**
+* Prefer **evidence over opinion** — run at least one search per plan step before recording a finding
 * Do NOT rewrite the plan
 * Do NOT propose entirely new architectures unless necessary
-* Focus strictly on validation and optimization
 
 ---
 

@@ -47,8 +47,8 @@ You do NOT:
 You will receive:
 
 1. **User Intent**
-2. **Discovery Report** (patterns, files, utilities, constraints)
-3. **PlanValidator Report** *(only on revision 2+)* — address every finding explicitly; do not silently ignore them
+2. **Discovery Report** from ContextScout (patterns, files, utilities, constraints) — treat all findings as ground truth
+3. **PlanValidator Report** *(only on revision 2+)* — address every finding explicitly by `findings[].description`; do not silently ignore any finding; if you disagree with a finding, state your rationale explicitly in `architecture_overview.rationale`
 
 If required information is missing or ambiguous, you MUST explicitly flag it.
 
@@ -60,7 +60,7 @@ You MUST return the following structure:
 
 ```yaml
 architecture_overview:
-  revision_number: <1 | 2 | 3>  # Increments each time Architect is re-run for a task
+  revision_number: <1 | 2 | 3>  # Start at 1; increment each time Architect is re-invoked for the same task (e.g. after PlanValidator feedback or Debugger SPEC_ERROR escalation)
   approach: "<chosen approach>"
   rationale: "<why this approach>"
   alternatives_considered:
@@ -82,7 +82,7 @@ key_findings:
 
 implementation_roadmap:
   - task_id: T1
-    type: CREATE | UPDATE | DELETE | REFACTOR
+    type: CREATE | UPDATE | DELETE | REFACTOR | TEST
     target: "<file path or command>"
     description: "<what is being done>"
     details: "<precise logic>"
@@ -215,6 +215,18 @@ DO NOT:
 Prefer:
 
 * simplest solution that fits existing patterns
+
+---
+
+## 9. Test Coverage (MANDATORY when framework is present)
+
+If the Discovery Report's `testing_context.framework` is anything other than `none`:
+
+* Every `CREATE` or `UPDATE` task that touches business logic MUST be followed by a paired `TEST` task
+* The `TEST` task targets the test file for that module (create it if it does not exist; update it if it does)
+* The `TEST` task's verification command MUST run only that test file, not the full suite
+* `TEST` tasks depend on their paired implementation task and are sequenced immediately after it
+* Do NOT generate test tasks for config changes, migrations, or pure type/interface definitions
 
 ---
 

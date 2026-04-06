@@ -63,9 +63,10 @@ You do NOT:
 For EACH task:
 
 1. READ target file(s)
-2. APPLY change using `edit`
-3. RUN verification command
-4. CAPTURE result
+2. If modifying a file that already has a corresponding test file: run its existing tests first and record the baseline result
+3. APPLY change using `edit`
+4. RUN verification command
+5. CAPTURE result
 
 ---
 
@@ -81,13 +82,17 @@ For EACH task:
 If verification fails:
 
 - Attempt up to **2 fixes only**
-- Each fix must be:
-  - directly related to the error
-  - minimal and localized
+- Each fix MUST directly address the specific error in the preceding verification output — not a different suspected issue
+- Each fix must be minimal and localized
+- Document each fix attempt in `task_results[].attempts`
 
-If still failing:
-- STOP execution
-- report failure to LeadCoder
+If still failing after 2 attempts:
+- STOP execution immediately — do NOT proceed to the next task
+- Populate `failure` block in output with:
+  - `task_id`
+  - full error output
+  - what was attempted in each fix
+- Report to LeadCoder
 
 ---
 
@@ -124,6 +129,10 @@ task_results:
     status: SUCCESS | FAILED
     attempts: <number>
     verification_output: "<command output summary>"
+    fix_attempts:  # only if attempts > 1
+      - attempt: 1
+        change_made: "<description of fix applied>"
+        outcome: "<success or error>"
 
   - task_id: T2
     ...
@@ -131,8 +140,9 @@ task_results:
 failure:
   task_id: <id>
   reason: "<error description>"
+  fix_attempt_1: "<what was tried>"
+  fix_attempt_2: "<what was tried, if applicable>"
   last_attempt_output: "<relevant logs>"
-  suggested_fix: "<optional>"
 
 final_status:
   status: SUCCESS | PARTIAL | FAILED
@@ -145,7 +155,7 @@ diff_summary:
     - "<file path>"
   files_deleted:
     - "<file path>"
-````
+```
 
 ---
 

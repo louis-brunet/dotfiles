@@ -46,9 +46,9 @@ You MUST NOT skip states.
 task(
   subagent_type="ContextScout",
   description="Codebase discovery",
-  prompt="Analyze codebase for: [User Intent]. Return structured Discovery Report."
+  prompt="Analyze the codebase relevant to the following intent. User Intent: [User Intent]. Focus your discovery on files, patterns, and symbols most likely to be affected or reused. Return a structured Discovery Report."
 )
-````
+```
 
 ---
 
@@ -76,7 +76,7 @@ WAIT for approval.
 task(
   subagent_type="Architect",
   description="Generate Technical Spec",
-  prompt="Using Discovery Report, create spec for: [Intent]"
+  prompt="Using the Discovery Report below, create a Technical Spec for: [User Intent]. Discovery Report: [ContextScout Output]. PlanValidator Findings (if revision): [PlanValidator Output]. Remediation Handoff (if revision): [PlanValidator remediation_handoff block]"
 )
 ```
 
@@ -88,14 +88,14 @@ task(
 task(
   subagent_type="PlanValidator",
   description="Validate Technical Spec",
-  prompt="Validate this spec: [Architect Output]"
+  prompt="Validate the following Technical Spec against the codebase. Spec: [Architect Output]. Discovery Report: [ContextScout Output]."
 )
 ```
 
 ### Rules:
 
-* If `final_verdict = BLOCKED` → return to Architect
-* If `APPROVED_WITH_CHANGES` → iterate
+* If `verdict = BLOCKED` → return to Architect
+* If `verdict = APPROVED_WITH_CHANGES` → iterate
 * Repeat until APPROVED
 * **Maximum iterations: 3**
 
@@ -139,7 +139,7 @@ WAIT for approval.
 task(
   subagent_type="Implementer",
   description="Execute approved spec",
-  prompt="Execute spec exactly. Stop on failure."
+  prompt="Execute the following Technical Spec exactly, one task at a time. Stop immediately on any failure and report. Spec: [Architect Output]"
 )
 ```
 
@@ -170,8 +170,28 @@ After Debugger produces a fix:
 task(
   subagent_type="Critic",
   description="Final review",
-  prompt="Audit implementation vs intent and standards"
+  prompt="Audit the following implementation against the original intent and codebase standards. User Intent: [User Intent]. Technical Spec: [Architect Output]. Files modified: [diff_summary]. Implementer Summary: [Implementer execution_summary]."
 )
+```
+
+After Critic completes, report final status to user using this format:
+
+```
+## ✅ Implementation Complete   (or ⚠️ Complete with Follow-ups)
+
+**What was built**
+<2–3 sentences describing what was implemented and why it matters.>
+
+**Changes**
+- Created: <list files, or "none">
+- Modified: <list files, or "none">
+- Deleted: <list files, or "none">
+
+**Tests**
+<"All tests passed." | "Tests failed — see critic findings below." | "No test framework detected; no tests run.">
+
+**Critic verdict:** APPROVED | CHANGES_REQUESTED
+<If CHANGES_REQUESTED: one sentence per finding, severity, and recommended next step.>
 ```
 
 ---
@@ -209,8 +229,9 @@ Always report re-entry decision to user before proceeding.
 ### Critic `CHANGES_REQUESTED` handling
 
 1. Evaluate severity of findings
-2. Minor issues → re-run Implementer with findings as input (Debugger not needed)
-3. Architectural issues → return to Phase 3
+2. `CRITICAL` or `HIGH` architectural issues → return to Phase 3 (re-run Architect, passing Critic's `remediation_handoff` block as input)
+3. `MEDIUM` or `LOW` issues → re-run Implementer, passing Critic's `remediation_handoff` block as additional input (Debugger not needed)
+4. **Maximum Critic → Implementer re-runs: 1** — if Critic raises `CHANGES_REQUESTED` again after remediation, escalate to user
 
 ---
 

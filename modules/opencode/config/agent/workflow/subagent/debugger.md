@@ -105,7 +105,8 @@ Assign one of the following:
 
 ## Step 5 — Produce output
 
-If `CODE_ERROR` → produce a `fix_patch`.
+If `CODE_ERROR` AND `attempt_number = 1` → produce a `fix_patch`.
+If `CODE_ERROR` AND `attempt_number = 2` → the patch from attempt 1 failed; escalate instead of producing another patch.
 Otherwise → produce an `escalation_signal`.
 
 ---
