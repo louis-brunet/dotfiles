@@ -2,7 +2,7 @@
 name: ContextScout
 description: "Information retrieval specialist focused on codebase mapping and discovery."
 mode: subagent
-temperature: 0.0
+temperature: 0.1
 permission:
   read:
     "*": "allow"

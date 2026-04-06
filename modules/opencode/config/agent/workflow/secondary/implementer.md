@@ -2,7 +2,7 @@
 name: Implementer
 description: "Execution agent responsible for file edits, command execution, and local verification."
 mode: subagent
-temperature: 0.0
+temperature: 0.1
 permission:
   bash:
     "rm -rf *": "ask"
