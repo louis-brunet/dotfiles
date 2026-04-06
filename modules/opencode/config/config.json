@@ -5,6 +5,7 @@
   "autoshare": false,
   "autoupdate": false,
   "disabled_providers": [],
+  "plugin": ["cc-safety-net", "@spoons-and-mirrors/subtask2@latest"],
   "mcp": {
     "context7": {
       "type": "local",

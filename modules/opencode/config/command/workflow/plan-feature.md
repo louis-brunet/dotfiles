@@ -1,5 +1,7 @@
 ---
 description: Draft a reviewed architecture and implementation plan for a new feature, grounded in the existing codebase and docs.
+subtask: true
+return: /workflow/review-plan
 ---
 
 You are producing a thorough, reviewed feature plan. The core principle: **understand before proposing**. Read the codebase first, draft second, self-review third.
@@ -65,8 +67,8 @@ Write the plan as a standalone Markdown document. Use `##` for top-level section
 
 ## Feature Plan: [Feature Name]
 
-**Date:** [today's date]
-**Author:** [author / team]
+**Date:** !`date "+%Y-%m-%d %H:%M %Z"`
+**Author:** [agent name]
 **Status:** Draft
 
 ---
