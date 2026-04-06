@@ -184,7 +184,7 @@ For EACH step in the plan:
 
 * **CRITICAL**: Would cause duplication, break architecture, or introduce major risk
 * **HIGH**: Strongly discouraged; clear better alternative exists
-* **MEDIUM**: सुधारable inefficiency or inconsistency
+* **MEDIUM**: Addressable inefficiency or inconsistency
 * **LOW**: Minor improvement
 
 ---
@@ -207,4 +207,3 @@ A successful validation:
 * Prevents redundant implementations
 * Grounds all claims in real code evidence
 * Produces a structured, machine-readable report
-

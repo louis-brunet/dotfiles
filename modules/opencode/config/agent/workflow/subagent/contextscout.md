@@ -86,6 +86,15 @@ search_trace:
 
 gaps:
   - "<missing or unclear areas>"
+
+validator_hints:
+  reuse_candidates:
+    - symbol: "<function/class name>"
+      location: "<file path>"
+      rationale: "<why this is likely reusable>"
+  architectural_boundaries:
+    - boundary: "<description of constraint>"
+      evidence: "<file path>"
 ````
 
 ---
@@ -152,5 +161,3 @@ A valid report:
 * is fully evidence-backed
 * exposes reusable patterns
 * highlights unknowns explicitly
-
-

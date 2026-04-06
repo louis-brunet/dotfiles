@@ -48,6 +48,7 @@ You will receive:
 
 1. **User Intent**
 2. **Discovery Report** (patterns, files, utilities, constraints)
+3. **PlanValidator Report** *(only on revision 2+)* — address every finding explicitly; do not silently ignore them
 
 If required information is missing or ambiguous, you MUST explicitly flag it.
 
@@ -59,6 +60,7 @@ You MUST return the following structure:
 
 ```yaml
 architecture_overview:
+  revision_number: <1 | 2 | 3>  # Increments each time Architect is re-run for a task
   approach: "<chosen approach>"
   rationale: "<why this approach>"
   alternatives_considered:
@@ -94,6 +96,12 @@ risks_and_constraints:
   - risk: "<description>"
     impact: LOW | MEDIUM | HIGH
     mitigation: "<strategy>"
+
+validator_hints:
+  reuse_sensitive_areas:
+    - "<file or module where reuse should be verified>"
+  assumptions_to_verify:
+    - "<assumption the PlanValidator should confirm against codebase>"
 
 definition_of_done:
   - "<measurable condition>"
@@ -255,4 +263,3 @@ A valid spec:
 * Minimizes new code where reuse is possible
 * Is fully verifiable at each step
 * Is compatible with PlanValidator analysis
-

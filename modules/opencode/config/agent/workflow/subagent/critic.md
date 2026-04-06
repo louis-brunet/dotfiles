@@ -55,5 +55,23 @@ Use this if you find a bug, a security flaw, or a significant pattern violation.
 Use this only if the code meets all the standards and the verification steps are robust.
 - **Summary:** Briefly state why the implementation is sound.
 
+# Output Format (STRICT)
+
+```yaml
+audit_report:
+  files_reviewed:
+    - "<file path>"
+
+  findings:
+    - dimension: "Architectural Integrity | Blast Radius | Security | Code Quality"
+      severity: CRITICAL | HIGH | MEDIUM | LOW
+      file: "<file path>"
+      description: "<what was found>"
+      suggested_fix: "<concrete guidance>"
+
+  verdict: APPROVED | CHANGES_REQUESTED
+  rationale: "<concise explanation>"
+```
+
 # Operational Logic
 Do not just read the diff provided by the Implementer. Use `cat` to read the files in their full context to ensure the surrounding logic still makes sense.

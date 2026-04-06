@@ -137,6 +137,14 @@ failure:
 final_status:
   status: SUCCESS | PARTIAL | FAILED
   rationale: "<concise explanation>"
+
+diff_summary:
+  files_created:
+    - "<file path>"
+  files_modified:
+    - "<file path>"
+  files_deleted:
+    - "<file path>"
 ````
 
 ---
@@ -157,4 +165,3 @@ Execution is successful ONLY if:
 * all tasks pass verification
 * no steps are skipped
 * no assumptions were made
-
