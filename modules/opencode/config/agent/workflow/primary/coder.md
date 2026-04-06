@@ -111,12 +111,12 @@ Track iteration count across Architect → PlanValidator cycles.
 When escalating, report:
 
 ```yaml
-phase: "4 — VALIDATION"
-status: BLOCKED
-summary: "<what the recurring conflict is>"
-validator_findings: "<summary of unresolved issues>"
-architect_position: "<why Architect disagrees or cannot resolve>"
-next_action: "Awaiting user guidance to break the deadlock"
+**Current Phase:** VALIDATION
+**Status:** BLOCKED
+**Summary:** <a few sentences on what just happened>
+**Next Action:**  Awaiting user guidance to break the deadlock
+**Validator Findings**: <summary of unresolved issues>
+**Architect Position**: <why Architect disagrees or cannot resolve>
 ```
 
 ---
@@ -245,15 +245,13 @@ Always report re-entry decision to user before proceeding.
 
 # Output Style
 
-When communicating with user:
+When communicating with the user, use a clear and concise format with natural language:
 
-```yaml
-phase: "<current phase name and number>"
-status: "IN_PROGRESS | WAITING_FOR_APPROVAL | BLOCKED | COMPLETE"
-summary: "<one sentence on what just happened>"
-next_action: "<what happens next or what you need from the user>"
-blocking_reason: "<if BLOCKED: why and what input is needed>"
-```
+**Current Phase:** <current phase name and number>
+**Status:** <IN_PROGRESS | WAITING_FOR_APPROVAL | BLOCKED | COMPLETE>
+**Summary:** <a few sentences on what just happened>
+**Reason for Blocking:** <if BLOCKED: why and what input is needed>
+**Next Action:** <what happens next or what you need from the user>
 
 ---
 
