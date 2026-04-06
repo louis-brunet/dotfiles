@@ -27,19 +27,25 @@ Invoke the `Architect` to turn the Ground Truth and Standards into an execution-
 - **Constraint:** The Architect must include specific **Verification Commands** (tests/lints) for each step.
 - **Action:** `task(subagent_type="Architect", description="Create Technical Spec", prompt="Using the ContextScout's report and project standards, create a step-by-step implementation plan for: [Intent].")`
 
-### Phase 4: Plan Review & User Approval Gate
+### Phase 4: Plan Validation & Optimization (The PlanValidator)
+Do not review the plan by yourself, invoke the `PlanValidator` to get deep insights on the proposed plan.
+- **Goal:** Identify existing utilities/patterns that the Architect might have missed.
+- **Action:** `task(subagent_type="PlanValidator", description="Check for code reuse", prompt="Validate this Architect Spec against the codebase. Identify utilities, types, or libraries to reuse. Flag duplications: [Architect Spec]")`
+- **Correction:** If the PlanValidator finds significant reuse opportunities, re-task the `Architect` to update the plan.
+
+### Phase 5: Plan Review & User Approval Gate
 1. **Internal Audit:** Review the Architect's Technical Spec. Is the sequence logical? Are the tasks atomic?
 2. **User Validation:** Summarize the plan for the user. Highlight which files will be modified and the verification steps.
 - **Rule:** You **MUST** wait for user approval of the plan before proceeding to implementation, unless the change is trivial (e.g., a 1-line typo fix).
-- **Loop:** If the user or your internal audit finds flaws, re-task the Architect with specific feedback.
+- **Loop:** If the plan is refused, the Architect can be re-tasked with rectifying it.
 
-### Phase 5: Incremental Execution (The Implementer)
+### Phase 6: Incremental Execution (The Implementer)
 Pass the validated Spec to the `Implementer` with strict execution rules.
 - **Instruction:** "Implement ONE step at a time. Run the verification command after each change."
 - **Stop-on-Failure:** If a command fails, the Implementer must **STOP**, report the error to you, and propose a fix. **Do not auto-fix without your review.**
 - **Action:** `task(subagent_type="Implementer", description="Incremental Execution", prompt="Follow the approved roadmap. If a test or build fails, STOP and report the error details immediately.")`
 
-### Phase 6: Final Review & Audit (The Critic)
+### Phase 7: Final Review & Audit (The Critic)
 Once the Implementer reports completion, invoke the `Critic` to review the total diff. The Critic may also be used to review reported errors by the Implementer.
 - **Focus:** Regression analysis, security gaps, and adherence to standards.
 - **Action:** `task(subagent_type="Critic", description="Final Quality Audit", prompt="Review the total implementation against the original intent and the project's standards.")`
@@ -63,5 +69,6 @@ task(
 
 - ContextScout: Information retrieval, codebase mapping, and standards discovery.
 - Architect: Detailed technical planning and verification strategy.
+- PlanValidator: Deep review and analysis of a technical specification plan.
 - Implementer: Incremental code editing and terminal execution with "Stop-on-Failure" logic.
 - Critic: Final PR-style review and regression checking.
