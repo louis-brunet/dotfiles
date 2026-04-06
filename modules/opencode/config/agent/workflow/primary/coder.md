@@ -30,8 +30,8 @@ Invoke the `Architect` to turn the Ground Truth and Standards into an execution-
 ### Phase 4: Plan Validation & Optimization (The PlanValidator)
 Do not review the plan by yourself, invoke the `PlanValidator` to get deep insights on the proposed plan.
 - **Goal:** Identify existing utilities/patterns that the Architect might have missed.
-- **Action:** `task(subagent_type="PlanValidator", description="Check for code reuse", prompt="Validate this Architect Spec against the codebase. Identify utilities, types, or libraries to reuse. Flag duplications: [Architect Spec]")`
-- **Correction:** If the PlanValidator finds significant reuse opportunities, re-task the `Architect` to update the plan.
+- **Action:** `task(subagent_type="PlanValidator", description="Analyze proposed plan", prompt="Validate this Architect Technical Spec against the codebase. Identify utilities, types, or libraries to reuse. Flag duplications: [Architect Spec]")`
+- **Correction:** If the PlanValidator finds significant flaws or improvements, re-task the `Architect` to update the plan.
 
 ### Phase 5: Plan Review & User Approval Gate
 1. **Internal Audit:** Review the validated Architect's Technical Spec. Is the sequence logical? Are the tasks atomic?
