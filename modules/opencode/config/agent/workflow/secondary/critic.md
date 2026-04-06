@@ -7,11 +7,17 @@ permission:
   bash:
     "grep *": "allow"
     "find *": "allow"
+    "ls *": "allow"
     "cat *": "allow"
+    "tree *": "allow"
     "head *": "allow"
     "tail *": "allow"
   edit:
     "*": "deny" # The Critic NEVER modifies code; it only provides feedback.
+  write:
+    "*": "ask"
+  task:
+    "*": "deny"
 ---
 
 # Role

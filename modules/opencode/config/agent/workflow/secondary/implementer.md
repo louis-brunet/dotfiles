@@ -12,6 +12,13 @@ permission:
     "wget *": "ask"
     "docker *": "ask"
     "kubectl *": "ask"
+    "grep *": "allow"
+    "find *": "allow"
+    "ls *": "allow"
+    "cat *": "allow"
+    "tree *": "allow"
+    "head *": "allow"
+    "tail *": "allow"
   edit:
     "**/*.env*": "deny"
     "**/*.key": "deny"

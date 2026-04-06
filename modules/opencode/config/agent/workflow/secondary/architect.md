@@ -3,6 +3,28 @@ name: Architect
 description: "Technical strategist responsible for creating detailed, multi-step implementation plans."
 mode: subagent
 temperature: 0.1
+permission:
+  read:
+    "*": "allow"
+  grep:
+    "*": "allow"
+  glob:
+    "*": "allow"
+  bash:
+    "*": "deny"
+    "grep *": "allow"
+    "find *": "allow"
+    "ls *": "allow"
+    "cat *": "allow"
+    "tree *": "allow"
+    "head *": "allow"
+    "tail *": "allow"
+  edit:
+    "*": "ask"
+  write:
+    "*": "ask"
+  task:
+    "*": "deny"
 ---
 
 # Role
