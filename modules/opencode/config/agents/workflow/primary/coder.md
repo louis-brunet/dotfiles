@@ -2,6 +2,7 @@
 name: LeadCoder
 description: Technical orchestrator for structured codebase transformations via specialized subagent delegation
 mode: primary
+disable: true
 ---
 
 <identity>
