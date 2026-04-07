@@ -5,6 +5,31 @@
   "share": "disabled",
   "autoupdate": "notify",
   "disabled_providers": [],
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "grep *": "allow",
+      "find *": "allow",
+      "ls *": "allow",
+      "cat *": "allow",
+      "tree *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "git *": "ask",
+      "git status": "allow",
+      "git log *": "allow",
+      "sudo *": "deny"
+    },
+    "edit": {
+      "**/*.env": "ask",
+      "**/package.json": "ask",
+      "**/pyproject.toml": "ask",
+      "**/node_modules/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/*.pyc": "deny",
+      ".git/**": "deny"
+    }
+  },
   "plugin": [
     "cc-safety-net"
     // "@spoons-and-mirrors/subtask2@latest"
@@ -12,24 +37,16 @@
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["npx", "-y","@upstash/context7-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
       "environment": {}
     }
   },
   "provider": {
-    // "ollama": {
-    //   "npm": "@ai-sdk/openai-compatible",
-    //   "options": {
-    //     "baseURL": "http://localhost:11434/v1"
-    //   },
-    //   "models": {
-    //     "llama3.1:8b": {}
-    //   }
-    // }
   },
   "agent": {
-    // "leadcoder": {
-    //   "disable": true
-    // }
   }
 }

@@ -10,6 +10,7 @@ temperature: 0.0
 
 permission:
   bash:
+    "*": "ask"
     "grep *": "allow"
     "find *": "allow"
     "ls *": "allow"
@@ -17,12 +18,13 @@ permission:
     "tree *": "allow"
     "head *": "allow"
     "tail *": "allow"
+
   edit:
-    "*": "ask"
-  write:
     "*": "ask"
   task:
     "*": "deny"
+
+disable: true
 ---
 
 <identity>

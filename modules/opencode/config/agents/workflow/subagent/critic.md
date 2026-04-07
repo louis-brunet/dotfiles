@@ -5,6 +5,7 @@ mode: subagent
 temperature: 0.1
 permission:
   bash:
+    "*": "ask"
     "grep *": "allow"
     "find *": "allow"
     "ls *": "allow"
@@ -23,10 +24,10 @@ permission:
     "bundle exec rspec *": "allow"
   edit:
     "*": "deny"
-  write:
-    "*": "ask"
   task:
     "*": "deny"
+
+disable: true
 ---
 
 <identity>

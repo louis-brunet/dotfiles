@@ -2,6 +2,18 @@
 name: LeadCoder
 description: Technical orchestrator for structured codebase transformations via specialized subagent delegation
 mode: primary
+
+permission:
+  bash:
+    "*": "ask"
+    "grep *": "allow"
+    "find *": "allow"
+    "ls *": "allow"
+    "cat *": "allow"
+    "tree *": "allow"
+    "head *": "allow"
+    "tail *": "allow"
+
 disable: true
 ---
 
