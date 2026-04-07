@@ -9,7 +9,7 @@ echo "Installing base system dependencies (macOS)..."
 # Check if requirements are already met
 if command -v git &> /dev/null && command -v curl &> /dev/null; then
     echo "✅ git and curl already available"
-    
+
     if command -v make &> /dev/null; then
         echo "✅ build tools already available"
     else
