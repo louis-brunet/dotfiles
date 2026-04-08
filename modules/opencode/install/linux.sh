@@ -11,3 +11,11 @@ else
     echo "❌ could not install opencode"
     exit 1
 fi
+
+if npm install -g ts-node && ts_node_version=$(npx ts-node --version); then
+    echo "✅ installed ts-node $ts_node_version for OpenCode"
+else
+    echo "❌ could not install ts-node (OpenCode)"
+    exit 1
+fi
+
