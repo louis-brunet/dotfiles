@@ -15,9 +15,33 @@
       "tree *": "allow",
       "head *": "allow",
       "tail *": "allow",
+      "echo *": "allow",
+      "pwd": "allow",
+      "which *": "allow",
+      "whoami": "allow",
+      "wc *": "allow",
+      "diff *": "allow",
+      "sort *": "allow",
+      "uniq *": "allow",
+      "cut *": "allow",
+      "jq *": "allow",
+      "date *": "allow",
+      "npx tsc *": "allow",
+      "npm run build *": "allow",
+      "npm run test *": "allow",
+      "yarn run build *": "allow",
+      "yarn run test *": "allow",
+      "rm *": "ask",
       "git *": "ask",
+      "git diff *": "allow", // safe read
+      "git show *": "allow",
       "git status": "allow",
       "git log *": "allow",
+      "git stash *": "ask",
+      "git push *": "ask", // currently falls through to "git *": ask
+      "git rebase *": "ask",
+      "git reset *": "ask",
+      "git checkout *": "ask",
       "sudo *": "deny"
     },
     "edit": {
@@ -27,8 +51,12 @@
       "**/node_modules/**": "deny",
       "**/__pycache__/**": "deny",
       "**/*.pyc": "deny",
-      ".git/**": "deny"
-    }
+      ".git/**": "deny",
+      "**/dist/**": "deny",
+      "**/build/**": "deny"
+    },
+    "external_directory": "ask",
+    "doom_loop": "ask"
   },
   "plugin": [
     "cc-safety-net"
@@ -45,8 +73,6 @@
       "environment": {}
     }
   },
-  "provider": {
-  },
-  "agent": {
-  }
+  "provider": {},
+  "agent": {}
 }
