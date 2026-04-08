@@ -33,12 +33,12 @@
       "yarn run test *": "allow",
       "rm *": "ask",
       "git *": "ask",
-      "git diff *": "allow", // safe read
+      "git diff *": "allow",
       "git show *": "allow",
       "git status": "allow",
       "git log *": "allow",
       "git stash *": "ask",
-      "git push *": "ask", // currently falls through to "git *": ask
+      "git push *": "ask",
       "git rebase *": "ask",
       "git reset *": "ask",
       "git checkout *": "ask",
