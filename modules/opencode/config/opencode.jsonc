@@ -33,6 +33,7 @@
       "yarn run build *": "allow",
       "yarn run test *": "allow",
       "yarn test *": "allow",
+      "yarn build *": "allow",
       "rm *": "ask",
       "git *": "ask",
       "git diff *": "allow",

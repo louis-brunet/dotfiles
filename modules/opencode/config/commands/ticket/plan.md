@@ -41,7 +41,7 @@ description: Interactive wizard to create structured implementation plans with u
     Plans MUST reference a target ticket (existing in .planning/tickets/ or new)
   </rule>
   <rule id="unique_id">
-    Plan filename MUST be unique: `plan-{target-slug}-{YYYYMMDD}-{seq}.md`
+    Plan filename MUST be unique: `plan-{target-slug}-{YYYY-MM-DD}-{seq}.md`
   </rule>
 </critical_rules>
 
@@ -98,7 +98,7 @@ Create structured implementation plans that analyze problems, propose approaches
 ```
 /ticket/plan Add JWT authentication for secure user login
 /ticket/plan Fix the login redirect loop on /dashboard
-/ticket/plan .planning/tickets/feature-user-auth-20260409.md
+/ticket/plan .planning/tickets/feature-user-auth-2026-04-09.md
 ```
 
 **Without input**: Agent scans for incomplete tickets, asks user to confirm target
@@ -126,7 +126,7 @@ Create structured implementation plans that analyze problems, propose approaches
 ```bash
 /ticket/plan                 # Agent scans for pending tickets → you select → plan created
 /ticket/plan Add JWT auth   # Agent analyzes problem → shows options → you select → plan created
-/ticket/plan feature-jwt-auth-20260409.md  # Agent loads ticket → analyzes → plan created
+/ticket/plan feature-jwt-auth-2026-04-09.md  # Agent loads ticket → analyzes → plan created
 ```
 
 ---
@@ -178,9 +178,9 @@ The agent searches to build context — user does not see this:
 Select a ticket to plan:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. feature-user-auth-20260401.md   | feature | pending
-2. bug-login-redirect-20260405.md  | bug     | pending
-3. refactor-api-endpoints-20260408.md | refactor | in_progress
+1. feature-user-auth-2026-04-01.md   | feature | pending
+2. bug-login-redirect-2026-04-05.md  | bug     | pending
+3. refactor-api-endpoints-2026-04-08.md | refactor | in_progress
 
 Select [1/2/3] or [c] to cancel:
 ```
@@ -266,17 +266,16 @@ After option selection, show complete plan:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan Preview: .planning/plans/plan-feature-jwt-auth-20260409-001.md
+Plan Preview: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
-plan:
-  id: plan-20260409-001
-  target_ticket: feature-jwt-auth-20260409
-  created: 2026-04-09
-  updated: 2026-04-09
-  approach: option-2
-  status: pending
+id: plan-2026-04-09-001
+target_ticket: feature-jwt-auth-2026-04-09
+created: 2026-04-09
+updated: 2026-04-09
+approach: option-2
+status: pending
 ---
 
 # Implementation Plan: Add JWT Authentication
@@ -354,7 +353,7 @@ npm test -- auth
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this plan?** (.planning/plans/plan-feature-jwt-auth-20260409-001.md) [y/n/comments]:
+**Create this plan?** (.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md) [y/n/comments]:
 ```
 
 **REQUIRE USER APPROVAL** (@user_approval)
@@ -371,7 +370,7 @@ On confirm: write the plan file to `.planning/plans/`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 File created:
-  .planning/plans/plan-feature-jwt-auth-20260409-001.md
+  .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 
 Target: feature-jwt-auth
 Approach: Robust Approach (Option 2)
@@ -394,9 +393,9 @@ mkdir -p .planning/plans
 `plan-{target-ticket-filename}-{seq}.md`
 
 Examples:
-- `plan-feature-jwt-auth-20260409-001.md`
-- `plan-bug-login-redirect-20260409-001.md`
-- `plan-refactor-api-20260409-002.md`
+- `plan-feature-jwt-auth-2026-04-09-001.md`
+- `plan-bug-login-redirect-2026-04-09-001.md`
+- `plan-refactor-api-2026-04-09-002.md`
 
 **Sequence**: Increment if multiple plans created for same ticket same day
 
@@ -404,13 +403,12 @@ Examples:
 
 ```yaml
 ---
-plan:
-  id: plan-{YYYYMMDD}-{seq}
-  target_ticket: {ticket-filename}
-  created: {YYYY-MM-DD}
-  updated: {YYYY-MM-DD}
-  approach: {option-id}
-  status: {pending|in_progress|completed|blocked}
+id: plan-{YYYYMMDD}-{seq}
+target_ticket: {ticket-filename}
+created: {YYYY-MM-DD}
+updated: {YYYY-MM-DD}
+approach: {option-id}
+status: {pending|in_progress|completed|blocked}
 ---
 ```
 
@@ -440,12 +438,12 @@ plan:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| plan.id | string | Yes | Unique plan identifier |
-| plan.target_ticket | string | Yes | Reference to ticket being planned |
-| plan.created | date | Yes | ISO 8601 |
-| plan.updated | date | Yes | ISO 8601, updated on plan modifications |
-| plan.status | enum | Yes | pending/in_progress/completed/blocked |
-| plan.approach | string | Yes | Selected option ID |
+| id | string | Yes | Unique plan identifier |
+| target_ticket | string | Yes | Reference to ticket being planned |
+| created | date | Yes | ISO 8601 |
+| updated | date | Yes | ISO 8601, updated on plan modifications |
+| status | enum | Yes | pending/in_progress/completed/blocked |
+| approach | string | Yes | Selected option ID |
 | analysis.problem_summary | string | Yes | 1-3 sentence overview |
 | analysis.considered_options | array | Yes | List of options analyzed |
 | considerations | array | No | Key factors to consider during implementation |
@@ -469,17 +467,16 @@ plan:
 
 # Agent analyzes → single clear approach → shows preview:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan Preview: .planning/plans/plan-feature-jwt-auth-20260409-001.md
+Plan Preview: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
-plan:
-  id: plan-20260409-001
-  target_ticket: feature-jwt-auth-20260409
-  created: 2026-04-09
-  updated: 2026-04-09
-  approach: option-1
-  status: pending
+id: plan-2026-04-09-001
+target_ticket: feature-jwt-auth-2026-04-09
+created: 2026-04-09
+updated: 2026-04-09
+approach: option-1
+status: pending
 ---
 
 # Implementation Plan: Add JWT Authentication
@@ -535,7 +532,7 @@ curl -X POST /api/auth/login -d '{"email":"test@example.com","password":"Test123
 
 **Create this plan?** [y/n/comments]: y
 
-✅ Plan created: .planning/plans/plan-feature-jwt-auth-20260409-001.md
+✅ Plan created: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ```
 
 ### Example 2: Plan without Input (Multiple Options)
@@ -548,14 +545,14 @@ curl -X POST /api/auth/login -d '{"email":"test@example.com","password":"Test123
 Select a ticket to plan:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. feature-user-auth-20260401.md   | feature | pending
-2. bug-login-redirect-20260405.md  | bug     | pending
+1. feature-user-auth-2026-04-01.md   | feature | pending
+2. bug-login-redirect-2026-04-05.md  | bug     | pending
 
 Select [1/2] or [c] to cancel: 1
 
 # Agent analyzes → multiple approaches → user selects:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Analyzed: feature-user-auth-20260401.md
+Analyzed: feature-user-auth-2026-04-01.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Option 1: Minimal - Basic JWT implementation
@@ -564,7 +561,7 @@ Option 2: Robust - JWT with refresh tokens + secure cookies
 Select [1/2]: 2
 
 # Shows plan preview, user approves
-✅ Plan created: .planning/plans/plan-feature-user-auth-20260409-001.md
+✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
 ```
 
 ### Example 2 with Validation Content:
@@ -580,11 +577,10 @@ Select [1/2]: 2
 
 # Agent shows plan preview with Validation section:
 ---
-plan:
-  id: plan-20260409-001
-  target_ticket: feature-jwt-auth-20260409
-  created: 2026-04-09
-  approach: option-2
+id: plan-2026-04-09-001
+target_ticket: feature-jwt-auth-2026-04-09
+created: 2026-04-09
+approach: option-2
 ---
 
 # Implementation Plan: User Authentication
@@ -609,7 +605,7 @@ npm test -- auth
 
 **Create this plan?** [y/n/comments]: y
 
-✅ Plan created: .planning/plans/plan-feature-user-auth-20260409-001.md
+✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
 ```
 
 ### Example 3: Plan with Comments
@@ -658,7 +654,7 @@ Choose [1/2/3]:
 **Target ticket not found**:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ticket not found: feature-unknown-20260409.md
+Ticket not found: feature-unknown-2026-04-09.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Options:
@@ -673,7 +669,7 @@ Choose [1/2/3]:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Plan already exists for this ticket:
-  📄 plan-feature-jwt-auth-20260409-001.md
+  📄 plan-feature-jwt-auth-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Options:

@@ -69,8 +69,8 @@ Execute implementation plans created by `/ticket/plan`. The command reads the pl
 
 User provides a path to a plan file:
 ```
-/ticket/implement .planning/plans/plan-feature-jwt-auth-20260409-001.md
-/ticket/implement plan-feature-jwt-auth-20260409-001.md
+/ticket/implement .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
+/ticket/implement plan-feature-jwt-auth-2026-04-09-001.md
 /ticket/implement 002   # If only one plan matches or scanning
 ```
 
@@ -97,7 +97,7 @@ User provides a path to a plan file:
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
    Please provide the full path or more details:
-   - .planning/plans/plan-xyz-20260409-001.md
+   - .planning/plans/plan-xyz-2026-04-09-001.md
    - Or use /ticket/plan to create one first
    ```
 
@@ -133,7 +133,7 @@ User provides a path to a plan file:
 Parse user input to locate the plan file:
 
 ```
-User input: ".planning/plans/plan-feature-jwt-auth-20260409-001.md"
+User input: ".planning/plans/plan-feature-jwt-auth-2026-04-09-001.md"
 → Validate: Check file exists
 → Load: Read plan content
 ```
@@ -167,13 +167,12 @@ fi
 
 **Check 2: Valid frontmatter**
 ```
-plan:
-  id: plan-...
-  target_ticket: ...
-  created: YYYY-MM-DD
-  updated: YYYY-MM-DD
-  approach: option-X
-  status: pending|in_progress|completed|blocked
+id: plan-...
+target_ticket: ...
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+approach: option-X
+status: pending|in_progress|completed|blocked
 ```
 
 **Check 3: Required sections**
@@ -215,7 +214,7 @@ Options:
 **Example progress**:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Executing: plan-feature-jwt-auth-20260409-001.md
+Executing: plan-feature-jwt-auth-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Step 1: Setup JWT library         [███░░░░░░░] 30%
@@ -236,13 +235,12 @@ After execution (or during), update the plan file to reflect actual state:
 **Update frontmatter**:
 ```yaml
 ---
-plan:
-  id: plan-20260409-001
-  target_ticket: feature-jwt-auth-20260409
-  created: 2026-04-09
-  updated: 2026-04-09
-  approach: option-2
-  status: in_progress  # or completed, blocked
+id: plan-2026-04-09-001
+target_ticket: feature-jwt-auth-2026-04-09
+created: 2026-04-09
+updated: 2026-04-09
+approach: option-2
+status: in_progress  # or completed, blocked
 ---
 ```
 
@@ -277,8 +275,8 @@ plan:
 ✅ Implementation Complete
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Plan: plan-feature-jwt-auth-20260409-001.md
-Target: feature-jwt-auth-20260409
+Plan: plan-feature-jwt-auth-2026-04-09-001.md
+Target: feature-jwt-auth-2026-04-09
 Status: completed
 Updated: 2026-04-09
 
@@ -286,7 +284,7 @@ Steps completed: 4/4
 
 Next steps:
 - Run tests to verify implementation
-- Update ticket status: /ticket/update feature-jwt-auth-20260409.md status=in_progress
+- Update ticket status: /ticket/update feature-jwt-auth-2026-04-09.md status=in_progress
 ```
 
 ---
@@ -307,12 +305,12 @@ Next steps:
 **Plan not found**:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ Plan not found: .planning/plans/plan-unknown-20260409-001.md
+⚠️ Plan not found: .planning/plans/plan-unknown-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Available plans in .planning/plans/:
-  - plan-feature-jwt-auth-20260409-001.md (pending)
-  - plan-bug-login-redirect-20260409-001.md (in_progress)
+  - plan-feature-jwt-auth-2026-04-09-001.md (pending)
+  - plan-bug-login-redirect-2026-04-09-001.md (in_progress)
 
 Options:
   1. Select from available plans
