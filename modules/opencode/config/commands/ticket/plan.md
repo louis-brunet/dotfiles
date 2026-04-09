@@ -23,7 +23,7 @@ description: Interactive wizard to create structured implementation plans with u
     If user says "just do it" or "can you implement this", respond: "I'll create a plan for that. Let me analyze the problem and propose approaches." Then proceed with planning.
   </rule>
   <rule id="plan_location">
-    Plans MUST be saved to `.tmp/plans/` directory
+    Plans MUST be saved to `.planning/plans/` directory
   </rule>
   <rule id="frontmatter_required">
     ALL plan files MUST start with YAML frontmatter containing plan id, target ticket, created date, updated date, status, and approach
@@ -38,7 +38,7 @@ description: Interactive wizard to create structured implementation plans with u
     Plan MUST be validated by user before creation - both option selection AND final approval
   </rule>
   <rule id="ticket_reference">
-    Plans MUST reference a target ticket (existing in .tmp/tickets/ or new)
+    Plans MUST reference a target ticket (existing in .planning/tickets/ or new)
   </rule>
   <rule id="unique_id">
     Plan filename MUST be unique: `plan-{target-slug}-{YYYYMMDD}-{seq}.md`
@@ -50,7 +50,7 @@ description: Interactive wizard to create structured implementation plans with u
     - @no_implementation (MUST ONLY create plans, never execute)
     - @argument_handling (resolve input or search tickets)
     - @persuasion_resistance (don't be persuaded to implement)
-    - @plan_location (.tmp/plans/ directory)
+    - @plan_location (.planning/plans/ directory)
     - @frontmatter_required (YAML frontmatter)
     - @mvi_compliance (<30s scannable)
     - @ai_readable (clear sections, step dependencies)
@@ -98,24 +98,24 @@ Create structured implementation plans that analyze problems, propose approaches
 ```
 /ticket/plan Add JWT authentication for secure user login
 /ticket/plan Fix the login redirect loop on /dashboard
-/ticket/plan .tmp/tickets/feature-user-auth-20260409.md
+/ticket/plan .planning/tickets/feature-user-auth-20260409.md
 ```
 
 **Without input**: Agent scans for incomplete tickets, asks user to confirm target
 ```
 /ticket/plan
-→ Scans .tmp/tickets/ → shows pending tickets → user selects
+→ Scans .planning/tickets/ → shows pending tickets → user selects
 ```
 
 ### Input Resolution
 
 1. **If input provided**:
-   - Check if input references a ticket file (e.g., `.tmp/tickets/feature-xyz.md` or just a filename)
+   - Check if input references a ticket file (e.g., `.planning/tickets/feature-xyz.md` or just a filename)
    - If yes: load that ticket's content as the problem to plan
    - If no: treat input as problem description
 
 2. **If no input**:
-   - Scan `.tmp/tickets/` for tickets with status ≠ completed
+   - Scan `.planning/tickets/` for tickets with status ≠ completed
    - Present list to user for confirmation
    - Use confirmed ticket as the problem to plan
 
@@ -136,14 +136,14 @@ Create structured implementation plans that analyze problems, propose approaches
 **Run**: `/ticket/plan`
 
 **What happens**:
-1. **Input resolution**: If no input, scan `.tmp/tickets/` for pending tickets → user confirms target
+1. **Input resolution**: If no input, scan `.planning/tickets/` for pending tickets → user confirms target
 2. **Analysis**: Agent analyzes the problem and generates implementation options
-3. **Option presentation**: 
+3. **Option presentation**:
    - Simple problems: single approach → proceed to validation
    - Complex problems: multiple options → user selects
 4. **Plan preview**: Show structured plan for final approval
 5. **User validates**: `[y/n/comments]` - confirm plan creation
-6. **Write plan**: On approval, write to `.tmp/plans/`
+6. **Write plan**: On approval, write to `.planning/plans/`
 
 ---
 
@@ -153,10 +153,10 @@ Create structured implementation plans that analyze problems, propose approaches
 
 The agent searches to build context — user does not see this:
 
-- **Check**: `.tmp/tickets/*.md` for the target ticket (if referencing)
+- **Check**: `.planning/tickets/*.md` for the target ticket (if referencing)
 - **Check**: Related source files for scope understanding
 - **Check**: `package.json` for tech stack
-- **Check**: Existing plans in `.tmp/plans/` to avoid duplication
+- **Check**: Existing plans in `.planning/plans/` to avoid duplication
 
 **Use findings** to build accurate analysis — don't guess.
 
@@ -170,7 +170,7 @@ The agent searches to build context — user does not see this:
 3. If not a ticket reference: treat as problem description
 
 **If no input provided**:
-1. List all tickets in `.tmp/tickets/` with status ≠ completed
+1. List all tickets in `.planning/tickets/` with status ≠ completed
 2. Present to user for confirmation:
 
 ```
@@ -182,7 +182,7 @@ Select a ticket to plan:
 2. bug-login-redirect-20260405.md  | bug     | pending
 3. refactor-api-endpoints-20260408.md | refactor | in_progress
 
-Select [1/2/3] or [c] to cancel: 
+Select [1/2/3] or [c] to cancel:
 ```
 
 ---
@@ -224,7 +224,7 @@ Analyzed: Add JWT authentication
 
 Approach: JWT with refresh tokens, httpOnly cookies
 
-**Proceed with this approach?** [y/n/comments]: 
+**Proceed with this approach?** [y/n/comments]:
 ```
 
 **Multiple options** (complex problem):
@@ -253,7 +253,7 @@ Option 3: Hybrid Approach
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Select an approach [1/2/3] or [c] to cancel: 
+Select an approach [1/2/3] or [c] to cancel:
 ```
 
 **On user selection**, proceed to Stage 4.
@@ -266,7 +266,7 @@ After option selection, show complete plan:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan Preview: .tmp/plans/plan-feature-jwt-auth-20260409-001.md
+Plan Preview: .planning/plans/plan-feature-jwt-auth-20260409-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -354,12 +354,12 @@ npm test -- auth
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this plan?** (.tmp/plans/plan-feature-jwt-auth-20260409-001.md) [y/n/comments]:
+**Create this plan?** (.planning/plans/plan-feature-jwt-auth-20260409-001.md) [y/n/comments]:
 ```
 
 **REQUIRE USER APPROVAL** (@user_approval)
 
-On confirm: write the plan file to `.tmp/plans/`
+On confirm: write the plan file to `.planning/plans/`
 
 ---
 
@@ -371,7 +371,7 @@ On confirm: write the plan file to `.tmp/plans/`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 File created:
-  .tmp/plans/plan-feature-jwt-auth-20260409-001.md
+  .planning/plans/plan-feature-jwt-auth-20260409-001.md
 
 Target: feature-jwt-auth
 Approach: Robust Approach (Option 2)
@@ -384,9 +384,9 @@ Steps: 4
 
 ### Plan Directory
 
-Ensure `.tmp/plans/` exists:
+Ensure `.planning/plans/` exists:
 ```bash
-mkdir -p .tmp/plans
+mkdir -p .planning/plans
 ```
 
 ### Plan Filename Format
@@ -469,7 +469,7 @@ plan:
 
 # Agent analyzes → single clear approach → shows preview:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan Preview: .tmp/plans/plan-feature-jwt-auth-20260409-001.md
+Plan Preview: .planning/plans/plan-feature-jwt-auth-20260409-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -535,7 +535,7 @@ curl -X POST /api/auth/login -d '{"email":"test@example.com","password":"Test123
 
 **Create this plan?** [y/n/comments]: y
 
-✅ Plan created: .tmp/plans/plan-feature-jwt-auth-20260409-001.md
+✅ Plan created: .planning/plans/plan-feature-jwt-auth-20260409-001.md
 ```
 
 ### Example 2: Plan without Input (Multiple Options)
@@ -564,7 +564,7 @@ Option 2: Robust - JWT with refresh tokens + secure cookies
 Select [1/2]: 2
 
 # Shows plan preview, user approves
-✅ Plan created: .tmp/plans/plan-feature-user-auth-20260409-001.md
+✅ Plan created: .planning/plans/plan-feature-user-auth-20260409-001.md
 ```
 
 ### Example 2 with Validation Content:
@@ -609,7 +609,7 @@ npm test -- auth
 
 **Create this plan?** [y/n/comments]: y
 
-✅ Plan created: .tmp/plans/plan-feature-user-auth-20260409-001.md
+✅ Plan created: .planning/plans/plan-feature-user-auth-20260409-001.md
 ```
 
 ### Example 3: Plan with Comments
@@ -632,7 +632,7 @@ Select [1/2/3]: 1
 # Re-shows preview for approval
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this plan?** (.tmp/plans/plan-...) [y/n/comments]: y
+**Create this plan?** (.planning/plans/plan-...) [y/n/comments]: y
 
 ✅ Plan created!
 ```
@@ -644,7 +644,7 @@ Select [1/2/3]: 1
 **No pending tickets found**:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-No incomplete tickets found in .tmp/tickets/
+No incomplete tickets found in .planning/tickets/
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Options:
@@ -652,7 +652,7 @@ Options:
   2. List all tickets
   3. Cancel
 
-Choose [1/2/3]: 
+Choose [1/2/3]:
 ```
 
 **Target ticket not found**:
@@ -666,7 +666,7 @@ Options:
   2. Create new ticket
   3. Cancel
 
-Choose [1/2/3]: 
+Choose [1/2/3]:
 ```
 
 **Plan already exists for ticket**:
@@ -682,7 +682,7 @@ Options:
   3. View existing plan
   4. Cancel
 
-Choose [1/2/3/4]: 
+Choose [1/2/3/4]:
 ```
 
 ---
@@ -723,7 +723,7 @@ Choose [1/2/3/4]:
 - [ ] User selected approach (if multiple)?
 - [ ] Plan preview shown to user?
 - [ ] User validated final plan before creation?
-- [ ] Plan written to .tmp/plans/?
+- [ ] Plan written to .planning/plans/?
 - [ ] Plan includes risks and mitigations?
 - [ ] Plan is AI-agent readable with clear steps?
 - [ ] Plan includes Validation section with success criteria?

@@ -1,5 +1,5 @@
 ---
-description: Execute implementation plans from .tmp/plans/ directory
+description: Execute implementation plans from .planning/plans/ directory
 ---
 
 <context>
@@ -14,7 +14,7 @@ description: Execute implementation plans from .tmp/plans/ directory
 
 <critical_rules priority="absolute" enforcement="strict">
   <rule id="plan_location">
-    Plans are stored in `.tmp/plans/` directory
+    Plans are stored in `.planning/plans/` directory
   </rule>
   <rule id="input_resolution">
     If input is unclear, ask user for clarification (not the plan file path)
@@ -34,7 +34,7 @@ description: Execute implementation plans from .tmp/plans/ directory
   <tier level="1" desc="Command Boundaries">
     - @validate_first (verify plan exists and valid before proceeding)
     - @input_resolution (ask for clarification if path unclear)
-    - @plan_location (.tmp/plans/ directory)
+    - @plan_location (.planning/plans/ directory)
     - @status_tracking (update status in plan file)
     - @plan_up_to_date (reflect actual implementation state)
   </tier>
@@ -69,25 +69,25 @@ Execute implementation plans created by `/ticket/plan`. The command reads the pl
 
 User provides a path to a plan file:
 ```
-/ticket/implement .tmp/plans/plan-feature-jwt-auth-20260409-001.md
+/ticket/implement .planning/plans/plan-feature-jwt-auth-20260409-001.md
 /ticket/implement plan-feature-jwt-auth-20260409-001.md
 /ticket/implement 002   # If only one plan matches or scanning
 ```
 
 ### Input Resolution
 
-1. **Full path provided** (e.g., `.tmp/plans/plan-xyz.md`):
+1. **Full path provided** (e.g., `.planning/plans/plan-xyz.md`):
    - Validate file exists
    - Load plan
 
 2. **Partial/relative path** (e.g., `plan-xyz.md`):
-   - Search in `.tmp/plans/` for matching plan
+   - Search in `.planning/plans/` for matching plan
    - If unique match: use it
    - If multiple matches: ask user to clarify
    - If not found: ask user for clarification
 
 3. **No input provided**:
-   - Scan `.tmp/plans/` for plans with status = pending or in_progress
+   - Scan `.planning/plans/` for plans with status = pending or in_progress
    - Present list for user selection
 
 4. **If unclear**:
@@ -95,9 +95,9 @@ User provides a path to a plan file:
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    Could not find plan: "plan-xyz"
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
+
    Please provide the full path or more details:
-   - .tmp/plans/plan-xyz-20260409-001.md
+   - .planning/plans/plan-xyz-20260409-001.md
    - Or use /ticket/plan to create one first
    ```
 
@@ -107,15 +107,15 @@ User provides a path to a plan file:
 
 ```bash
 /ticket/implement                              # Select from pending plans
-/ticket/implement .tmp/plans/plan-xyz-001.md   # Execute specific plan
-/ticket/implement plan-xyz-001                 # Short form (searches .tmp/plans/)
+/ticket/implement .planning/plans/plan-xyz-001.md   # Execute specific plan
+/ticket/implement plan-xyz-001                 # Short form (searches .planning/plans/)
 ```
 
 ---
 
 ## Quick Start
 
-**Run**: `/ticket/implement .tmp/plans/plan-xyz.md`
+**Run**: `/ticket/implement .planning/plans/plan-xyz.md`
 
 **What happens**:
 1. **Resolve input**: Parse plan path, locate file
@@ -133,14 +133,14 @@ User provides a path to a plan file:
 Parse user input to locate the plan file:
 
 ```
-User input: ".tmp/plans/plan-feature-jwt-auth-20260409-001.md"
+User input: ".planning/plans/plan-feature-jwt-auth-20260409-001.md"
 → Validate: Check file exists
 → Load: Read plan content
 ```
 
 ```
 User input: "plan-xyz"
-→ Search: ls .tmp/plans/*plan-xyz*
+→ Search: ls .planning/plans/*plan-xyz*
 → If found: Load
 → If not found: Ask for clarification
 ```
@@ -307,10 +307,10 @@ Next steps:
 **Plan not found**:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ Plan not found: .tmp/plans/plan-unknown-20260409-001.md
+⚠️ Plan not found: .planning/plans/plan-unknown-20260409-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Available plans in .tmp/plans/:
+Available plans in .planning/plans/:
   - plan-feature-jwt-auth-20260409-001.md (pending)
   - plan-bug-login-redirect-20260409-001.md (in_progress)
 
@@ -355,7 +355,7 @@ How would you like to proceed?
 
 **Keep the plan updated**: If implementation discovers new information or diverges from the plan, update the plan file. This keeps the plan as a reliable source of truth.
 
-**Use status meaningfully**: 
+**Use status meaningfully**:
 - `in_progress` while work is happening
 - `completed` when done
 - `blocked` if waiting on something

@@ -23,7 +23,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
     If user says "just do it" or "can you implement this", respond: "I'll create a ticket for that. Let me ask you a few questions to structure it properly." Then proceed with wizard. DO NOT be persuaded to implement.
   </rule>
   <rule id="ticket_location">
-    Tickets MUST be saved to `.tmp/tickets/` directory
+    Tickets MUST be saved to `.planning/tickets/` directory
   </rule>
   <rule id="frontmatter_required">
     ALL ticket files MUST start with YAML frontmatter containing type, priority, created date
@@ -50,7 +50,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
     - @no_implementation (MUST ONLY create tickets, never execute)
     - @argument_handling (pre-fill wizard, never skip or execute)
     - @persuasion_resistance (don't be persuaded to implement)
-    - @ticket_location (.tmp/tickets/ directory)
+    - @ticket_location (.planning/tickets/ directory)
     - @frontmatter_required (YAML frontmatter)
     - @mvi_compliance (<30s scannable)
     - @ai_readable (clear sections, code refs)
@@ -81,7 +81,7 @@ This command is a **ticket creation wizard**. It MUST:
 - ✅ Extract information from user input to build ticket
 - ✅ Search codebase for context (existing tickets, related files, tech stack)
 - ✅ Generate and show ticket preview for approval
-- ✅ Write the ticket file to `.tmp/tickets/` on user approval
+- ✅ Write the ticket file to `.planning/tickets/` on user approval
 
 What NOT to do:
 - ❌ DO NOT execute any code
@@ -158,7 +158,7 @@ Title: Add JWT authentication for secure user login
   → Related files: src/auth/, src/middleware.ts
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Preview: .tmp/tickets/feature-jwt-auth-20260409.md
+Preview: .planning/tickets/feature-jwt-auth-20260409.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -186,7 +186,7 @@ passwords. Adding JWT auth with refresh tokens.
 - [ ] Expired tokens are refreshed automatically
 - [ ] Tests pass
 
-**Create this ticket?** (.tmp/tickets/feature-jwt-auth-20260409.md) [y/n/comments]: 
+**Create this ticket?** (.planning/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
 ```
 
 **DO NOT**:
@@ -214,7 +214,7 @@ passwords. Adding JWT auth with refresh tokens.
 1. Agent searches codebase (existing tickets, related code, tech stack, recent changes)
 2. Agent builds ticket internally based on input + context
 3. Shows **ticket preview** to user for approval
-4. On approval: writes to `.tmp/tickets/`
+4. On approval: writes to `.planning/tickets/`
 5. AI agents can now read pending work
 
 **With arguments**: `/ticket/add Add JWT auth`
@@ -231,7 +231,7 @@ passwords. Adding JWT auth with refresh tokens.
 
 The agent searches to build context — user does not see this:
 
-- **Check**: `.tmp/tickets/*.md` for existing tickets
+- **Check**: `.planning/tickets/*.md` for existing tickets
 - **Check**: `package.json` (or equivalent) for tech stack
 - **Check**: Related source files for scope
 - **Check**: `git log --oneline -10` for recent changes
@@ -242,7 +242,7 @@ The agent searches to build context — user does not see this:
 
 ### Stage 1: Check for Related Existing Tickets
 
-**Check: `.tmp/tickets/` directory for related existing open tickets**
+**Check: `.planning/tickets/` directory for related existing open tickets**
 
 **If tickets exist**, ask for user input:
 
@@ -252,7 +252,7 @@ Found existing tickets!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Related open tickets:
-  📄 feature-user-auth-20260115.md      | feature | pending    
+  📄 feature-user-auth-20260115.md      | feature | pending
   📄 bug-login-redirect-20260120.md     | bug     | in_progress
 
 Options:
@@ -261,7 +261,7 @@ Options:
   3. List all tickets
   4. Cancel
 
-Choose [1/2/3/4]: 
+Choose [1/2/3/4]:
 ```
 
 Otherwise, **if no tickets**:
@@ -278,7 +278,7 @@ No existing tickets. Let's create one!
 
 The agent searches codebase and builds ticket — user sees only the result:
 
-- Check: `.tmp/tickets/*.md` for existing tickets
+- Check: `.planning/tickets/*.md` for existing tickets
 - Check: `package.json` for tech stack
 - Check: Related source files for scope
 - Check: `git log --oneline -10` for recent changes
@@ -295,7 +295,7 @@ The agent searches codebase and builds ticket — user sees only the result:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Preview: .tmp/tickets/feature-jwt-auth-20260409.md
+Preview: .planning/tickets/feature-jwt-auth-20260409.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -325,12 +325,12 @@ Adding JWT auth with refresh tokens.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this ticket?** (.tmp/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
+**Create this ticket?** (.planning/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
 ```
 
 **REQUIRE USER APPROVAL** (@user_approval)
 
-On confirm: write the ticket file to `.tmp/tickets/`
+On confirm: write the ticket file to `.planning/tickets/`
 
 ---
 
@@ -342,7 +342,7 @@ On confirm: write the ticket file to `.tmp/tickets/`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 File created:
-  .tmp/tickets/feature-jwt-auth-20260129.md
+  .planning/tickets/feature-jwt-auth-20260129.md
 
 Title: Add JWT authentication for secure user login
 Type: feature
@@ -356,7 +356,7 @@ Status: pending (open)
 ### Codebase Search (Stage 0)
 
 **Process**:
-1. List existing tickets: `ls .tmp/tickets/*.md 2>/dev/null`
+1. List existing tickets: `ls .planning/tickets/*.md 2>/dev/null`
 2. Parse ticket metadata (type, status, date)
 3. Detect tech stack: `cat package.json | grep -A5 '"dependencies"'`
 4. Find related files: `glob src/**/*.{ts,tsx} | head -20`
@@ -385,7 +385,7 @@ priority: {critical|high|medium|low}
 complexity: {sm|md|lg|xl}
 status: {pending|in_progress|completed|blocked}
 created: {YYYY-MM-DD}
-related_tickets: 
+related_tickets:
   - ...
 ---
 ```
@@ -430,7 +430,7 @@ related_tickets:
 
 # Agent searches codebase, builds ticket, shows preview:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Preview: .tmp/tickets/feature-jwt-auth-20260409.md
+Preview: .planning/tickets/feature-jwt-auth-20260409.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -460,9 +460,9 @@ Adding JWT auth with refresh tokens.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this ticket?** (.tmp/tickets/feature-jwt-auth-20260409.md) [y/n/comments]: 
+**Create this ticket?** (.planning/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
 
-✅ Created: .tmp/tickets/feature-jwt-auth-20260409.md
+✅ Created: .planning/tickets/feature-jwt-auth-20260409.md
 ```
 
 ### Example 2: Create Bug Ticket
@@ -472,7 +472,7 @@ Adding JWT auth with refresh tokens.
 # Agent searches, builds ticket, shows preview:
 # User approves → file created
 
-✅ Created: .tmp/tickets/bug-login-redirect-20260409.md
+✅ Created: .planning/tickets/bug-login-redirect-20260409.md
 ```
 
 ---
@@ -489,7 +489,7 @@ Options:
   2. Update existing
   3. Cancel
 
-Choose [1/2/3]: 
+Choose [1/2/3]:
 ```
 
 ---
@@ -500,9 +500,9 @@ Choose [1/2/3]:
 
 **Write for AI**: Use clear language, code references, specific acceptance criteria. AI agents will read this!
 
-**Use Priority Wisely**: 
+**Use Priority Wisely**:
 - critical = Blocker, must fix
-- high = Important, planned soon  
+- high = Important, planned soon
 - medium = Nice to have
 - low = Backlog
 
@@ -523,10 +523,10 @@ Choose [1/2/3]:
 - [ ] Cross-referenced existing tickets?
 - [ ] Checked codebase and previous work to gather context?
 - [ ] User validated the ticket before creation?
-- [ ] Ticket file written to .tmp/tickets/? (check, don't assume)
+- [ ] Ticket file written to .planning/tickets/? (check, don't assume)
 
 ---
 
-<user_input id="ticket_creation_request"> 
+<user_input id="ticket_creation_request">
 $ARGUMENTS
 </user_input>
