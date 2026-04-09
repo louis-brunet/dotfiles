@@ -26,7 +26,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
     Tickets MUST be saved to `.planning/tickets/` directory
   </rule>
   <rule id="frontmatter_required">
-    ALL ticket files MUST start with YAML frontmatter containing type, priority, created date
+    ALL ticket files MUST start with YAML frontmatter containing type, priority, created date, and updated date
   </rule>
   <rule id="mvi_compliance">
     Ticket MUST be scannable <30s. MVI formula: 1-3 sentence summary, key details, actionable context
@@ -38,7 +38,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
     Tickets MUST include "Related Files" section linking to existing code, configs, patterns
   </rule>
   <rule id="unique_id">
-    Ticket filename MUST be unique: `{type}-{slug}-{timestamp}.md` (e.g., `feature-user-auth-20260129.md`)
+    Ticket filename MUST be unique: `{type}-{slug}-{YYYY-MM-DD}.md` (e.g., `feature-user-auth-2026-01-29.md`)
   </rule>
   <rule id="user_approval">
     Ticket MUST be validated by the user before creation
@@ -56,6 +56,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
     - @ai_readable (clear sections, code refs)
     - @codebase_refs (link to existing code)
     - @unique_id (unique filename)
+    - @user_approval (ticket MUST be validated before creation)
   </tier>
   <tier level="2" desc="Workflow">
     - Codebase search (existing tickets, related code)
@@ -153,12 +154,12 @@ Type: feature (detected from "Add")
 Title: Add JWT authentication for secure user login
 
 [Searching codebase for context...]
-  → Found existing ticket: feature-user-auth-20260115.md
+  → Found existing ticket: feature-user-auth-2026-01-15.md
   → Tech stack: Next.js 15 + TypeScript
   → Related files: src/auth/, src/middleware.ts
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Preview: .planning/tickets/feature-jwt-auth-20260409.md
+Preview: .planning/tickets/feature-jwt-auth-2026-04-09.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -168,6 +169,7 @@ priority: high
 complexity: md
 status: pending
 created: 2026-04-09
+updated: 2026-04-09
 ---
 
 # Add JWT Authentication
@@ -175,6 +177,11 @@ created: 2026-04-09
 ## Summary
 Users need secure authentication. Currently using plain text
 passwords. Adding JWT auth with refresh tokens.
+
+## Context
+- No authentication middleware currently exists in `src/middleware.ts`
+- Related ticket: feature-user-auth-2026-01-15.md (prior auth work)
+- Tech stack: Next.js 15 + TypeScript
 
 ## Scope
 - src/auth/ - login, register, token refresh
@@ -186,7 +193,10 @@ passwords. Adding JWT auth with refresh tokens.
 - [ ] Expired tokens are refreshed automatically
 - [ ] Tests pass
 
-**Create this ticket?** (.planning/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
+## Notes
+_No additional notes._
+
+**Create this ticket?** (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 ```
 
 **DO NOT**:
@@ -252,8 +262,8 @@ Found existing tickets!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Related open tickets:
-  📄 feature-user-auth-20260115.md      | feature | pending
-  📄 bug-login-redirect-20260120.md     | bug     | in_progress
+  📄 feature-user-auth-2026-01-15.md      | feature | pending
+  📄 bug-login-redirect-2026-01-20.md     | bug     | in_progress
 
 Options:
   1. Create new ticket
@@ -295,7 +305,7 @@ The agent searches codebase and builds ticket — user sees only the result:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Preview: .planning/tickets/feature-jwt-auth-20260409.md
+Preview: .planning/tickets/feature-jwt-auth-2026-04-09.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -305,6 +315,7 @@ priority: high
 complexity: md
 status: pending
 created: 2026-04-09
+updated: 2026-04-09
 ---
 
 # Add JWT Authentication
@@ -312,6 +323,11 @@ created: 2026-04-09
 ## Summary
 Users need secure authentication. Currently using plain text passwords.
 Adding JWT auth with refresh tokens.
+
+## Context
+- No authentication middleware currently exists in `src/middleware.ts`
+- Related ticket: feature-user-auth-2026-01-15.md (prior auth work)
+- Tech stack: Next.js 15 + TypeScript
 
 ## Scope
 - src/auth/ - login, register, token refresh
@@ -323,9 +339,12 @@ Adding JWT auth with refresh tokens.
 - [ ] Expired tokens are refreshed automatically
 - [ ] Tests pass
 
+## Notes
+_No additional notes._
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this ticket?** (.planning/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
+**Create this ticket?** (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 ```
 
 **REQUIRE USER APPROVAL** (@user_approval)
@@ -342,7 +361,7 @@ On confirm: write the ticket file to `.planning/tickets/`
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 File created:
-  .planning/tickets/feature-jwt-auth-20260129.md
+  .planning/tickets/feature-jwt-auth-2026-01-29.md
 
 Title: Add JWT authentication for secure user login
 Type: feature
@@ -366,8 +385,8 @@ Status: pending (open)
 
 ### Ticket Generation
 
-**Filename format**: `{type}-{slug}-{YYYYMMDD}.md`
-- Example: `feature-user-auth.md` → `feature-user-auth-20260129.md`
+**Filename format**: `{type}-{slug}-{YYYY-MM-DD}.md`
+- Example: `feature-user-auth.md` → `feature-user-auth-2026-01-29.md`
 
 **Slug generation**:
 - Lowercase
@@ -385,6 +404,7 @@ priority: {critical|high|medium|low}
 complexity: {sm|md|lg|xl}
 status: {pending|in_progress|completed|blocked}
 created: {YYYY-MM-DD}
+updated: {YYYY-MM-DD}
 related_tickets:
   - ...
 ---
@@ -394,7 +414,7 @@ related_tickets:
 
 **Required sections**:
 1. `## Summary` - 1-3 sentences (MVI)
-2. `## Context` - Problem, value, related decisions
+2. `## Context` - Problem, value, related decisions, relevant codebase findings (existing tickets, related files, tech stack)
 3. `## Scope` - Files/directories affected
 4. `## Related Files` - Code references
 5. `## Acceptance Criteria` - Checkbox list
@@ -412,9 +432,10 @@ related_tickets:
 | priority | enum | Yes | critical/high/medium/low |
 | complexity | enum | Yes | sm/md/lg/xl (estimated effort) |
 | status | enum | Yes | pending/in_progress/completed/blocked |
-| created | date | Yes | ISO 8601 |
+| created | date | Yes | ISO 8601 date of creation |
+| updated | date | Yes | ISO 8601 date last modified |
 | summary | string | Yes | 1-3 sentence overview |
-| context | string | No | Problem, value, rationale |
+| context | string | Yes | Problem, value, rationale, codebase references |
 | scope | array | No | Files/directories |
 | related_files | array | No | Code references |
 | acceptance_criteria | array | Yes | Completion conditions |
@@ -430,7 +451,7 @@ related_tickets:
 
 # Agent searches codebase, builds ticket, shows preview:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Preview: .planning/tickets/feature-jwt-auth-20260409.md
+Preview: .planning/tickets/feature-jwt-auth-2026-04-09.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
@@ -440,6 +461,7 @@ priority: high
 complexity: md
 status: pending
 created: 2026-04-09
+updated: 2026-04-09
 ---
 
 # Add JWT Authentication
@@ -447,6 +469,11 @@ created: 2026-04-09
 ## Summary
 Users need secure authentication. Currently using plain text passwords.
 Adding JWT auth with refresh tokens.
+
+## Context
+- No authentication middleware currently exists in `src/middleware.ts`
+- Related ticket: feature-user-auth-2026-01-15.md (prior auth work)
+- Tech stack: Next.js 15 + TypeScript
 
 ## Scope
 - src/auth/ - login, register, token refresh
@@ -457,12 +484,15 @@ Adding JWT auth with refresh tokens.
 - [ ] Tests pass
 
 ## Notes
+- Prefer a library like `jose` or `jsonwebtoken` over rolling custom JWT logic — check `package.json` before adding a new dep
+- Refresh token rotation should be stateless if possible; avoid a DB lookup on every request
+- Cookie-based storage preferred over localStorage for XSS resistance — align with the pattern in `src/auth/session.ts` if it exists
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this ticket?** (.planning/tickets/feature-jwt-auth-20260409.md) [y/n/comments]:
+**Create this ticket?** (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 
-✅ Created: .planning/tickets/feature-jwt-auth-20260409.md
+✅ Created: .planning/tickets/feature-jwt-auth-2026-04-09.md
 ```
 
 ### Example 2: Create Bug Ticket
@@ -472,7 +502,7 @@ Adding JWT auth with refresh tokens.
 # Agent searches, builds ticket, shows preview:
 # User approves → file created
 
-✅ Created: .planning/tickets/bug-login-redirect-20260409.md
+✅ Created: .planning/tickets/bug-login-redirect-2026-04-09.md
 ```
 
 ---
@@ -482,7 +512,7 @@ Adding JWT auth with refresh tokens.
 **File Exists**:
 ```
 ⚠️ Ticket with similar title already exists
-  📄 feature-user-auth-20260115.md
+  📄 feature-user-auth-2026-01-15.md
 
 Options:
   1. Continue (create new)

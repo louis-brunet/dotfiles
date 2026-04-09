@@ -1,5 +1,5 @@
 ---
-name: ContextScout
+name: ContextExplorer
 description: >
   Codebase discovery agent responsible for extracting
   structure, patterns, and constraints with high fidelity.
@@ -23,6 +23,7 @@ permission:
   task:
     "*": "deny"
 
+# TODO, when enabling, change angent name
 disable: true
 ---
 
