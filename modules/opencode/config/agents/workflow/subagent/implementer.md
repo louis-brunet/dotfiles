@@ -10,13 +10,8 @@ temperature: 0.0
 
 permission:
   bash:
-    "rm -rf *": "ask"
-    "sudo *": "deny"
-    "chmod *": "ask"
-    "curl *": "ask"
-    "wget *": "ask"
-    "docker *": "ask"
-    "kubectl *": "ask"
+    "*": "ask"
+
     "grep *": "allow"
     "find *": "allow"
     "ls *": "allow"
@@ -24,13 +19,23 @@ permission:
     "tree *": "allow"
     "head *": "allow"
     "tail *": "allow"
-    "git add *": "ask"
-    "git commit *": "ask"
-    "git revert *": "ask"
-    "git reset *": "ask"
+
+    "rm *": "ask"
+    "chmod *": "ask"
+    "curl *": "ask"
+    "wget *": "ask"
+    "docker *": "ask"
+    "kubectl *": "ask"
+
+    "git *": "ask"
     "git status": "allow"
     "git log *": "allow"
+
+    "sudo *": "deny"
+
   edit:
+    "**/package.json": "deny"
+    "**/pyproject.toml": "deny"
     "**/*.env*": "deny"
     "**/*.key": "deny"
     "**/*.secret": "deny"
@@ -38,6 +43,8 @@ permission:
     "**/__pycache__/**": "deny"
     "**/*.pyc": "deny"
     ".git/**": "deny"
+
+disable: true
 ---
 
 <identity>

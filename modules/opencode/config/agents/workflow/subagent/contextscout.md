@@ -9,14 +9,8 @@ mode: subagent
 temperature: 0.0
 
 permission:
-  read:
-    "*": "allow"
-  grep:
-    "*": "allow"
-  glob:
-    "*": "allow"
   bash:
-    "*": "deny"
+    "*": "ask"
     "grep *": "allow"
     "find *": "allow"
     "ls *": "allow"
@@ -26,10 +20,10 @@ permission:
     "tail *": "allow"
   edit:
     "*": "deny"
-  write:
-    "*": "deny"
   task:
     "*": "deny"
+
+disable: true
 ---
 
 <identity>

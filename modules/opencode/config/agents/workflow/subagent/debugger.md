@@ -9,14 +9,8 @@ mode: subagent
 temperature: 0.0
 
 permission:
-  read:
-    "*": "allow"
-  grep:
-    "*": "allow"
-  glob:
-    "*": "allow"
   bash:
-    "*": "deny"
+    "*": "ask"
     "grep *": "allow"
     "find *": "allow"
     "ls *": "allow"
@@ -25,17 +19,11 @@ permission:
     "head *": "allow"
     "tail *": "allow"
   edit:
-    "**/*.env*": "deny"
-    "**/*.key": "deny"
-    "**/*.secret": "deny"
-    "node_modules/**": "deny"
-    "**/__pycache__/**": "deny"
-    "**/*.pyc": "deny"
-    ".git/**": "deny"
-  write:
     "*": "ask"
   task:
     "*": "deny"
+
+disable: true
 ---
 
 <identity>

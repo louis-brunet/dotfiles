@@ -5,6 +5,59 @@
   "share": "disabled",
   "autoupdate": "notify",
   "disabled_providers": [],
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "grep *": "allow",
+      "find *": "allow",
+      "ls *": "allow",
+      "cat *": "allow",
+      "tree *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "echo *": "allow",
+      "pwd": "allow",
+      "which *": "allow",
+      "whoami": "allow",
+      "wc *": "allow",
+      "diff *": "allow",
+      "sort *": "allow",
+      "uniq *": "allow",
+      "cut *": "allow",
+      "jq *": "allow",
+      "date *": "allow",
+      "npx tsc *": "allow",
+      "npm run build *": "allow",
+      "npm run test *": "allow",
+      "yarn run build *": "allow",
+      "yarn run test *": "allow",
+      "rm *": "ask",
+      "git *": "ask",
+      "git diff *": "allow",
+      "git show *": "allow",
+      "git status": "allow",
+      "git log *": "allow",
+      "git stash *": "ask",
+      "git push *": "ask",
+      "git rebase *": "ask",
+      "git reset *": "ask",
+      "git checkout *": "ask",
+      "sudo *": "deny"
+    },
+    "edit": {
+      "**/*.env": "ask",
+      "**/package.json": "ask",
+      "**/pyproject.toml": "ask",
+      "**/node_modules/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/*.pyc": "deny",
+      ".git/**": "deny",
+      "**/dist/**": "deny",
+      "**/build/**": "deny"
+    },
+    "external_directory": "ask",
+    "doom_loop": "ask"
+  },
   "plugin": [
     "cc-safety-net"
     // "@spoons-and-mirrors/subtask2@latest"
@@ -12,24 +65,14 @@
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["npx", "-y","@upstash/context7-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
       "environment": {}
     }
   },
-  "provider": {
-    // "ollama": {
-    //   "npm": "@ai-sdk/openai-compatible",
-    //   "options": {
-    //     "baseURL": "http://localhost:11434/v1"
-    //   },
-    //   "models": {
-    //     "llama3.1:8b": {}
-    //   }
-    // }
-  },
-  "agent": {
-    // "leadcoder": {
-    //   "disable": true
-    // }
-  }
+  "provider": {},
+  "agent": {}
 }
