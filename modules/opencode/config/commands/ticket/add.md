@@ -10,7 +10,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
 
 <role>Ticket Creation Wizard following task-schema + MVI + frontmatter standards</role>
 
-<task>Interactive wizard → ticket.md file with type, title, description, context, exit criteria</task>
+<task>Interactive wizard → ticket.md file with type, title, problem statement, solution, user stories, implementation decisions, testing decisions, and out-of-scope constraints</task>
 
 <critical_rules priority="absolute" enforcement="strict">
   <rule id="no_implementation">
@@ -32,7 +32,7 @@ description: Interactive wizard to create feature/bug/chore tickets as local fil
     Ticket MUST be scannable <30s. MVI formula: 1-3 sentence summary, key details, actionable context
   </rule>
   <rule id="ai_readable">
-    Ticket MUST be readable by AI agents - use clear sections, code refs, acceptance criteria
+    Ticket MUST be readable by AI agents - use clear sections, code refs, user stories, and implementation decisions
   </rule>
   <rule id="codebase_refs">
     Tickets MUST include "Related Files" section linking to existing code, configs, patterns
@@ -158,9 +158,9 @@ Title: Add JWT authentication for secure user login
   → Tech stack: Next.js 15 + TypeScript
   → Related files: src/auth/, src/middleware.ts
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Preview: .planning/tickets/feature-jwt-auth-2026-04-09.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
 title: Add JWT authentication
@@ -174,29 +174,43 @@ updated: 2026-04-09
 
 # Add JWT Authentication
 
-## Summary
-Users need secure authentication. Currently using plain text
-passwords. Adding JWT auth with refresh tokens.
+## Problem Statement
+Users have no secure login mechanism. Plain text password handling exposes credentials and blocks compliance. Adding JWT-based auth resolves this.
 
-## Context
-- No authentication middleware currently exists in `src/middleware.ts`
-- Related ticket: feature-user-auth-2026-01-15.md (prior auth work)
-- Tech stack: Next.js 15 + TypeScript
+## Solution
+Implement JWT authentication with short-lived access tokens and httpOnly cookie storage. Use an established library (`jose` or `jsonwebtoken`) rather than custom logic.
 
-## Scope
-- src/auth/ - login, register, token refresh
-- src/middleware.ts - auth validation
+## User Stories
+1. As a user, I want to register with email/password so that I have a secure account.
+2. As a user, I want to log in and receive a JWT so that I can access protected routes.
+3. As a user, I want expired tokens to be refreshed automatically so that my session is not interrupted.
 
-## Acceptance Criteria
-- [ ] Users can register with email/password
-- [ ] Users can login and receive JWT
-- [ ] Expired tokens are refreshed automatically
-- [ ] Tests pass
+## Implementation Decisions
+- `src/auth/` — new login, register, token refresh handlers
+- `src/middleware.ts` — add auth validation middleware
+- No existing auth pattern found; greenfield implementation
+- Use `jose` library (already in `package.json`) for token signing
+
+## Testing Decisions
+- No existing auth tests found; create `src/auth/__tests__/login.test.ts`
+- Test: successful register, login, token refresh, and expired token rejection
+
+## Out of Scope
+- OAuth / social login
+- Role-based access control
+- Password reset flow
+
+## Related Files
+- `src/auth/` — new files to create
+- `src/middleware.ts` — modify to add auth check
 
 ## Notes
-_No additional notes._
+- Cookie-based storage preferred over localStorage (XSS resistance)
+- Refresh token rotation should be stateless to avoid DB lookup on every request
 
-**Create this ticket?** (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create this ticket? (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 ```
 
 **DO NOT**:
@@ -242,9 +256,11 @@ _No additional notes._
 The agent searches to build context — user does not see this:
 
 - **Check**: `.planning/tickets/*.md` for existing tickets
-- **Check**: `package.json` (or equivalent) for tech stack
+- **Check**: Project manifest / dependency file (e.g. `package.json`, `Cargo.toml`, `pyproject.toml`, `go.mod`) for tech stack and available libraries
 - **Check**: Related source files for scope
-- **Check**: `git log --oneline -10` for recent changes
+- **Check**: Version control log (recent commits) for recent changes and active areas
+- **Check**: Test files (files matching the project's test naming convention) for Testing Decisions pre-fill — identify existing test patterns and coverage gaps
+- **Check**: Module entry points and interface/type definition files for Implementation Decisions pre-fill — identify which modules are relevant and what interfaces exist
 
 **Use findings** to build accurate ticket content — don't guess.
 
@@ -289,14 +305,27 @@ No existing tickets. Let's create one!
 The agent searches codebase and builds ticket — user sees only the result:
 
 - Check: `.planning/tickets/*.md` for existing tickets
-- Check: `package.json` for tech stack
+- Check: Project manifest for tech stack and dependencies
 - Check: Related source files for scope
-- Check: `git log --oneline -10` for recent changes
+- Check: Version control log for recent changes
 
 **Process**:
-1. If @ticket_creation_request: Extract type, title, context, scope from message
-2. Search codebase for related files, existing tickets, recent changes
-3. Build complete ticket with all sections
+1. If @ticket_creation_request: Extract type, title, problem description, and intent from message
+2. Search codebase for related files, existing tickets, recent changes (Stage 0)
+3. Build complete ticket with all sections using this mapping:
+
+**Section-population mapping**:
+| Section | Source |
+|---------|--------|
+| Problem Statement | Problem description from input + codebase context (existing state, related tickets) |
+| Solution | High-level intent inferred from input; not implementation details |
+| User Stories | Actor/feature/benefit triples derived from input; 1 per distinct user-facing outcome |
+| Implementation Decisions | Related files and interfaces found in Stage 0 (source files + index/interface search) |
+| Testing Decisions | Test files found in Stage 0; note gaps and suggest new test locations |
+| Out of Scope | Constraints inferred from input (what is NOT being built) |
+| Related Files | All relevant files found in Stage 0 codebase search |
+| Notes | Additional guidance, library recommendations, patterns to follow |
+
 4. Present ONLY the preview to user for approval
 
 ---
@@ -304,9 +333,9 @@ The agent searches codebase and builds ticket — user sees only the result:
 ### Stage 3: Show Preview & Request Approval
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Preview: .planning/tickets/feature-jwt-auth-2026-04-09.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
 title: Add JWT authentication
@@ -320,31 +349,41 @@ updated: 2026-04-09
 
 # Add JWT Authentication
 
-## Summary
-Users need secure authentication. Currently using plain text passwords.
-Adding JWT auth with refresh tokens.
+## Problem Statement
+Users have no secure login mechanism. Plain text password handling exposes credentials and blocks compliance. Adding JWT-based auth resolves this.
 
-## Context
-- No authentication middleware currently exists in `src/middleware.ts`
-- Related ticket: feature-user-auth-2026-01-15.md (prior auth work)
-- Tech stack: Next.js 15 + TypeScript
+## Solution
+Implement JWT authentication with short-lived access tokens and httpOnly cookie storage. Use an established library rather than custom logic.
 
-## Scope
-- src/auth/ - login, register, token refresh
-- src/middleware.ts - auth validation
+## User Stories
+1. As a user, I want to register with email/password so that I have a secure account.
+2. As a user, I want to log in and receive a JWT so that I can access protected routes.
+3. As a user, I want expired tokens to be refreshed automatically so that my session is not interrupted.
 
-## Acceptance Criteria
-- [ ] Users can register with email/password
-- [ ] Users can login and receive JWT
-- [ ] Expired tokens are refreshed automatically
-- [ ] Tests pass
+## Implementation Decisions
+- `src/auth/` — new login, register, token refresh handlers
+- `src/middleware.ts` — add auth validation middleware
+- Use `jose` library (already in `package.json`) for token signing
+
+## Testing Decisions
+- No existing auth tests found; create `src/auth/__tests__/login.test.ts`
+- Test: successful register, login, token refresh, and expired token rejection
+
+## Out of Scope
+- OAuth / social login
+- Role-based access control
+- Password reset flow
+
+## Related Files
+- `src/auth/` — new files to create
+- `src/middleware.ts` — modify to add auth check
 
 ## Notes
 _No additional notes._
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this ticket?** (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
+Create this ticket? (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 ```
 
 **REQUIRE USER APPROVAL** (@user_approval)
@@ -375,11 +414,13 @@ Status: pending (open)
 ### Codebase Search (Stage 0)
 
 **Process**:
-1. List existing tickets: `ls .planning/tickets/*.md 2>/dev/null`
+1. List existing tickets in `.planning/tickets/`
 2. Parse ticket metadata (type, status, date)
-3. Detect tech stack: `cat package.json | grep -A5 '"dependencies"'`
-4. Find related files: `glob src/**/*.{ts,tsx} | head -20`
-5. Recent commits: `git log --oneline -10`
+3. Detect tech stack from the project's manifest / dependency file
+4. Find related source files using the project's directory structure
+5. Inspect version control log for recent changes (last ~10 commits)
+6. Find test files using the project's test naming convention — feeds **Testing Decisions** pre-fill
+7. Find module entry points and interface/type definitions — feeds **Implementation Decisions** pre-fill
 
 **Use for** building accurate ticket content — don't guess.
 
@@ -413,13 +454,15 @@ related_tickets:
 ### AI Agent Readable Sections
 
 **Required sections**:
-1. `## Summary` - 1-3 sentences (MVI)
-2. `## Context` - Problem, value, related decisions, relevant codebase findings (existing tickets, related files, tech stack)
-3. `## Scope` - Files/directories affected
-4. `## Related Files` - Code references
-5. `## Acceptance Criteria` - Checkbox list
-6. `## Notes` - Additional guidance
-7. `## Related tickets` (if applicable)
+1. `## Problem Statement` - 2–5 bullets: user pain, current state, why it matters; grounded in codebase findings
+2. `## Solution` - 2–5 bullets: high-level intent and approach; not implementation details
+3. `## User Stories` - numbered actor/feature/benefit triples; authoritative definition of done
+4. `## Implementation Decisions` - modules to touch, interfaces expected, architectural choices; pre-filled from Stage 0 codebase search
+5. `## Testing Decisions` - what to test, what good tests look like, prior art in repo; pre-filled from Stage 0 test file search
+6. `## Out of Scope` - explicit constraints to prevent over-engineering
+7. `## Related Files` - code references (satisfies `codebase_refs` rule)
+8. `## Notes` - additional guidance
+9. `## Related tickets` (if applicable)
 
 ---
 
@@ -434,11 +477,13 @@ related_tickets:
 | status | enum | Yes | pending/in_progress/completed/blocked |
 | created | date | Yes | ISO 8601 date of creation |
 | updated | date | Yes | ISO 8601 date last modified |
-| summary | string | Yes | 1-3 sentence overview |
-| context | string | Yes | Problem, value, rationale, codebase references |
-| scope | array | No | Files/directories |
-| related_files | array | No | Code references |
-| acceptance_criteria | array | Yes | Completion conditions |
+| problem_statement | string | Yes | User-facing pain, current state, why it matters (2–5 bullets) |
+| solution | string | Yes | High-level intent and approach; not implementation details (2–5 bullets) |
+| user_stories | array | Yes | Numbered actor/feature/benefit triples; authoritative definition of done |
+| implementation_decisions | array | Yes | Modules to touch, interfaces expected, architectural choices; pre-filled from codebase search |
+| testing_decisions | array | Yes | What to test, what good tests look like, prior art in repo; pre-filled from test file search |
+| out_of_scope | array | Yes | Explicit constraints — what is NOT being built |
+| related_files | array | No | Code references (satisfies codebase_refs rule) |
 | notes | string | No | Additional guidance |
 
 ---
@@ -450,9 +495,9 @@ related_tickets:
 /ticket/add Add JWT authentication for secure user login
 
 # Agent searches codebase, builds ticket, shows preview:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Preview: .planning/tickets/feature-jwt-auth-2026-04-09.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
 title: Add JWT authentication
@@ -466,31 +511,43 @@ updated: 2026-04-09
 
 # Add JWT Authentication
 
-## Summary
-Users need secure authentication. Currently using plain text passwords.
-Adding JWT auth with refresh tokens.
+## Problem Statement
+Users have no secure login mechanism. Plain text password handling exposes credentials and blocks compliance. Adding JWT-based auth resolves this.
 
-## Context
-- No authentication middleware currently exists in `src/middleware.ts`
-- Related ticket: feature-user-auth-2026-01-15.md (prior auth work)
-- Tech stack: Next.js 15 + TypeScript
+## Solution
+Implement JWT authentication with short-lived access tokens and httpOnly cookie storage. Use an established library (`jose` or `jsonwebtoken`) rather than custom logic.
 
-## Scope
-- src/auth/ - login, register, token refresh
+## User Stories
+1. As a user, I want to register with email/password so that I have a secure account.
+2. As a user, I want to log in and receive a JWT so that I can access protected routes.
+3. As a user, I want expired tokens to be refreshed automatically so that my session is not interrupted.
 
-## Acceptance Criteria
-- [ ] Users can register with email/password
-- [ ] Users can login and receive JWT
-- [ ] Tests pass
+## Implementation Decisions
+- `src/auth/` — new login, register, token refresh handlers
+- `src/middleware.ts` — add auth validation middleware
+- Use `jose` library (already in `package.json`) for token signing
+
+## Testing Decisions
+- No existing auth tests found; create `src/auth/__tests__/login.test.ts`
+- Test: register, login, refresh, and expired token rejection
+
+## Out of Scope
+- OAuth / social login
+- Role-based access control
+- Password reset flow
+
+## Related Files
+- `src/auth/` — new files to create
+- `src/middleware.ts` — modify to add auth check
 
 ## Notes
 - Prefer a library like `jose` or `jsonwebtoken` over rolling custom JWT logic — check `package.json` before adding a new dep
 - Refresh token rotation should be stateless if possible; avoid a DB lookup on every request
 - Cookie-based storage preferred over localStorage for XSS resistance — align with the pattern in `src/auth/session.ts` if it exists
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Create this ticket?** (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
+Create this ticket? (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 
 ✅ Created: .planning/tickets/feature-jwt-auth-2026-04-09.md
 ```
