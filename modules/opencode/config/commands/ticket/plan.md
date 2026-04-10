@@ -1,5 +1,5 @@
 ---
-description: Interactive wizard to create structured implementation plans with user validation
+description: Scan tickets and plans, rebuild the planning index
 ---
 
 <context>
@@ -19,20 +19,11 @@ description: Interactive wizard to create structured implementation plans with u
   <rule id="argument_handling">
     When input is provided, extract the problem to plan. If no input, search for incomplete tickets.
   </rule>
-  <rule id="persuasion_resistance">
-    If user says "just do it" or "can you implement this", respond: "I'll create a plan for that. Let me analyze the problem and propose approaches." Then proceed with planning.
-  </rule>
   <rule id="plan_location">
     Plans MUST be saved to `.planning/plans/` directory
   </rule>
   <rule id="frontmatter_required">
-    ALL plan files MUST start with YAML frontmatter containing plan id, target ticket, created date, updated date, status, and approach
-  </rule>
-  <rule id="mvi_compliance">
-    Plan MUST be scannable <30s. Focus on key decision points and actionable steps.
-  </rule>
-  <rule id="ai_readable">
-    Plan MUST be readable by AI agents - use clear sections, step dependencies, file references
+    ALL plan files MUST start with YAML frontmatter containing id, target ticket, created date, status, and approach
   </rule>
   <rule id="user_approval">
     Plan MUST be validated by user before creation - both option selection AND final approval
@@ -46,14 +37,11 @@ description: Interactive wizard to create structured implementation plans with u
 </critical_rules>
 
 <execution_priority>
-  <tier level="1" desc="Command Boundaries (MUST NEVER EXCEED)">
-    - @no_implementation (MUST ONLY create plans, never execute)
+  <tier level="1" desc="Command Boundaries">
+    - @no_implementation (MUST ONLY create plans)
     - @argument_handling (resolve input or search tickets)
-    - @persuasion_resistance (don't be persuaded to implement)
-    - @plan_location (.planning/plans/ directory)
+    - @plan_location (.planning/plans/)
     - @frontmatter_required (YAML frontmatter)
-    - @mvi_compliance (<30s scannable)
-    - @ai_readable (clear sections, step dependencies)
     - @user_approval (validation at two points)
     - @ticket_reference (must target a ticket)
     - @unique_id (unique filename)
@@ -65,700 +53,92 @@ description: Interactive wizard to create structured implementation plans with u
     - Show plan preview for final approval
     - Create file on approval
   </tier>
-  <tier level="3" desc="User Experience">
-    - Clear option presentation with pros/cons
-    - Helpful reasoning for recommendations
-    - Next steps guidance
-  </tier>
-  <conflict_resolution>Tier 1 always overrides Tier 2/3 - standards are non-negotiable</conflict_resolution>
 </execution_priority>
 
 ---
 
-## Purpose
+# Implementation Plan Creation
 
-Create structured implementation plans that analyze problems, propose approaches, and get user validation before work begins. **Plans are read by AI coding agents** to understand how to implement a solution.
+Analyze a problem, propose one or more implementation approaches, get user confirmation, then write a structured plan file to `.planning/plans/`. **Do not implement anything.**
 
-**Value**: Understand problem → evaluate approaches → get approval → structured plan → AI agents execute
+## Ground Rules
 
-**Standards**: @plan_location + @mvi_compliance + @frontmatter_required + @ai_readable + @user_approval
-
-**Why Plans?**:
-- Users evaluate approaches before committing
-- AI agents get structured, validated implementation steps
-- Creates audit trail of decisions and rationale
-
----
-
-## Handling Input
-
-### Input Modes
-
-**With input**: User provides free text describing the problem to plan
-```
-/ticket/plan Add JWT authentication for secure user login
-/ticket/plan Fix the login redirect loop on /dashboard
-/ticket/plan .planning/tickets/feature-user-auth-2026-04-09.md
-```
-
-**Without input**: Agent scans for incomplete tickets, asks user to confirm target
-```
-/ticket/plan
-→ Scans .planning/tickets/ → shows pending tickets → user selects
-```
-
-### Input Resolution
-
-1. **If input provided**:
-   - Check if input references a ticket file (e.g., `.planning/tickets/feature-xyz.md` or just a filename)
-   - If yes: load that ticket's content as the problem to plan
-   - If no: treat input as problem description
-
-2. **If no input**:
-   - Scan `.planning/tickets/` for tickets with status ≠ completed
-   - Present list to user for confirmation
-   - Use confirmed ticket as the problem to plan
-
----
-
-## Usage
-
-```bash
-/ticket/plan                 # Agent scans for pending tickets → you select → plan created
-/ticket/plan Add JWT auth   # Agent analyzes problem → shows options → you select → plan created
-/ticket/plan feature-jwt-auth-2026-04-09.md  # Agent loads ticket → analyzes → plan created
-```
-
----
-
-## Quick Start
-
-**Run**: `/ticket/plan`
-
-**What happens**:
-1. **Input resolution**: If no input, scan `.planning/tickets/` for pending tickets → user confirms target
-2. **Analysis**: Agent analyzes the problem and generates implementation options
-3. **Option presentation**:
-   - Simple problems: single approach → proceed to validation
-   - Complex problems: multiple options → user selects
-4. **Plan preview**: Show structured plan for final approval
-5. **User validates**: `[y/n/comments]` - confirm plan creation
-6. **Write plan**: On approval, write to `.planning/plans/`
-
----
+- **Only create the plan file. Never write code or modify source files.**
+- A plan must target an existing ticket in `.planning/tickets/`.
+- Show approach options and get user sign-off before writing the file.
+- If a plan already exists for the ticket, flag it and ask whether to update or create a new one.
 
 ## Workflow
 
-### Stage 0: Codebase Search (Agent Internal)
-
-The agent searches to build context — user does not see this:
-
-- **Check**: `.planning/tickets/*.md` for the target ticket (if referencing)
-- **Check**: Related source files for scope understanding
-- **Check**: `package.json` for tech stack
-- **Check**: Existing plans in `.planning/plans/` to avoid duplication
-
-**Use findings** to build accurate analysis — don't guess.
-
----
-
-### Stage 1: Input Resolution
-
-**If user provided input**:
-1. Parse input for ticket references (filename, path, or `#ticket-id`)
-2. If ticket found: load ticket content as the problem
-3. If not a ticket reference: treat as problem description
-
-**If no input provided**:
-1. List all tickets in `.planning/tickets/` with status ≠ completed
-2. Present to user for confirmation:
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Select a ticket to plan:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1. feature-user-auth-2026-04-01.md   | feature | pending
-2. bug-login-redirect-2026-04-05.md  | bug     | pending
-3. refactor-api-endpoints-2026-04-08.md | refactor | in_progress
-
-Select [1/2/3] or [c] to cancel:
-```
-
----
-
-### Stage 2: Problem Analysis & Option Generation
-
-**Analyze the problem**:
-- Understand what needs to be built/fixed
-- Identify scope (files, components, dependencies)
-- Consider constraints and requirements
-
-**Determine option count** using guiding heuristics:
-
-| Criteria | Single Option | Multiple Options |
-|----------|---------------|-------------------|
-| Scope | 1-2 files | 4+ files |
-| Dependencies | No external deps | Multiple integrations |
-| Reversibility | Easy to rollback | Hard to reverse |
-| Alternatives | One clear path | Two+ reasonable paths |
-
-**Generate options**:
-
-For each option, provide:
-- **Title**: Short name
-- **Description**: What this approach does
-- **Pros**: Benefits
-- **Cons**: Drawbacks
-- **Risk**: low/medium/high
-
----
-
-### Stage 3: Present Options & User Selection
-
-**Single option** (simple problem):
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Analyzed: Add JWT authentication
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Approach: JWT with refresh tokens, httpOnly cookies
-
-**Proceed with this approach?** [y/n/comments]:
-```
-
-**Multiple options** (complex problem):
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Analyzed: Add JWT authentication
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Option 1: Minimal Approach
-  - Description: Basic JWT with short-lived tokens
-  - Pros: Fast, simple, lower risk
-  - Cons: Limited security features, may need upgrade
-  - Risk: low
-
-Option 2: Robust Approach
-  - Description: JWT with refresh tokens, secure cookies
-  - Pros: Production-ready, comprehensive security
-  - Cons: More complex, longer timeline
-  - Risk: medium
-
-Option 3: Hybrid Approach
-  - Description: Minimal now, plan robust upgrade
-  - Pros: Quick win, clear upgrade path
-  - Cons: Two-phase implementation
-  - Risk: low
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Select an approach [1/2/3] or [c] to cancel:
-```
-
-**On user selection**, proceed to Stage 4.
-
----
-
-### Stage 4: Show Plan Preview & Request Approval
-
-After option selection, show complete plan:
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan Preview: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
----
-target_ticket: feature-jwt-auth-2026-04-09
-created: 2026-04-09
-updated: 2026-04-09
-approach: option-2
-status: pending
----
-
-# Implementation Plan: Add JWT Authentication
-
-## Analysis
-
-### Problem Summary
-Users need secure authentication. Currently using plain text passwords.
-
-### Considered Options
-(Options presented earlier, with user's selection highlighted)
-
-## Considerations
-
-- Security requirements and compliance needs
-- Performance implications of JWT validation
-- Token storage and refresh strategy
-
-## Existing Patterns
-
-- (To be filled based on codebase analysis - authentication patterns, token handling, etc.)
-
-## Selected Approach
-
-**Option 2: Robust Approach**
-
-**Reasoning**: [User's rationale or agent's recommendation]
-
-## Testing Approach
-
-- Unit tests for JWT generation/validation logic in `src/auth/jwt.ts`
-- Integration tests for registration and login endpoints
-- Existing test patterns: `npm test -- auth` (jest, existing auth test suite)
-- New tests required for token refresh and middleware validation
-
-## Implementation Steps
-
-### Step 1: User Registration
-- Description: Add registration endpoint with password hashing
-- Files: `src/auth/register.ts`, `src/db/users.ts`
-- Complexity: medium
-
-### Step 2: Login & JWT Generation
-- Description: Create login flow with JWT token generation
-- Files: `src/auth/login.ts`, `src/auth/jwt.ts`
-- Complexity: medium
-
-### Step 3: Token Refresh
-- Description: Implement refresh token rotation
-- Files: `src/auth/refresh.ts`
-- Complexity: high
-
-### Step 4: Auth Middleware
-- Description: Add request validation middleware
-- Files: `src/middleware/auth.ts`
-- Complexity: medium
-
-## Risks and Mitigations
-
-- **Risk**: Token expiration handling
-  - **Mitigation**: Implement refresh token rotation with graceful renewal
-- **Risk**: Security vulnerabilities in JWT handling
-  - **Mitigation**: Use established libraries, follow best practices
-
-## Validation
-
-### Success Criteria
-- Users can register with email/password
-- Users can login and receive JWT token
-- Protected routes reject invalid/expired tokens
-- Token refresh works correctly
-
-### Validation Steps
-1. Run auth test suite: `npm test -- auth`
-2. Manual test: Register → Login → Access protected route
-3. Verify token expiry behavior
-
-### Verification Commands
-```bash
-npm test -- auth
-```
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**Create this plan?** (.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md) [y/n/comments]:
-```
-
-**REQUIRE USER APPROVAL** (@user_approval)
-
-On confirm: write the plan file to `.planning/plans/`
-
----
-
-### Stage 5: Confirmation
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Plan created successfully!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-File created:
-  .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-
-Target: feature-jwt-auth
-Approach: Robust Approach (Option 2)
-Steps: 4
-
-Next step:
-  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-```
-
----
-
-## Implementation Details
-
-### Plan Directory
-
-Ensure `.planning/plans/` exists:
-```bash
-mkdir -p .planning/plans
-```
-
-### Plan Filename Format
-
-`plan-{target-ticket-filename}-{seq}.md`
-
-Examples:
-- `plan-feature-jwt-auth-2026-04-09-001.md`
-- `plan-bug-login-redirect-2026-04-09-001.md`
-- `plan-refactor-api-2026-04-09-002.md`
-
-**Sequence**: Increment if multiple plans created for same ticket same day
-
-### Frontmatter Schema
-
+1. **Resolve the target ticket** — accept a ticket path/name directly, or scan `.planning/tickets/` for non-completed tickets and let the user pick.
+2. **Explore the codebase** — read the ticket, check related source files, existing plans, and tech stack to ground the analysis in reality.
+3. **Propose approaches** — for straightforward problems present one clear approach; for genuinely ambiguous or high-risk problems present 2–3 options with trade-offs. Let the complexity of the problem drive the count, not a formula.
+4. **Confirm approach** — get user selection (if multiple) or a simple yes/no (if one).
+5. **Draft the plan** — produce a complete plan preview.
+6. **Confirm and write** — show filename + preview, get approval, then write the file.
+
+## Plan Format
+
+**Filename**: `.planning/plans/plan-{ticket-slug}-{YYYY-MM-DD}-{NNN}.md`
+- `NNN` is a zero-padded sequence number starting at `001`, incremented if a plan for the same ticket already exists.
+
+**Frontmatter**:
 ```yaml
 ---
-target_ticket: {ticket-filename}
-created: {YYYY-MM-DD}
-updated: {YYYY-MM-DD}
-approach: {option-id}
-status: {pending|in_progress|completed|blocked}
----
-```
-
-### AI-Agent Readable Sections
-
-**Required sections**:
-1. `## Analysis` - Problem summary, considered options
-2. `## Considerations` - Key factors to keep in mind during implementation
-3. `## Existing Patterns` - Relevant patterns already in the codebase (if applicable)
-4. `## Selected Approach` - Chosen option with reasoning
-5. `## Testing Approach` - How testing will be handled
-6. `## Implementation Steps` - Numbered steps with file references
-7. `## Risks and Mitigations` - Potential issues and how to address them
-8. `## Validation` - Success criteria and validation steps for implementation
-
-**Step structure**:
-```markdown
-### Step N: {Step Title}
-- Description: {What this step does}
-- Files: {file1}, {file2}
-- Complexity: {low|medium|high}
-- Dependencies: {other steps, if any}
-```
-
----
-
-## Plan Schema
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| id | string | Yes | Unique plan identifier |
-| target_ticket | string | Yes | Reference to ticket being planned |
-| created | date | Yes | ISO 8601 |
-| updated | date | Yes | ISO 8601, updated on plan modifications |
-| status | enum | Yes | pending/in_progress/completed/blocked |
-| approach | string | Yes | Selected option ID |
-| analysis.problem_summary | string | Yes | 1-3 sentence overview |
-| analysis.considered_options | array | Yes | List of options analyzed |
-| considerations | array | No | Key factors to consider during implementation |
-| existing_patterns | array | No | Relevant patterns already in the codebase |
-| selected_approach.id | string | Yes | Chosen option |
-| selected_approach.reasoning | string | No | Why this was chosen |
-| testing_approach | string | Yes | Key testing patterns, existing and planned |
-| implementation_steps | array | Yes | Ordered steps with details |
-| risks_and_mitigations | array | No | Potential risks and mitigation strategies |
-| validation.success_criteria | array | Yes | List of criteria to verify implementation success |
-| validation.validation_steps | array | Yes | Steps to validate the implementation works correctly |
-| validation.verification_commands | array | No | Commands/scripts to run for verification |
-
----
-
-## Examples
-
-### Example 1: Plan with Input (Single Option)
-
-```bash
-/ticket/plan Add JWT authentication
-
-# Agent analyzes → single clear approach → shows preview:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan Preview: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
----
-target_ticket: feature-jwt-auth-2026-04-09
-created: 2026-04-09
-updated: 2026-04-09
-approach: option-1
+id: plan-{ticket-slug}-{YYYY-MM-DD}-{NNN}
+target_ticket: {ticket-filename-without-.md}
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+approach: {short label for chosen approach}
 status: pending
 ---
+```
 
-# Implementation Plan: Add JWT Authentication
-
+**Sections**:
+```markdown
 ## Analysis
+Short summary of the problem, constraints, and key findings from codebase exploration.
 
-### Problem Summary
-Users need secure authentication. Currently using plain text passwords.
-
-## Considerations
-
-- Security requirements and compliance needs
-- Performance implications of JWT validation
-
-## Selected Approach
-
-**JWT with Refresh Tokens** - Standard approach for secure authentication.
-
-## Testing Approach
-
-- Unit tests for token generation and validation in `src/auth/tokens.ts`
-- Integration tests for register/login endpoints
-- Existing test patterns: `npm test -- auth` (jest)
+## Approach
+What will be done and why this approach was chosen (mention trade-offs if alternatives were considered).
 
 ## Implementation Steps
 
-### Step 1: Setup JWT library
-- Description: Install and configure JWT library
-- Files: `package.json`, `src/auth/config.ts`
-
-### Step 2: Create token service
-- Description: JWT generation and validation
-- Files: `src/auth/tokens.ts`
-
-## Risks and Mitigations
-
-- **Risk**: Token expiration during critical operations
-  - **Mitigation**: Implement refresh token mechanism
-
-## Validation
-
-### Success Criteria
-- User can register with valid email/password
-- User can log in and receive JWT token
-- Token validates correctly on protected routes
-- Expired tokens are rejected with appropriate error
-
-### Validation Steps
-1. Run auth test suite: `npm test -- auth`
-2. Manual test: Register new user, login, access protected route
-3. Verify token expiration: Login, wait 15min, attempt protected action
-
-### Verification Commands
-```bash
-npm test -- auth
-curl -X POST /api/auth/register -d '{"email":"test@example.com","password":"Test123!"}'
-curl -X POST /api/auth/login -d '{"email":"test@example.com","password":"Test123!"}'
-```
-
-**Create this plan?** [y/n/comments]: y
-
-✅ Plan created: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-
-Next step:
-  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-```
-
-### Example 2: Plan without Input (Multiple Options)
-
-```bash
-/ticket/plan
-
-# Agent scans for pending tickets:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Select a ticket to plan:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1. feature-user-auth-2026-04-01.md   | feature | pending
-2. bug-login-redirect-2026-04-05.md  | bug     | pending
-
-Select [1/2] or [c] to cancel: 1
-
-# Agent analyzes → multiple approaches → user selects:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Analyzed: feature-user-auth-2026-04-01.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Option 1: Minimal - Basic JWT implementation
-Option 2: Robust - JWT with refresh tokens + secure cookies
-
-Select [1/2]: 2
-
-# Shows plan preview, user approves
-✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
-
-Next step:
-  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-```
-
-### Example 2 with Validation Content:
-
-```bash
-/ticket/plan
-
-# Agent scans for pending tickets → user selects → analyzes → shows options:
-Option 1: Minimal - Basic JWT implementation
-Option 2: Robust - JWT with refresh tokens + secure cookies
-
-Select [1/2]: 2
-
-# Agent shows plan preview with Validation section:
----
-target_ticket: feature-jwt-auth-2026-04-09
-created: 2026-04-09
-approach: option-2
----
-
-# Implementation Plan: User Authentication
+### Step N: {title}
+- **Files**: which files to create or modify
+- **What**: what this step does
+- **Dependencies**: steps that must complete first (if any)
 
 ## Testing Approach
-
-- Unit tests for JWT token service and refresh logic
-- Integration tests for auth endpoints
-- Existing test patterns: `npm test -- auth`
+What to test, where test files live or should be created, and how to run them.
 
 ## Validation
+- **Success criteria**: observable outcomes that confirm the implementation is correct
+- **Verification**: commands or manual steps to check each criterion
 
-### Success Criteria
-- Users can register with email/password
-- Users can login and receive JWT token
-- Protected routes reject invalid tokens
-- Token refresh works correctly
-
-### Validation Steps
-1. Run test suite: npm test -- auth
-2. Manual test: Register → Login → Access protected route
-3. Verify token expiry handling
-
-### Verification Commands
-```bash
-npm test -- auth
+## Risks & Mitigations  *(omit if none)*
+Known risks and how the plan accounts for them.
 ```
 
-**Create this plan?** [y/n/comments]: y
+## Quality Bar
 
-✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
-
-Next step:
-  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-```
-
-### Example 3: Plan with Comments
-
-```bash
-**Create this plan?** [y/n/comments]: y
-
-# Wait, can we use a different auth library? Consider jsonwebtoken instead.
-
-# Re-prompts:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Options:
-  1. Use jsonwebtoken (as suggested)
-  2. Keep jose library
-  3. Show both options in plan
-
-Select [1/2/3]: 1
-
-# Regenerates plan with updated approach
-# Re-shows preview for approval
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**Create this plan?** (.planning/plans/plan-...) [y/n/comments]: y
-
-✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
-
-Next step:
-  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-```
-
----
-
-## Error Handling
-
-**No pending tickets found**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-No incomplete tickets found in .planning/tickets/
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Options:
-  1. Create a new ticket first (/ticket/add)
-  2. List all tickets
-  3. Cancel
-
-Choose [1/2/3]:
-```
-
-**Target ticket not found**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ticket not found: feature-unknown-2026-04-09.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Options:
-  1. Search for similar ticket
-  2. Create new ticket
-  3. Cancel
-
-Choose [1/2/3]:
-```
-
-**Plan already exists for ticket**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Plan already exists for this ticket:
-  📄 plan-feature-jwt-auth-2026-04-09-001.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Options:
-  1. Update existing plan
-  2. Create new plan (with seq 002)
-  3. View existing plan
-  4. Cancel
-
-Choose [1/2/3/4]:
-```
-
----
-
-## Tips
-
-**Keep Plans Focused**: One plan = one ticket. Don't try to plan multiple tickets at once.
-
-**Be Specific in Steps**: Include file paths, dependencies between steps. AI agents need clear guidance.
-
-**Use Complexity Wisely**:
-- low = Simple change, single file
-- medium = Some complexity, 2-3 files
-- high = Significant complexity, multiple components
-
-**Validate User Selection**: Always confirm both option selection AND final plan approval.
-
-**Include Validation Section**: Plans should include:
-- Success criteria: What must be true after implementation
-- Validation steps: How to verify the implementation works
-- Verification commands: Optional commands to run for testing
-
-**Reference the Ticket**: Plans should link back to the ticket being planned. This creates traceability.
-
-**Next Steps**: After plan is created, user can:
-- Execute the plan themselves
-- Delegate to AI agent with the plan
-- Update ticket status to "planned"
+A good plan is **executable without follow-up questions**. An agent reading it cold should know exactly which files to touch, in what order, and how to verify success. Omit sections that would be empty rather than padding them.
 
 ---
 
 ## Success Criteria
 
-- [ ] Input resolved (from argument or ticket scan)?
-- [ ] Problem analyzed with appropriate options?
-- [ ] Considerations documented?
 - [ ] Existing patterns identified (if applicable)?
 - [ ] User selected approach (if multiple)?
 - [ ] Plan preview shown to user?
 - [ ] User validated final plan before creation?
 - [ ] Plan written to .planning/plans/?
 - [ ] Plan includes risks and mitigations?
-- [ ] Plan is AI-agent readable with clear steps?
-- [ ] Plan includes Validation section with success criteria?
-- [ ] Plan includes validation steps?
-- [ ] Plan includes verification commands (if applicable)?
+- [ ] Plan includes validation section with success criteria?
 
 ---
+
+Create a plan from the following @planning_request:
 
 <user_input id="planning_request">
 $ARGUMENTS

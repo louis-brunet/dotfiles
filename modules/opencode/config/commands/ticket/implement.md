@@ -1,366 +1,101 @@
 ---
-description: Execute implementation plans from .planning/plans/ directory
+description: Execute implementation plans from .planning/plans/
 ---
 
 <context>
-  <system>Implementation plan execution command</system>
-  <domain>Local plan files containing structured implementation steps</domain>
-  <task>Read plan file → execute implementation → update progress</task>
+  <system>Implementation plan execution</system>
+  <domain>Plan execution and progress tracking</domain>
+  <task>Execute plan steps and keep plan file accurate</task>
 </context>
 
-<role>Implementation Plan Executor - reads plan, executes steps, tracks progress</role>
+<role>Plan Execution Agent - executes implementation plans, tracks progress</role>
 
-<task>Execute the implementation steps defined in a plan file, keeping it up to date</task>
+<task>Execute steps from plan file, update status and progress as work completes</task>
 
 <critical_rules priority="absolute" enforcement="strict">
-  <rule id="plan_location">
-    Plans are stored in `.planning/plans/` directory
-  </rule>
-  <rule id="input_resolution">
-    If input is unclear, ask user for clarification (not the plan file path)
+  <rule id="plan_source_of_truth">
+    The plan file is the source of truth. If implementation diverges from the plan, UPDATE the plan to reflect what was actually done.
   </rule>
   <rule id="status_tracking">
-    MUST update plan file status as implementation progresses (status + updated date)
+    ALWAYS update status in frontmatter as work progresses (pending → in_progress → completed | blocked)
   </rule>
-  <rule id="plan_up_to_date">
-    Plan file reflects actual implementation state - update if implementation diverges from plan
+  <rule id="updated_tracking">
+    ALWAYS update updated date in frontmatter whenever the file is changed
   </rule>
-  <rule id="validate_first">
-    Validate plan file exists and has valid frontmatter before execution
+  <rule id="step_completion">
+    Mark steps in the plan body as they finish using the completion format
+  </rule>
+  <rule id="divergence_handling">
+    If a step changes (different file, different approach, new discovery), note it inline under that step
   </rule>
 </critical_rules>
 
 <execution_priority>
   <tier level="1" desc="Command Boundaries">
-    - @validate_first (verify plan exists and valid before proceeding)
-    - @input_resolution (ask for clarification if path unclear)
-    - @plan_location (.planning/plans/ directory)
-    - @status_tracking (update status in plan file)
-    - @plan_up_to_date (reflect actual implementation state)
+    - @plan_source_of_truth (update plan when diverging)
+    - @status_tracking (update status in frontmatter)
+    - @updated_tracking (update date in frontmatter)
+    - @step_completion (mark steps as done)
+    - @divergence_handling (note changes inline)
   </tier>
   <tier level="2" desc="Workflow">
-    - Input resolution (parse plan path)
-    - Plan validation
-    - Execute implementation steps
-    - Update plan status
+    - Resolve the plan (path, name, or scan)
+    - Validate plan (frontmatter, implementation steps)
+    - Execute steps
+    - Track progress (mark done, update status)
+    - Handle divergence (note changes)
+    - Complete (set completed, summarize)
   </tier>
-  <tier level="3" desc="User Experience">
-    - Clear progress feedback
-    - Inform when plan needs updating
-  </tier>
-  <conflict_resolution>Tier 1 always overrides Tier 2/3</conflict_resolution>
 </execution_priority>
 
 ---
 
-## Purpose
+# Implementation Plan Execution
 
-Execute implementation plans created by `/ticket/plan`. The command reads the plan file, executes the defined steps, and keeps the plan up to date with implementation progress.
+Read a plan from `.planning/plans/`, execute the work it describes, and keep the plan file accurate as work progresses.
 
-**Value**: Plan → Execution → Progress Tracking → Updated Plan
+## Ground Rules
 
-**How execution works**: Out of scope. The agent executing this command decides how to execute (direct, delegation, parallel, etc.) based on the steps and context. This command focuses on plan loading, validation, execution orchestration, and status tracking.
-
----
-
-## Handling Input
-
-### Input Format
-
-User provides a path to a plan file:
-```
-/ticket/implement .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
-/ticket/implement plan-feature-jwt-auth-2026-04-09-001.md
-/ticket/implement 002   # If only one plan matches or scanning
-```
-
-### Input Resolution
-
-1. **Full path provided** (e.g., `.planning/plans/plan-xyz.md`):
-   - Validate file exists
-   - Load plan
-
-2. **Partial/relative path** (e.g., `plan-xyz.md`):
-   - Search in `.planning/plans/` for matching plan
-   - If unique match: use it
-   - If multiple matches: ask user to clarify
-   - If not found: ask user for clarification
-
-3. **No input provided**:
-   - Scan `.planning/plans/` for plans with status = pending or in_progress
-   - Present list for user selection
-
-4. **If unclear**:
-   ```
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Could not find plan: "plan-xyz"
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-   Please provide the full path or more details:
-   - .planning/plans/plan-xyz-2026-04-09-001.md
-   - Or use /ticket/plan to create one first
-   ```
-
----
-
-## Usage
-
-```bash
-/ticket/implement                              # Select from pending plans
-/ticket/implement .planning/plans/plan-xyz-001.md   # Execute specific plan
-/ticket/implement plan-xyz-001                 # Short form (searches .planning/plans/)
-```
-
----
-
-## Quick Start
-
-**Run**: `/ticket/implement .planning/plans/plan-xyz.md`
-
-**What happens**:
-1. **Resolve input**: Parse plan path, locate file
-2. **Validate plan**: Check frontmatter, required sections
-3. **Execute steps**: Run implementation (how = agent's decision)
-4. **Track progress**: Update plan status as steps complete
-5. **Update plan**: Reflect actual state (steps modified, notes added, etc.)
-
----
+- The plan file is the source of truth. If implementation diverges from the plan, **update the plan** to reflect what was actually done.
+- Update `status` in the frontmatter as work progresses (`pending → in_progress → completed | blocked`).
+- Always update `updated: {date}` in the frontmatter whenever the file is changed.
 
 ## Workflow
 
-### Stage 0: Input Resolution
-
-Parse user input to locate the plan file:
-
-```
-User input: ".planning/plans/plan-feature-jwt-auth-2026-04-09-001.md"
-→ Validate: Check file exists
-→ Load: Read plan content
-```
-
-```
-User input: "plan-xyz"
-→ Search: ls .planning/plans/*plan-xyz*
-→ If found: Load
-→ If not found: Ask for clarification
-```
-
-```
-User input: (none)
-→ Scan: Find plans with status = pending or in_progress
-→ Present: List for user to select
-```
-
----
-
-### Stage 1: Plan Validation
-
-Validate the plan file before execution:
-
-**Check 1: File exists**
-```
-if [ ! -f "$plan_path" ]; then
-  echo "Plan file not found: $plan_path"
-  exit 1
-fi
-```
-
-**Check 2: Valid frontmatter**
-```
-id: plan-...
-target_ticket: ...
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-approach: option-X
-status: pending|in_progress|completed|blocked
-```
-
-**Check 3: Required sections**
-- `## Analysis` - Problem summary
-- `## Implementation Steps` - At least one step
-
-**If invalid**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ Invalid plan file
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Missing required fields:
-- frontmatter: status field
-- section: Implementation Steps
-
-Options:
-  1. Use /ticket/plan to create a valid plan
-  2. Cancel
-```
-
----
-
-### Stage 2: Execute Implementation
-
-**Read the plan**: Parse implementation steps, understand scope
-
-**Execute steps**: The agent executing decides how to execute:
-- Direct execution
-- Delegation to subagents
-- Parallel execution
-- Sequential execution
-
-**Progress tracking**: After each step (or batch), update plan:
-- Mark step as completed (if tracking steps individually)
-- Update overall status in frontmatter
-- Add `updated: {current date}`
-
-**Example progress**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Executing: plan-feature-jwt-auth-2026-04-09-001.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Step 1: Setup JWT library         [███░░░░░░░] 30%
-Step 2: Create token service      [░░░░░░░░░] pending
-Step 3: Implement login flow       [░░░░░░░░░] pending
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Status: in_progress → Updated: 2026-04-09
-```
-
----
-
-### Stage 3: Update Plan
-
-After execution (or during), update the plan file to reflect actual state:
-
-**Update frontmatter**:
-```yaml
----
-id: plan-2026-04-09-001
-target_ticket: feature-jwt-auth-2026-04-09
-created: 2026-04-09
-updated: 2026-04-09
-approach: option-2
-status: in_progress  # or completed, blocked
----
-```
-
-**If implementation diverged from plan**:
-- Add notes about changes
-- Update step descriptions
-- Document new discoveries
-- Keep original steps but mark as modified
-
-**Example**:
-```markdown
-## Implementation Steps
-
-### Step 1: Setup JWT library ✅
-- Description: Install and configure JWT library
-- Files: `package.json`, `src/auth/config.ts`
-- Status: completed
-- Notes: Used `jose` library instead of `jsonwebtoken` (better ESM support)
-
-### Step 2: Create token service ⏳
-- Description: JWT generation and validation
-- Files: `src/auth/tokens.ts`
-- Status: in_progress
-```
-
----
-
-### Stage 4: Completion
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Implementation Complete
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Plan: plan-feature-jwt-auth-2026-04-09-001.md
-Target: feature-jwt-auth-2026-04-09
-Status: completed
-Updated: 2026-04-09
-
-Steps completed: 4/4
-
-Next steps:
-- Run tests to verify implementation
-- Update ticket status: /ticket/update feature-jwt-auth-2026-04-09.md status=in_progress
-```
-
----
+1. **Resolve the plan** — accept a full path, a partial name (search `.planning/plans/`), or scan for `pending`/`in_progress` plans if no input given.
+2. **Validate** — confirm the file exists, has valid frontmatter (`id`, `target_ticket`, `status`), and contains an `## Implementation Steps` section. If invalid, tell the user what is missing.
+3. **Execute** — work through the implementation steps. Decide how to execute (sequentially, in parallel, delegated) based on the plan content and available context.
+4. **Track progress** — after each step (or logical batch), mark it done in the plan body and update `status` + `updated` in frontmatter.
+5. **Handle divergence** — if a step changes (different file, different approach, new discovery), note it inline under that step rather than silently doing something the plan doesn't describe.
+6. **Complete** — when all steps are done, set `status: completed` and summarise what was done and what to verify next.
 
 ## Status Values
 
-| Status | Description |
-|--------|-------------|
-| pending | Plan created, not started |
-| in_progress | Implementation ongoing |
-| completed | All steps done |
-| blocked | Cannot proceed (dependency, issue) |
+| Value | Meaning |
+|-------|---------|
+| `pending` | Not started |
+| `in_progress` | Work underway |
+| `completed` | All steps done |
+| `blocked` | Cannot proceed; reason noted in plan |
 
----
+## Step Completion Format
 
-## Error Handling
+Mark steps in the plan body as they finish:
 
-**Plan not found**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ Plan not found: .planning/plans/plan-unknown-2026-04-09-001.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Available plans in .planning/plans/:
-  - plan-feature-jwt-auth-2026-04-09-001.md (pending)
-  - plan-bug-login-redirect-2026-04-09-001.md (in_progress)
-
-Options:
-  1. Select from available plans
-  2. Create new plan with /ticket/plan
-  3. Cancel
+```markdown
+### Step 1: Setup rate-limit config ✅
+- **Files**: `src/config/plans.ts`
+- **What**: Added `rateLimit` field to each tier.
+- **Notes**: Found `free` tier was missing from the object entirely — added it with defaults.
 ```
 
-**Invalid plan format**:
+If a step is blocked or changed, note it clearly:
+
+```markdown
+### Step 2: Create middleware ⚠️ changed
+- **Notes**: Used `redis-rate-limit` package instead of a custom Lua script — already
+  present in package.json and handles the atomicity requirement.
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ Invalid plan format
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Missing required frontmatter fields:
-  - status
-  - updated
-
-Please use a valid plan file or create one with /ticket/plan
-```
-
-**Execution failure**:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ Step 2 failed: Create token service
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Error: [error details]
-
-Options:
-  1. Retry step
-  2. Skip and continue
-  3. Update plan and stop
-
-How would you like to proceed?
-```
-
----
-
-## Tips
-
-**Keep the plan updated**: If implementation discovers new information or diverges from the plan, update the plan file. This keeps the plan as a reliable source of truth.
-
-**Use status meaningfully**:
-- `in_progress` while work is happening
-- `completed` when done
-- `blocked` if waiting on something
-
-**Track step progress**: Mark individual steps as completed in the body, not just the overall status.
-
-**Add notes**: Document discoveries, decisions, and changes in the plan. Future maintainers (human or AI) will thank you.
 
 ---
 
@@ -373,6 +108,8 @@ How would you like to proceed?
 - [ ] Plan reflects actual implementation state?
 
 ---
+
+Implement the plan from this @implement_request:
 
 <user_input id="implement_request">
 $ARGUMENTS
