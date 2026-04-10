@@ -13,4 +13,4 @@
 [credential]
 	helper = GIT_CREDENTIAL_HELPER
 
-# vim:ft=git_config:
+# vim:ft=gitconfig:

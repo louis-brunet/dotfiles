@@ -73,4 +73,4 @@
 [grep]
   lineNumber = true
 
-# vim:ft=git_config:
+# vim:ft=gitconfig:
