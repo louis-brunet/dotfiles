@@ -270,7 +270,6 @@ Plan Preview: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
-id: plan-2026-04-09-001
 target_ticket: feature-jwt-auth-2026-04-09
 created: 2026-04-09
 updated: 2026-04-09
@@ -303,6 +302,13 @@ Users need secure authentication. Currently using plain text passwords.
 **Option 2: Robust Approach**
 
 **Reasoning**: [User's rationale or agent's recommendation]
+
+## Testing Approach
+
+- Unit tests for JWT generation/validation logic in `src/auth/jwt.ts`
+- Integration tests for registration and login endpoints
+- Existing test patterns: `npm test -- auth` (jest, existing auth test suite)
+- New tests required for token refresh and middleware validation
 
 ## Implementation Steps
 
@@ -406,7 +412,6 @@ Examples:
 
 ```yaml
 ---
-id: plan-{YYYYMMDD}-{seq}
 target_ticket: {ticket-filename}
 created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
@@ -422,9 +427,10 @@ status: {pending|in_progress|completed|blocked}
 2. `## Considerations` - Key factors to keep in mind during implementation
 3. `## Existing Patterns` - Relevant patterns already in the codebase (if applicable)
 4. `## Selected Approach` - Chosen option with reasoning
-5. `## Implementation Steps` - Numbered steps with file references
-6. `## Risks and Mitigations` - Potential issues and how to address them
-7. `## Validation` - Success criteria and validation steps for implementation
+5. `## Testing Approach` - How testing will be handled
+6. `## Implementation Steps` - Numbered steps with file references
+7. `## Risks and Mitigations` - Potential issues and how to address them
+8. `## Validation` - Success criteria and validation steps for implementation
 
 **Step structure**:
 ```markdown
@@ -453,6 +459,7 @@ status: {pending|in_progress|completed|blocked}
 | existing_patterns | array | No | Relevant patterns already in the codebase |
 | selected_approach.id | string | Yes | Chosen option |
 | selected_approach.reasoning | string | No | Why this was chosen |
+| testing_approach | string | Yes | Key testing patterns, existing and planned |
 | implementation_steps | array | Yes | Ordered steps with details |
 | risks_and_mitigations | array | No | Potential risks and mitigation strategies |
 | validation.success_criteria | array | Yes | List of criteria to verify implementation success |
@@ -474,7 +481,6 @@ Plan Preview: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
-id: plan-2026-04-09-001
 target_ticket: feature-jwt-auth-2026-04-09
 created: 2026-04-09
 updated: 2026-04-09
@@ -497,6 +503,12 @@ Users need secure authentication. Currently using plain text passwords.
 ## Selected Approach
 
 **JWT with Refresh Tokens** - Standard approach for secure authentication.
+
+## Testing Approach
+
+- Unit tests for token generation and validation in `src/auth/tokens.ts`
+- Integration tests for register/login endpoints
+- Existing test patterns: `npm test -- auth` (jest)
 
 ## Implementation Steps
 
@@ -586,13 +598,18 @@ Select [1/2]: 2
 
 # Agent shows plan preview with Validation section:
 ---
-id: plan-2026-04-09-001
 target_ticket: feature-jwt-auth-2026-04-09
 created: 2026-04-09
 approach: option-2
 ---
 
 # Implementation Plan: User Authentication
+
+## Testing Approach
+
+- Unit tests for JWT token service and refresh logic
+- Integration tests for auth endpoints
+- Existing test patterns: `npm test -- auth`
 
 ## Validation
 
