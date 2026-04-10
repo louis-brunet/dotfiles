@@ -74,6 +74,15 @@
         "@upstash/context7-mcp"
       ],
       "environment": {}
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ],
+      "environment": {},
+      "enabled": true
     }
   },
   "provider": {},
