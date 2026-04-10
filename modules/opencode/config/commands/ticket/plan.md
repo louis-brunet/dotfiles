@@ -375,6 +375,9 @@ File created:
 Target: feature-jwt-auth
 Approach: Robust Approach (Option 2)
 Steps: 4
+
+Next step:
+  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ```
 
 ---
@@ -533,6 +536,9 @@ curl -X POST /api/auth/login -d '{"email":"test@example.com","password":"Test123
 **Create this plan?** [y/n/comments]: y
 
 ✅ Plan created: .planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
+
+Next step:
+  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ```
 
 ### Example 2: Plan without Input (Multiple Options)
@@ -562,6 +568,9 @@ Select [1/2]: 2
 
 # Shows plan preview, user approves
 ✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
+
+Next step:
+  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ```
 
 ### Example 2 with Validation Content:
@@ -606,6 +615,9 @@ npm test -- auth
 **Create this plan?** [y/n/comments]: y
 
 ✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
+
+Next step:
+  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ```
 
 ### Example 3: Plan with Comments
@@ -630,7 +642,10 @@ Select [1/2/3]: 1
 
 **Create this plan?** (.planning/plans/plan-...) [y/n/comments]: y
 
-✅ Plan created!
+✅ Plan created: .planning/plans/plan-feature-user-auth-2026-04-09-001.md
+
+Next step:
+  /ticket/implement @.planning/plans/plan-feature-jwt-auth-2026-04-09-001.md
 ```
 
 ---
