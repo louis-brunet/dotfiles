@@ -83,6 +83,15 @@
       ],
       "environment": {},
       "enabled": false
+    },
+    "shadcn": {
+      "type": "local",
+      "command": [
+        "npx",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "enabled": true
     }
   },
   "provider": {},
