@@ -82,7 +82,7 @@
         "@playwright/mcp@latest"
       ],
       "environment": {},
-      "enabled": true
+      "enabled": false
     }
   },
   "provider": {},
