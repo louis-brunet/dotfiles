@@ -319,7 +319,7 @@ The agent searches codebase and builds ticket — user sees only the result:
 |---------|--------|
 | Problem Statement | Problem description from input + codebase context (existing state, related tickets) |
 | Solution | High-level intent inferred from input; not implementation details |
-| User Stories | Actor/feature/benefit triples derived from input; 1 per distinct user-facing outcome |
+| User Stories | Actor/feature/benefit triples derived from input; 1 per distinct user-facing outcome; the list of user stories should be LONG |
 | Implementation Decisions | Related files and interfaces found in Stage 0 (source files + index/interface search) |
 | Testing Decisions | Test files found in Stage 0; note gaps and suggest new test locations |
 | Out of Scope | Constraints inferred from input (what is NOT being built) |
@@ -459,7 +459,7 @@ related_tickets:
 **Required sections**:
 1. `## Problem Statement` - 2–5 bullets: user pain, current state, why it matters; grounded in codebase findings
 2. `## Solution` - 2–5 bullets: high-level intent and approach; not implementation details
-3. `## User Stories` - numbered actor/feature/benefit triples; authoritative definition of done
+3. `## User Stories` - long list of numbered actor/feature/benefit triples; authoritative definition of done
 4. `## Implementation Decisions` - modules to touch, interfaces expected, architectural choices; pre-filled from Stage 0 codebase search
 5. `## Testing Decisions` - what to test, what good tests look like, prior art in repo; pre-filled from Stage 0 test file search
 6. `## Out of Scope` - explicit constraints to prevent over-engineering
