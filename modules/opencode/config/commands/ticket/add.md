@@ -405,6 +405,9 @@ File created:
 Title: Add JWT authentication for secure user login
 Type: feature
 Status: pending (open)
+
+Next step:
+  /ticket/plan @.planning/tickets/feature-jwt-auth-2026-01-29.md
 ```
 
 ---
@@ -550,6 +553,9 @@ Implement JWT authentication with short-lived access tokens and httpOnly cookie 
 Create this ticket? (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comments]:
 
 ✅ Created: .planning/tickets/feature-jwt-auth-2026-04-09.md
+
+Next step:
+  /ticket/plan @.planning/tickets/feature-jwt-auth-2026-04-09.md
 ```
 
 ### Example 2: Create Bug Ticket
@@ -560,6 +566,9 @@ Create this ticket? (.planning/tickets/feature-jwt-auth-2026-04-09.md) [y/n/comm
 # User approves → file created
 
 ✅ Created: .planning/tickets/bug-login-redirect-2026-04-09.md
+
+Next step:
+  /ticket/plan @.planning/tickets/bug-login-redirect-2026-04-09.md
 ```
 
 ---
