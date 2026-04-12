@@ -67,7 +67,8 @@ Read a plan from `.planning/plans/`, execute the work it describes, and keep the
 3. **Execute** — work through the implementation steps. Decide how to execute (sequentially, in parallel, delegated) based on the plan content and available context.
 4. **Track progress** — after each step (or logical batch), mark it done in the plan body and update `status` + `updated` in frontmatter.
 5. **Handle divergence** — if a step changes (different file, different approach, new discovery), note it inline under that step rather than silently doing something the plan doesn't describe.
-6. **Complete** — when all steps are done, set `status: completed` and summarise what was done and what to verify next.
+6. **Complete** — when all steps are done, set `status: completed` 
+7. **Summarize** - tell the user what was done, key design decisions taken during implementation, and what to verify next.
 
 ## Status Values
 
