@@ -68,7 +68,7 @@ Create a structured Markdown ticket in `.planning/tickets/` that captures intent
 ## Workflow
 
 1. **Understand the request** — extract ticket type, title, and intent from what the user said.
-2. **Explore the codebase** — scan `.planning/tickets/` for related tickets; check project structure, dependencies, and recent git history to ground implementation and testing sections in reality.
+2. **Explore the codebase** — scan `.planning/tickets/` for related tickets; check project structure, dependencies, and recent git history + status to ground implementation and testing sections in reality.
    - Do NOT infer detailed implementation steps unless trivial.
 3. **Draft the ticket** - infer the content of the file (frontmatter + sections below) from user intent and gathered context. Focus on *problem clarity*, *desired outcome*, and *constraints*.
 4. **Show ticket preview** - show the user full content + filename.
