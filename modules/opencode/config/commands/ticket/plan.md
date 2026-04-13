@@ -72,10 +72,11 @@ Analyze a problem, propose one or more implementation approaches, get user confi
 
 1. **Resolve the target ticket** — accept a ticket path/name directly, or scan `.planning/tickets/` for non-completed tickets and let the user pick.
 2. **Explore the codebase** — read the ticket, check related source files, existing plans, and tech stack to ground the analysis in reality.
-3. **Propose approaches** — for straightforward problems present one clear approach; for genuinely ambiguous or high-risk problems present 2–3 options with trade-offs. Let the complexity of the problem drive the count, not a formula.
-4. **Confirm approach** — get user selection (if multiple) or a simple yes/no (if one).
-5. **Draft the plan** — produce a complete plan preview.
-6. **Confirm and write** — show filename + preview, get approval, then write the file.
+3. **Ask for key decisions** - understand the intent of the ticket and clarify any key architectural, structural or design decisions
+4. **Propose approaches** — for straightforward problems present one clear approach; for genuinely ambiguous or high-risk problems present 2–3 options with trade-offs. Let the complexity of the problem drive the count, not a formula.
+5. **Confirm approach** — get user selection (if multiple) or a simple yes/no (if one).
+6. **Draft the plan** — produce a complete plan preview.
+7. **Confirm and write** — show filename + preview, get approval, then write the file.
 
 ## Plan Format
 
@@ -118,6 +119,9 @@ What to test, where test files live or should be created, and how to run them.
 
 ## Risks & Mitigations  *(omit if none)*
 Known risks and how the plan accounts for them.
+
+## Prerequisites *(omit if none)*
+Significant preliminary setup to be done by the user.
 ```
 
 ## Quality Bar
@@ -128,13 +132,12 @@ A good plan is **executable without follow-up questions**. An agent reading it c
 
 ## Success Criteria
 
-- [ ] Existing patterns identified (if applicable)?
+- [ ] Existing patterns identified?
+- [ ] Key design decisions considered?
 - [ ] User selected approach (if multiple)?
 - [ ] Plan preview shown to user?
 - [ ] User validated final plan before creation?
 - [ ] Plan written to .planning/plans/?
-- [ ] Plan includes risks and mitigations?
-- [ ] Plan includes validation section with success criteria?
 
 ---
 
