@@ -67,7 +67,7 @@ Read a plan from `.planning/plans/`, execute the work it describes, and keep the
 3. **Execute** — work through the implementation steps. Decide how to execute (sequentially, in parallel, delegated) based on the plan content and available context.
 4. **Track progress** — after each step (or logical batch), mark it done in the plan body and update `status` + `updated` in frontmatter.
 5. **Handle divergence** — if a step changes (different file, different approach, new discovery), note it inline under that step rather than silently doing something the plan doesn't describe.
-6. **Complete** — when all steps are done, set `status: completed` 
+6. **Complete** — when all steps are done, set `status: completed` on both the plan and the ticket. If a `.planning/index.md` file exists, update statuses there as well.
 7. **Summarize** - tell the user what was done, key design decisions taken during implementation, and what to verify next.
 
 ## Status Values
@@ -105,7 +105,7 @@ If a step is blocked or changed, note it clearly:
 - [ ] Plan file located and loaded?
 - [ ] Plan validated (frontmatter + required sections)?
 - [ ] Implementation executed?
-- [ ] Plan status updated in frontmatter?
+- [ ] Plan and ticket status updated in frontmatter?
 - [ ] Plan reflects actual implementation state?
 
 ---
