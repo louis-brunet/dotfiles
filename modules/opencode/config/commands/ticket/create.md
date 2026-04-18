@@ -29,7 +29,7 @@ description: Create tickets for features, bugs, and chores
     Ticket MUST be validated by the user after writing - preview shown, approval requested, file may be rewritten if changes needed
   </rule>
   <rule id="unique_id">
-    Ticket filename MUST be unique: `{type}-{slug}-{YYYY-MM-DD}.md`
+    Ticket filename MUST be unique: `{YYYY-MM-DD}-{type}-{slug}.md`
   </rule>
 </critical_rules>
 
@@ -77,7 +77,7 @@ Create a structured Markdown ticket in `.planning/tickets/` that captures intent
 
 ## Ticket Format
 
-**Filename**: `.planning/tickets/{type}-{slug}-{YYYY-MM-DD}.md`
+**Filename**: `.planning/tickets/{YYYY-MM-DD}-{type}-{slug}.md`
 - Slug: lowercase, hyphens, no special chars, max 50 chars
 
 **Frontmatter**:

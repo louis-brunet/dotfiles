@@ -32,7 +32,7 @@ description: Scan tickets and plans, rebuild the planning index
     Plans MUST reference a target ticket (existing in .planning/tickets/ or new)
   </rule>
   <rule id="unique_id">
-    Plan filename MUST be unique: `plan-{target-slug}-{YYYY-MM-DD}-{seq}.md`
+    Plan filename MUST be unique: `{YYYY-MM-DD}-{target-slug}-{seq}.md`
   </rule>
 </critical_rules>
 
@@ -81,13 +81,13 @@ Analyze a problem, propose one or more implementation approaches, get user confi
 
 ## Plan Format
 
-**Filename**: `.planning/plans/plan-{ticket-slug}-{YYYY-MM-DD}-{NNN}.md`
-- `NNN` is a zero-padded sequence number starting at `001`, incremented if a plan for the same ticket already exists.
+**Filename**: `.planning/plans/{YYYY-MM-DD}-{target-slug}-{NN}.md`
+- `NN` is a zero-padded sequence number starting at `01`, incremented if a plan for the same ticket already exists.
 
 **Frontmatter**:
 ```yaml
 ---
-id: plan-{ticket-slug}-{YYYY-MM-DD}-{NNN}
+id: {YYYY-MM-DD}-{target-slug}-{NN}.md
 target_ticket: {ticket-filename-without-.md}
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
