@@ -26,7 +26,7 @@ description: Create tickets for features, bugs, and chores
     ALL ticket files MUST start with YAML frontmatter containing type, priority, created date, and updated date
   </rule>
   <rule id="user_approval">
-    Ticket MUST be validated by the user before creation
+    Ticket MUST be validated by the user after writing - preview shown, approval requested, file may be rewritten if changes needed
   </rule>
   <rule id="unique_id">
     Ticket filename MUST be unique: `{type}-{slug}-{YYYY-MM-DD}.md`
@@ -39,7 +39,7 @@ description: Create tickets for features, bugs, and chores
     - @argument_handling (extract info, never skip)
     - @ticket_location (.planning/tickets/)
     - @frontmatter_required (YAML frontmatter)
-    - @user_approval (ticket preview and validation required before writing)
+    - @user_approval (preview shown, approval requested after writing)
     - @unique_id (unique filename)
   </tier>
   <tier level="2" desc="Workflow">
@@ -71,9 +71,9 @@ Create a structured Markdown ticket in `.planning/tickets/` that captures intent
 2. **Explore the codebase** — scan `.planning/tickets/` for related tickets; check project structure, dependencies, and recent git history + status to ground implementation and testing sections in reality.
    - Do NOT infer detailed implementation steps unless trivial.
 3. **Draft the ticket** - infer the content of the file (frontmatter + sections below) from user intent and gathered context. Focus on *problem clarity*, *desired outcome*, and *constraints*.
-4. **Show ticket preview** - show the user full content + filename.
-5. **CONFIRM BEFORE WRITING** — wait for explicit user approval BEFORE writing any file. This step is MANDATORY — never skip it or write the file first.
-6. **Write the file** — only after you have received explicit approval.
+4. **Write the file** — write the ticket file to `.planning/tickets/`.
+5. **Show ticket preview** - show the user the filename and full content.
+6. **Request approval** — ask for confirmation or comments. If changes needed, update the file and show the preview again.
 
 ## Ticket Format
 
@@ -160,7 +160,7 @@ Avoid:
 
 - [ ] Cross-referenced existing tickets?
 - [ ] Checked codebase and previous work to gather context?
-- [ ] User validated the ticket before creation?
+- [ ] User validated the ticket after writing?
 - [ ] Ticket file written to .planning/tickets/? (check, don't assume)
 
 ---

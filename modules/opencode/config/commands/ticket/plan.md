@@ -26,7 +26,7 @@ description: Scan tickets and plans, rebuild the planning index
     ALL plan files MUST start with YAML frontmatter containing id, target ticket, created date, status, and approach
   </rule>
   <rule id="user_approval">
-    Plan MUST be validated by user before creation - both option selection AND final approval
+    Plan MUST be validated by user after writing - preview shown, approval requested, file may be rewritten if changes needed
   </rule>
   <rule id="ticket_reference">
     Plans MUST reference a target ticket (existing in .planning/tickets/ or new)
@@ -42,7 +42,7 @@ description: Scan tickets and plans, rebuild the planning index
     - @argument_handling (resolve input or search tickets)
     - @plan_location (.planning/plans/)
     - @frontmatter_required (YAML frontmatter)
-    - @user_approval (validation at two points)
+    - @user_approval (preview shown, approval requested after writing)
     - @ticket_reference (must target a ticket)
     - @unique_id (unique filename)
   </tier>
@@ -75,8 +75,9 @@ Analyze a problem, propose one or more implementation approaches, get user confi
 3. **Ask for key decisions** - understand the intent of the ticket and clarify any key architectural, structural or design decisions
 4. **Propose approaches** — for straightforward problems present one clear approach; for genuinely ambiguous or high-risk problems present 2–3 options with trade-offs. Let the complexity of the problem drive the count, not a formula.
 5. **Confirm approach** — get user selection (if multiple) or a simple yes/no (if one).
-6. **Draft the plan** — produce a complete plan preview.
-7. **Confirm and write** — show filename + preview, get approval, then write the file.
+6. **Draft and write the plan** — produce the complete plan and write it to `.planning/plans/`.
+7. **Show preview** — show the user the filename and full content.
+8. **Request approval** — ask for confirmation or comments. If changes needed, update the file and show the preview again.
 
 ## Plan Format
 
@@ -136,7 +137,7 @@ A good plan is **executable without follow-up questions**. An agent reading it c
 - [ ] Key design decisions considered?
 - [ ] User selected approach (if multiple)?
 - [ ] Plan preview shown to user?
-- [ ] User validated final plan before creation?
+- [ ] User validated final plan after writing?
 - [ ] Plan written to .planning/plans/?
 
 ---
