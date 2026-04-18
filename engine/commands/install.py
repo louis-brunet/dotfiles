@@ -115,7 +115,7 @@ def run(args: argparse.Namespace) -> None:
 
     state = StateManager(state_dir)
     executor = Executor(state)
-    results = executor.execute_order(order, modules)
+    results = executor.execute_order(order, modules, force=args.force)
 
     succeeded = [n for n, r in results.items() if r.success]
     failed = [n for n, r in results.items() if not r.success]

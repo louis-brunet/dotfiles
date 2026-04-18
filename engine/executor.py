@@ -124,7 +124,9 @@ class Executor:
         script: Path | None = None
         current_platform = get_current_platform()
 
-        console.debug(f"[{module.name}] Resolving {action} script for platform: {current_platform.name}")
+        console.debug(
+            f"[{module.name}] Resolving {action} script for platform: {current_platform.name}"
+        )
 
         if action == "install":
             script = module.get_install_script(current_platform)
@@ -203,8 +205,7 @@ class Executor:
 
             if success:
                 console.info(
-                    f"[{module.name}] {action.capitalize()} succeeded "
-                    f"(exit 0, {duration:.2f}s)"
+                    f"[{module.name}] {action.capitalize()} succeeded (exit 0, {duration:.2f}s)"
                 )
                 return ExecutionResult(
                     success=True,
@@ -241,6 +242,7 @@ class Executor:
         self,
         order: list[str],
         modules: dict[str, Module],
+        force: bool = False,
     ) -> dict[str, ExecutionResult]:
         """
         Execute modules in specified order.
@@ -266,8 +268,8 @@ class Executor:
 
             console.info(f"[{index}/{total}] Processing module: {name}")
 
-            # Skip if already installed
-            if self._state.is_installed(name):
+            # Skip if already installed (unless force is True)
+            if not force and self._state.is_installed(name):
                 console.info(f"[{name}] Already installed — skipping")
                 results[name] = ExecutionResult(
                     success=True,
