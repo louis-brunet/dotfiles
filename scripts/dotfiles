@@ -1,0 +1,23 @@
+#!/bin/bash
+# Dotfiles Engine CLI Entry Point
+# This script provides a simple wrapper around the Python engine
+
+set -e
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Use venv Python if available, otherwise fall back to system python
+VENV_PYTHON="$DOTFILES_ROOT/.venv/bin/python"
+if [[ -x "$VENV_PYTHON" ]]; then
+    PYTHON="$VENV_PYTHON"
+else
+    PYTHON="python3"
+fi
+
+# Add the engine directory to Python path (for module imports)
+export PYTHONPATH="$DOTFILES_ROOT:$PYTHONPATH"
+
+# Run the Python module
+"$PYTHON" -m engine "$@"
