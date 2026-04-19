@@ -98,8 +98,25 @@ status: pending
 
 **Sections**:
 ```markdown
-## Analysis
+## Summary
 Short summary of the problem, constraints, and key findings from codebase exploration.
+
+## Current State Analysis
+
+What exists now, what's missing, key constraints discovered
+
+## Desired End State
+
+A Specification of the desired end state after this plan is complete, and how to verify it
+
+### Key Discoveries:
+- Important finding with file:line reference
+- Pattern to follow
+- Constraint to work within
+
+## What We're NOT Doing
+
+Explicitly list out-of-scope items to prevent scope creep
 
 ## Approach
 What will be done and why this approach was chosen (mention trade-offs if alternatives were considered).
@@ -116,7 +133,7 @@ What to test, where test files live or should be created, and how to run them.
 
 ## Validation
 - **Success criteria**: observable outcomes that confirm the implementation is correct
-- **Verification**: commands or manual steps to check each criterion
+- **Verification**: automated commands or manual steps to check each criterion
 
 ## Risks & Mitigations  *(omit if none)*
 Known risks and how the plan accounts for them.

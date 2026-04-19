@@ -111,20 +111,25 @@ What success looks like from a user/system perspective — without prescribing h
 - Known constraints (technical, product, infra)
 - Open questions that must be answered during planning
 
+## Out of Scope
+Explicit list of what this ticket does NOT cover.
+
 ## Implementation Notes *(optional)*
 Light directional hints only (e.g., relevant areas of the codebase).
 Avoid step-by-step instructions or architectural decisions unless trivial.
 
-## Testing Notes
+## Success Criteria
 What should be validated at a high level. Relevant existing testing patterns. Avoid test implementation detail.
 
-## Out of Scope
-Explicit list of what this ticket does NOT cover.
+## Context
 
-## Related Files
-Key files or areas that may be relevant (existing, likely impacted, to-be-created).
+### Current State
+What currently exists, if anything
 
-## Notes *(optional)*
+### Patterns to Investigate
+Keywords or patterns to look for when planning or implementing. Why they are relevant.
+
+### Notes *(optional)*
 Additional context if needed for planning or implementation.
 ```
 
