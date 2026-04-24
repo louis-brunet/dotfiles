@@ -165,24 +165,31 @@ return {
     --     }
     -- },
 
+    ---@type lspconfig.settings.ts_ls
     settings = {
-        settings = {
-            typescript = {
-                -- format = {
-                --     indentSize = vim.o.shiftwidth,
-                --     convertTabsToSpaces = vim.o.expandtab,
-                --     tabSize = vim.o.tabstop,
-                -- },
+        typescript = {
+            -- format = {
+            --     indentSize = vim.o.shiftwidth,
+            --     convertTabsToSpaces = vim.o.expandtab,
+            --     tabSize = vim.o.tabstop,
+            -- },
+            preferences = {
+                preferTypeOnlyAutoImports = true,
             },
-            javascript = {
-                -- format = {
-                --     indentSize = vim.o.shiftwidth,
-                --     convertTabsToSpaces = vim.o.expandtab,
-                --     tabSize = vim.o.tabstop,
-                -- },
-            },
-            completions = { completeFunctionCalls = true },
+            -- suggest = {
+            --     completeFunctionCalls = true,
+            -- }
         },
+        javascript = {
+            -- format = {
+            --     indentSize = vim.o.shiftwidth,
+            --     convertTabsToSpaces = vim.o.expandtab,
+            --     tabSize = vim.o.tabstop,
+            -- },
+            -- suggest = { completeFunctionCalls = true },
+        },
+        -- ["js/ts"] = {
+        -- },
     },
 
     on_attach = function(client, bufnr)

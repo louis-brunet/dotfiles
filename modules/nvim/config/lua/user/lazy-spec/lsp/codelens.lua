@@ -44,9 +44,7 @@ return {
                     SymbolKind.Function,
                     SymbolKind.Method,
                     SymbolKind.Interface,
-                    -- vim.lsp.protocol.SymbolKind.Function,
-                    -- vim.lsp.protocol.SymbolKind.Method,
-                    -- vim.lsp.protocol.SymbolKind.Interface,
+                    SymbolKind.Class,
                 },
                 -- Symbol Kinds that may have target symbol kinds as children
                 wrapper_symbol_kinds = {

@@ -1,9 +1,8 @@
 ---@type vim.lsp.Config
 return {
-    ---@class LuaLanguageServerSettings
+    ---@type lspconfig.settings.lua_ls
     settings = {
         --- https://luals.github.io/wiki/settings/
-        ---@class LuaLanguageServerSettingsLua
         Lua = {
             telemetry = { enable = false },
 
