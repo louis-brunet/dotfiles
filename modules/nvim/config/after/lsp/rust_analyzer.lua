@@ -3,6 +3,7 @@ return {
     -- maps to lspconfig's `cmd` option
     -- cmd = { '/home/louis/.cargo/bin/rust-analyzer' },
 
+    ---@type lspconfig.settings.rust_analyzer
     settings = {
         ["rust-analyzer"] = {
             diagnostics = {

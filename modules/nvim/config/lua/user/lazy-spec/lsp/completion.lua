@@ -13,7 +13,9 @@ local M = {
         "folke/lazydev.nvim",
         ft = "lua",
         ---@type lazydev.Config require("lazydev")
-        opts = { library = { vim.env.VIMRUNTIME } },
+        opts = {
+            library = { vim.env.VIMRUNTIME, { path = "nvim-lspconfig", words = { "lspconfig" } } }
+        },
     },
 
     {
