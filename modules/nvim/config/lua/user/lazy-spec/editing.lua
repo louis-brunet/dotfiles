@@ -135,6 +135,7 @@ local M = {
     -- different treesitter node types, e.g. for tsx files
     {
         "folke/ts-comments.nvim",
+
         opts = {},
         event = "VeryLazy",
         enabled = vim.fn.has("nvim-0.10.0") == 1,

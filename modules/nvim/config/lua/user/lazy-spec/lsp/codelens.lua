@@ -35,7 +35,8 @@ return {
                 sections = {              -- Enable / Disable specific request, formatter example looks 'Format Requests'
                     definition = false,
                     references = display_references,
-                    implements = display_implementations,
+                    implements = false,
+                    -- implements = display_implementations,
                     git_authors = display_git_authors,
                 },
                 ignore_filetype = { "prisma" },
