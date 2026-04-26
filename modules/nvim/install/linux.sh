@@ -128,11 +128,12 @@ download_nvim_and_verify_checksum() {
     chmod +x "$NVIM_EXECUTABLE_PATH"
 }
 
-# # NOTE: $HOME/bin should be in PATH
-# nvim_path="$HOME/bin/nvim"
-if [[ ! -x "$NVIM_EXECUTABLE_PATH" ]] || [[ -n "$DOTFILES_ALWAYS_UPDATE_NVIM" ]]; then
-    download_nvim_and_verify_checksum
-fi
+# # # NOTE: $HOME/bin should be in PATH
+# # nvim_path="$HOME/bin/nvim"
+# if [[ ! -x "$NVIM_EXECUTABLE_PATH" ]] || [[ -n "$DOTFILES_ALWAYS_UPDATE_NVIM" ]]; then
+#     download_nvim_and_verify_checksum
+# fi
+download_nvim_and_verify_checksum
 
 # sudo snap install nvim --classic
 

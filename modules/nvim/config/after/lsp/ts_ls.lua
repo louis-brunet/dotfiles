@@ -134,6 +134,7 @@ return {
     -- maps to lspconfig's `init_options` (!= `settings`)
     init_options = {
         hostInfo = "neovim",
+        -- https://github.com/typescript-language-server/typescript-language-server/blob/master/docs/configuration.md#preferences-options
         preferences = {
             quotePreference = "single",
 
@@ -148,6 +149,8 @@ return {
 
             importModuleSpecifierPreference = "relative",
             importModuleSpecifierEnding = "minimal",
+
+            preferTypeOnlyAutoImports = true,
         },
     },
 
@@ -165,31 +168,32 @@ return {
     --     }
     -- },
 
+    -- NOTE: not sure if this is the right nesting level for this type hint:
     ---@type lspconfig.settings.ts_ls
     settings = {
-        typescript = {
-            -- format = {
-            --     indentSize = vim.o.shiftwidth,
-            --     convertTabsToSpaces = vim.o.expandtab,
-            --     tabSize = vim.o.tabstop,
-            -- },
-            preferences = {
-                preferTypeOnlyAutoImports = true,
-            },
-            -- suggest = {
-            --     completeFunctionCalls = true,
-            -- }
-        },
-        javascript = {
-            -- format = {
-            --     indentSize = vim.o.shiftwidth,
-            --     convertTabsToSpaces = vim.o.expandtab,
-            --     tabSize = vim.o.tabstop,
-            -- },
-            -- suggest = { completeFunctionCalls = true },
-        },
-        -- ["js/ts"] = {
+        -- typescript = {
+        --     -- format = {
+        --     --     indentSize = vim.o.shiftwidth,
+        --     --     convertTabsToSpaces = vim.o.expandtab,
+        --     --     tabSize = vim.o.tabstop,
+        --     -- },
+        --     preferences = {
+        --         preferTypeOnlyAutoImports = true,
+        --     },
+        --     -- suggest = {
+        --     --     completeFunctionCalls = true,
+        --     -- }
         -- },
+        -- javascript = {
+        --     -- format = {
+        --     --     indentSize = vim.o.shiftwidth,
+        --     --     convertTabsToSpaces = vim.o.expandtab,
+        --     --     tabSize = vim.o.tabstop,
+        --     -- },
+        --     -- suggest = { completeFunctionCalls = true },
+        -- },
+        -- -- ["js/ts"] = {
+        -- -- },
     },
 
     on_attach = function(client, bufnr)
