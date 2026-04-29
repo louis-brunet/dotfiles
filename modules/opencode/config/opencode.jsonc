@@ -73,6 +73,7 @@
         "-y",
         "@upstash/context7-mcp"
       ],
+      "enabled": false,
       "environment": {}
     },
     "playwright": {
