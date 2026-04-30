@@ -1,4 +1,6 @@
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 return {
     -- {
     --     "boltlessengineer/zeta.nvim",

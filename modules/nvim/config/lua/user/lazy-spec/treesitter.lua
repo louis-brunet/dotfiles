@@ -1,3 +1,5 @@
+---@module 'lazy'
+
 ---@type TSConfig
 ---@diagnostic disable-next-line: missing-fields
 local treesitter_opts = {
@@ -93,7 +95,7 @@ local treesitter_opts = {
     },
 }
 
----@type LazySpec require('lazy')
+---@type LazySpec
 return {
     {
         -- Highlight, edit, and navigate code

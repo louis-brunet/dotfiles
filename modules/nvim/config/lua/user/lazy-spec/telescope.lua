@@ -129,7 +129,9 @@ local function create_custom_layout_strategy(
     end
 end
 
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 return {
     -- Fuzzy Finder (files, lsp, etc)
     {

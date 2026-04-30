@@ -1,4 +1,6 @@
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 return {
     {
         "aznhe21/actions-preview.nvim",

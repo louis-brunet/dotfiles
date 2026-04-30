@@ -18,7 +18,9 @@ end
 
 local colorscheme_name = require("user.config.theme").colorscheme_name
 
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 return {
     -- {
     --     -- Theme inspired by Atom

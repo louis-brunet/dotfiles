@@ -1,4 +1,6 @@
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 local M = {
     -- {
     --     'Lommix/ollamachad.nvim',

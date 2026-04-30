@@ -1,5 +1,7 @@
 -- [[ Configure LSP ]]
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 local M = {
     {
         "dmmulroy/tsc.nvim",

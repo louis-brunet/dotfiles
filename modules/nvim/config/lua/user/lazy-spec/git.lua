@@ -1,5 +1,7 @@
 --- [ Git related plugins ]
----@type LazySpec require('lazy')
+---@module 'lazy'
+
+---@type LazySpec
 local M = {
     {
         "tpope/vim-fugitive",
