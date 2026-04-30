@@ -4,7 +4,7 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     {
         "nvim-tree/nvim-tree.lua",

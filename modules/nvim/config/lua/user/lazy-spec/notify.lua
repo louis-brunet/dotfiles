@@ -1,4 +1,4 @@
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     'rcarriga/nvim-notify',
 

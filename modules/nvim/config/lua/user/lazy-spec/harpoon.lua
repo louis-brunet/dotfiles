@@ -15,7 +15,7 @@ local harpoon_ui_config = {
 }
 
 
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",

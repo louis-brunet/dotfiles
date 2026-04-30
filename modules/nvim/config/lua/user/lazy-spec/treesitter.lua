@@ -93,7 +93,7 @@ local treesitter_opts = {
     },
 }
 
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     {
         -- Highlight, edit, and navigate code

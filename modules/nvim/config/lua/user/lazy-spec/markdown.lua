@@ -1,6 +1,6 @@
 local render_markdown_filetypes = { "markdown", "Avante" }
 
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     {
         -- Make sure to set this up properly if you have lazy=true

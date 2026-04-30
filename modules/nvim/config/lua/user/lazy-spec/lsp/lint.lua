@@ -1,4 +1,4 @@
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     'mfussenegger/nvim-lint',
     ft = 'dockerfile',  -- only load when opening a Dockerfile

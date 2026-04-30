@@ -8,7 +8,7 @@ local custom_mason_config = {
     },
 }
 
----@type LazySpec
+---@type LazySpec require('lazy')
 return {
     -- Automatically install LSPs to stdpath for neovim
     { "mason-org/mason.nvim", cmd = "Mason", config = true },
