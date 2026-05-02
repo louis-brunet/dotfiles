@@ -144,7 +144,8 @@ return {
 
         dependencies = {
             "nvim-lua/plenary.nvim",
-            "nvim-telescope/telescope-ui-select.nvim",
+
+            -- "nvim-telescope/telescope-ui-select.nvim",
 
             -- Fuzzy Finder Algorithm which requires local dependencies to be built.
             -- Only load if `make` is available. Make sure you have the system
@@ -188,33 +189,33 @@ return {
 
             telescope.setup({
                 extensions = {
-                    ["ui-select"] = {
-                        telescope_themes.get_cursor {
-                            layout_config = {
-                                height = 12,
-                            },
-                            borderchars = {
-                                prompt = border_chars.box,
-                                preview = border_chars.box,
-                                results = border_chars.merge_top,
-                            },
-                            -- even more opts
-                        },
-
-                        -- pseudo code / specification for writing custom displays, like the one
-                        -- for "codeactions"
-                        -- specific_opts = {
-                        --   [kind] = {
-                        --     make_indexed = function(items) -> indexed_items, width,
-                        --     make_displayer = function(widths) -> displayer
-                        --     make_display = function(displayer) -> function(e)
-                        --     make_ordinal = function(e) -> string
-                        --   },
-                        --   -- for example to disable the custom builtin "codeactions" display
-                        --      do the following
-                        --   codeactions = false,
-                        -- }
-                    },
+                    -- ["ui-select"] = {
+                    --     telescope_themes.get_cursor {
+                    --         layout_config = {
+                    --             height = 12,
+                    --         },
+                    --         borderchars = {
+                    --             prompt = border_chars.box,
+                    --             preview = border_chars.box,
+                    --             results = border_chars.merge_top,
+                    --         },
+                    --         -- even more opts
+                    --     },
+                    --
+                    --     -- pseudo code / specification for writing custom displays, like the one
+                    --     -- for "codeactions"
+                    --     -- specific_opts = {
+                    --     --   [kind] = {
+                    --     --     make_indexed = function(items) -> indexed_items, width,
+                    --     --     make_displayer = function(widths) -> displayer
+                    --     --     make_display = function(displayer) -> function(e)
+                    --     --     make_ordinal = function(e) -> string
+                    --     --   },
+                    --     --   -- for example to disable the custom builtin "codeactions" display
+                    --     --      do the following
+                    --     --   codeactions = false,
+                    --     -- }
+                    -- },
                 },
 
                 defaults = {
@@ -249,7 +250,11 @@ return {
                 },
             })
 
-            local telescope_extensions = { "fzf", "ui-select", "notify" }
+            local telescope_extensions = {
+                "fzf",
+                -- "ui-select",
+                "notify"
+            }
             for _, extension in ipairs(telescope_extensions) do
                 local ok = pcall(telescope.load_extension, extension)
                 if not ok then
