@@ -63,6 +63,7 @@ high | medium | low
    - Why is it needed?
    - What should the outcome be?
    - Any technical constraints?
+   - Ask user clarifying questions if needed
 
 2. **Generate ticket** using the format above
 
