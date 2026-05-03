@@ -1,0 +1,23 @@
+{
+  "skill_name": "plan-writer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write an implementation plan for adding user authentication with JWT tokens",
+      "expected_output": "A detailed markdown plan in .planning/plans/ with overview, goals, technical approach, implementation steps, dependencies, risks, testing strategy, and success criteria",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a plan to implement a REST API for managing user profiles",
+      "expected_output": "A detailed plan with API endpoints, data models, authentication requirements, and implementation steps",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Break down this feature into a plan: add a dashboard showing analytics charts with real-time data updates",
+      "expected_output": "A plan with steps for frontend components, backend API, WebSocket setup, and data visualization",
+      "files": []
+    }
+  ]
+}

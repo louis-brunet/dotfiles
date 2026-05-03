@@ -1,0 +1,23 @@
+{
+  "skill_name": "ticket-writer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a ticket for adding user authentication with JWT tokens to the app",
+      "expected_output": "A markdown ticket file saved to .planning/tickets/ with title, summary, problem, solution, acceptance criteria, technical notes, dependencies, labels, and priority",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a ticket for fixing the bug where the login button doesn't work on mobile",
+      "expected_output": "A markdown ticket file saved to .planning/tickets/ describing the bug, its impact, and steps to reproduce and fix",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Document a task to add dark mode support to the application",
+      "expected_output": "A markdown ticket file with acceptance criteria for the dark mode feature",
+      "files": []
+    }
+  ]
+}

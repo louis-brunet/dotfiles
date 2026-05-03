@@ -1,0 +1,23 @@
+{
+  "skill_name": "implementation-validator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run validation checks on the codebase - build, tests, and lint",
+      "expected_output": "Validation results for build, tests, and lint with pass/fail status and any error details",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Validate the implementation against the ticket at .planning/tickets/user-authentication.md - verify all acceptance criteria are met",
+      "expected_output": "Verification report showing which acceptance criteria are met and which are not",
+      "files": [".planning/tickets/user-authentication.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "Run a code review on the recent changes - check for security issues, best practices, and code quality",
+      "expected_output": "Code review findings with specific issues and recommendations",
+      "files": []
+    }
+  ]
+}
