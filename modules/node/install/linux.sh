@@ -9,7 +9,7 @@ if ! which nvm >/dev/null; then
     # this is also done by the oh-my-zsh plugin "nvm"
     export NVM_DIR="$(printf %s "${XDG_CONFIG_HOME:-$HOME/.config}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" # This loads nvm
-    
+
     nvm --version
     echo "✅ installed nvm (run exec zsh)"
 fi
@@ -21,4 +21,11 @@ if ! which node >/dev/null; then
     echo "node $(node --version)"
     echo "npm $(npm --version)"
     echo "✅ installed node LTS and npm"
+fi
+
+if ! which bun >/dev/null; then
+    npm install -g bun
+
+    echo "bun: $(bun --version)"
+    echo "✅ installed bun"
 fi
