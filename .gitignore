@@ -11,3 +11,4 @@ amdgpu-install*.deb*
 dist/
 build/
 /backup
+/state
