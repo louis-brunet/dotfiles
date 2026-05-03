@@ -10,3 +10,4 @@ amdgpu-install*.deb*
 *.egg-info/
 dist/
 build/
+/backup
