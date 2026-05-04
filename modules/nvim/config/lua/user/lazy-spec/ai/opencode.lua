@@ -2,16 +2,11 @@
 
 ---@type LazySpec
 return {
-    -- {
-    --     dir = "~/code/opencode-workflow/apps/opencode-agent.nvim",
-    --     dependencies = "nickjvandyke/opencode.nvim",
-    -- },
-
     {
         "nickjvandyke/opencode.nvim",
         version = "*",  -- Latest stable release
         dependencies = {
-            { dir = "~/code/opencode-workflow/apps/opencode-agent.nvim" },
+            -- { dir = "~/code/opencode-workflow/apps/opencode-agent.nvim" },
 
             {
                 -- `snacks.nvim` integration is recommended, but optional
