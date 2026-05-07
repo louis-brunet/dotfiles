@@ -2,16 +2,11 @@
 
 ---@type LazySpec
 return {
-    -- {
-    --     dir = "~/code/opencode-workflow/apps/opencode-agent.nvim",
-    --     dependencies = "nickjvandyke/opencode.nvim",
-    -- },
-
     {
         "nickjvandyke/opencode.nvim",
         version = "*",  -- Latest stable release
         dependencies = {
-            { dir = "~/code/opencode-workflow/apps/opencode-agent.nvim" },
+            -- { dir = "~/code/opencode-workflow/apps/opencode-agent.nvim" },
 
             {
                 -- `snacks.nvim` integration is recommended, but optional
@@ -37,12 +32,20 @@ return {
         config = function()
             local opencode_port = nil
 
+            local contexts_from_plugin = {}
+            local prompts_from_plugin = {}
+            local ok, opencode_agent_prompts = pcall(require, "opencode_agents.prompts")
+            if ok then
+                contexts_from_plugin = opencode_agent_prompts.contexts
+                prompts_from_plugin = opencode_agent_prompts.prompt
+            end
+
             ---@type opencode.Opts
             vim.g.opencode_opts = {
                 -- Your configuration, if any; goto definition on the type or field for details
                 contexts = vim.tbl_extend(
                     "force",
-                    require("opencode_agent.prompts").contexts,
+                    contexts_from_plugin,
                     {
                         -- ["@my-custom-context"] = function(ctx)
                         --     -- local range = vim.inspect(ctx.range)
@@ -56,7 +59,7 @@ return {
                 ),
                 prompts = vim.tbl_extend(
                     "force",
-                    require("opencode_agent.prompts").prompts,
+                    prompts_from_plugin,
                     {
                         -- create_ticket = { prompt = "......@this, @diff, @my-custom-context, .....", submit = true },
                         -- my_custom_prompt = {
