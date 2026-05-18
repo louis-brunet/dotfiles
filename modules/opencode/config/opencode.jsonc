@@ -26,6 +26,7 @@
       "cut *": "allow",
       "jq *": "allow",
       "date *": "allow",
+      "mkdir *": "allow",
       "npx tsc *": "allow",
       "npm run build *": "allow",
       "npm run test *": "allow",
