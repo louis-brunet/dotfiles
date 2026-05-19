@@ -3,6 +3,7 @@ description: "OpenCode CLI tool"
 version: "1.0.0"
 platforms:
   - linux
+  - macos
 depends:
   - base
 provides:
