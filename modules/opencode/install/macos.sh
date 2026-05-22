@@ -3,3 +3,4 @@
 set -e
 
 brew install anomalyco/tap/opencode
+brew install --cask opencode-desktop
