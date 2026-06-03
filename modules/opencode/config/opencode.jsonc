@@ -49,6 +49,7 @@
       "git log *": "allow",
       "git reflog *": "allow",
       "git branch --list *": "allow",
+      "git merge-base *": "allow",
       "git stash *": "ask",
       "git push *": "ask",
       "git rebase *": "ask",
