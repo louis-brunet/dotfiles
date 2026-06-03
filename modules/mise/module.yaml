@@ -1,0 +1,22 @@
+name: mise
+description: "Mise (mise-en-place), dev environment manager"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends:
+  - base
+
+provides:
+  - mise
+
+requires:
+  commands: []
+
+tags:
+  - development
+  - environment
+
+health_check: |
+  mise --version

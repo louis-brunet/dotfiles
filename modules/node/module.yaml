@@ -7,10 +7,12 @@ platforms:
 
 depends:
   - base
+  - mise
 
 provides:
   - node
   - npm
+  - bun
 
 requires:
   commands:

@@ -5,6 +5,4 @@ extends = "../../symlonk-config.toml"
 source_dir = "."
 
 [symlinks]
-".zshenv" = "zshenv"
-".zshrc" = "zshrc"
-".p10k.zsh" = "p10k/custom_config.zsh"
+".config/mise/config.toml" = "config/config.toml"
