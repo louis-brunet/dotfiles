@@ -67,6 +67,7 @@
       "git reflog *": "allow",
       "git branch --list *": "allow",
       "git merge-base *": "allow",
+      "git rev-parse *": "allow",
       "git stash *": "ask",
       "git push *": "ask",
       "git rebase *": "ask",
