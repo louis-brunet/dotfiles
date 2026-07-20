@@ -35,6 +35,7 @@ local M = {
         "lewis6991/gitsigns.nvim",
         event = "VeryLazy",
         opts = {
+
             -- See `:help gitsigns.txt`
             sign_priority = 50,  -- set higher priority than diagnostic signs
 
@@ -45,6 +46,18 @@ local M = {
                 -- topdelete = { text = '‾' },
                 -- changedelete = { text = '~' },
             },
+
+            current_line_blame = true,  -- Toggle with `:Gitsigns toggle_current_line_blame`
+            current_line_blame_opts = {
+                -- virt_text = true,
+                -- virt_text_pos = "eol",  -- 'eol' | 'overlay' | 'right_align'
+                delay = 800,
+                -- ignore_whitespace = false,
+                -- virt_text_priority = 100,
+                -- use_focus = true,
+            },
+            -- current_line_blame_formatter =
+            -- "<author>, <author_time:%R> - <summary>",
 
             -- Executed when attaching to new git file
             on_attach = function(bufnr)
