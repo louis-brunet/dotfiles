@@ -60,6 +60,8 @@
       "uv run ruff *": "allow",
       "uv run mypy *": "allow",
       "uv run alembic heads *": "allow",
+      "uv run alembic current *": "allow",
+      "uv run alembic history *": "allow",
       "rm *": "ask",
       "git *": "ask",
       "git diff *": "allow",
