@@ -9,11 +9,14 @@
   "permission": {
     "bash": {
       "*": "ask",
+      /** General bash commands considered safe */
       "basename *": "allow",
       "cat *": "allow",
       "cut *": "allow",
       "date *": "allow",
       "diff *": "allow",
+      "docker logs *": "allow",
+      "docker ps *": "allow",
       "echo *": "allow",
       "find *": "allow",
       "grep *": "allow",
@@ -21,8 +24,11 @@
       "jq *": "allow",
       "ls *": "allow",
       "mkdir *": "allow",
+      "netstat *": "allow",
       "nl *": "allow",
+      "ps *": "allow",
       "pwd": "allow",
+      "rg *": "allow",
       "sleep *": "allow",
       "sort *": "allow",
       "tail *": "allow",
@@ -32,6 +38,7 @@
       "wc *": "allow",
       "which *": "allow",
       "whoami": "allow",
+      /** TypeScript */
       "npx tsc *": "allow",
       "npm run build *": "allow",
       "npm run test *": "allow",
@@ -59,6 +66,7 @@
       "yarn lint *": "allow",
       "yarn lint:fix *": "allow",
       "yarn typecheck *": "allow",
+      /** Python */
       "uv --version": "allow",
       "uv run pytest *": "allow",
       "uv run ruff *": "allow",
@@ -68,6 +76,7 @@
       "uv run alembic heads *": "allow",
       "uv run alembic history *": "allow",
       "uv sync": "allow",
+      /** NOTE: order matters, the last rule wins. So `ask`/`deny` configs should go towards the end. */
       "rm *": "ask",
       "git *": "ask",
       "git stash *": "ask",
@@ -95,7 +104,6 @@
       "gcloud iam roles describe *": "allow",
       "gcloud iam roles list *": "allow",
       "gcloud version": "allow",
-      "rg *": "allow",
       "sudo *": "deny"
     },
     "edit": {
