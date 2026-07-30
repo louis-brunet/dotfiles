@@ -28,6 +28,8 @@
       "nl *": "allow",
       "ps *": "allow",
       "pwd": "allow",
+      "python --version": "allow",
+      "python3 --version": "allow",
       "rg *": "allow",
       "sleep *": "allow",
       "sort *": "allow",
