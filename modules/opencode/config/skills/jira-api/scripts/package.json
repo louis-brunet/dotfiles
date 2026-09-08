@@ -1,0 +1,14 @@
+{
+  "name": "@azp-dar-review-portal/jira-api",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "test": "node --test src/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
+  }
+}
