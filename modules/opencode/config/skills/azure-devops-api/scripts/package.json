@@ -1,14 +1,11 @@
 {
-  "name": "@azp-dar-review-portal/azure-devops-api",
+  "name": "opencode-skill-azure-devops-api",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "test": "node --test src/*.test.ts"
-  },
-  "devDependencies": {
-    "@types/node": "^24.0.0"
   }
 }

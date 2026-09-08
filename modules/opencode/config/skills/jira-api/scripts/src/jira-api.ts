@@ -11,8 +11,12 @@ main().catch((error: unknown) => {
 });
 
 async function main(): Promise<void> {
+  if (!isSupportedNodeVersion()) {
+    throw new Error("This script requires Node.js 22.18 or newer for native TypeScript execution.");
+  }
+
   if (typeof fetch !== "function") {
-    throw new Error("This script requires Node.js 18 or newer.");
+    throw new Error("This script requires native fetch support.");
   }
 
   loadJiraEnvironment();
@@ -20,6 +24,11 @@ async function main(): Promise<void> {
   const auth = loadJiraAuthConfigFromEnv();
 
   await dispatchCommand(command, auth);
+}
+
+function isSupportedNodeVersion(): boolean {
+  const [major, minor] = process.versions.node.split(".").map(Number);
+  return major > 22 || (major === 22 && minor >= 18);
 }
 
 function getErrorMessage(error: unknown): string {
