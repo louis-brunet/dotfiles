@@ -28,6 +28,8 @@ Instead, ask the agent for the Azure DevOps task you want. For example:
 
 The skill needs Azure DevOps credentials available in the environment.
 
+Node.js 22.18 or newer is required. The CLI has no npm runtime dependencies and does not require `npm install`.
+
 Generate an Azure DevOps personal access token for this skill.
 
 - Permissions required:
@@ -47,13 +49,17 @@ Generate an Azure DevOps personal access token for this skill.
 - `AZURE_DEVOPS_USERNAME`: username paired with the PAT for basic auth. Defaults to `azure-devops-user`.
 - `AZURE_DEVOPS_API_VERSION`: Azure DevOps REST API version. Defaults to `7.1`.
 
-The usual setup flow is:
+The usual skill-local setup flow is:
 
 ```bash
 cp -i .env.example .env
 ```
 
-The script automatically loads environment variables from its adjacent `.env` file.
+For a global installation, create this file beside the installed skill. For a project-local copy, create it beside that copy. You can instead place project-specific values in the current repository root’s `.env`.
+
+Configuration precedence is: shell environment variables, repository-root `.env`, then the active skill’s `.env`.
+
+Do not commit `.env` or `node_modules`.
 
 ## What the skill supports
 

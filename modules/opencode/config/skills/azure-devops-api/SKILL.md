@@ -35,12 +35,19 @@ Optional values:
 - `AZURE_DEVOPS_USERNAME`
 - `AZURE_DEVOPS_API_VERSION`
 
-The script automatically loads environment variables from either of these files when present:
+## Setup
 
-- `{repo-root}/.env`
+Requires Node.js 22.18 or newer. No npm installation is required to run or test this skill.
+
+Copy `.env.example` to a gitignored `.env` in the active skill directory, then set the required values. A project can instead provide repository-specific values in its root `.env`.
+
+The script loads configuration from these locations when present, in precedence order:
+
+- shell environment variables
+- repository-root `.env` for the current working directory
 - `{skill-directory}/.env`
 
-Shell environment variables override `.env` values.
+Never commit `.env` or `node_modules` when copying this skill.
 
 ## Commands
 

@@ -32,6 +32,10 @@ Instead, ask the agent for the Jira task you want. For example:
 
 The skill needs Jira credentials available in the environment.
 
+### Prerequisite
+
+Node.js 22.18 or newer is required. The CLI has no npm runtime dependencies and does not require `npm install`.
+
 ### Required values
 
 - `JIRA_BASE_URL`
@@ -41,11 +45,17 @@ The skill needs Jira credentials available in the environment.
 To create a Jira Cloud API token, see:
 https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/
 
-The usual setup flow is:
+The usual skill-local setup flow is:
 
 ```bash
 cp -i .env.example .env
 ```
+
+For a global installation, create this file beside the installed skill. For a project-local copy, create it beside that copy. You can instead place project-specific values in the current repository root’s `.env`.
+
+Configuration precedence is: shell environment variables, repository-root `.env`, then the active skill’s `.env`.
+
+Do not commit `.env` or `node_modules`.
 
 ### Optional defaults
 
