@@ -78,7 +78,14 @@ Update setup documentation after behavior and tests are complete.
 - [ ] Shell values take precedence.
 - [ ] Both integration test suites pass.
 
+## Review Findings
+
+| ID | Severity | Location | Summary | Status |
+|----|----------|----------|---------|--------|
+| R1 | Major | `scripts/src/env.test.ts` | Tests do not verify shell, repository, and skill `.env` precedence or skill-only fallback. | Open |
+
 ## Implementation Log
 
 - 2026-09-08 Started Steps 1-3. Repository discovery will begin at the active command working directory; skill-local configuration remains located relative to each CLI.
 - 2026-09-08 Completed Steps 1-3. Both integrations now load skill `.env` first, then active repository `.env`, while preserving pre-existing shell values. Added isolated Git-directory, Git-worktree-file, and no-repository discovery coverage. Per user decision, dotenv parsing remains permissive rather than allowlisted.
+- 2026-09-08 Review completed. Scope: 0090b00..00b71bf portable environment implementation. Checks: Jira `npm test` (17 tests), Azure DevOps `npm test` (31 tests), CLI usage paths, and `git diff --check`. Findings: Blocker 0, Major 1, Minor 0, Suggestion 0. Unresolved: R1. Detailed findings remain in conversation and cannot be reconstructed from this log entry alone.

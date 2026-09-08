@@ -84,7 +84,14 @@ Publish after underlying behavior is complete.
 - [ ] Setup supports global and project-local copies.
 - [ ] Documentation does not instruct users to commit secrets or installed dependencies.
 
+## Review Findings
+
+| ID | Severity | Location | Summary | Status |
+|----|----------|----------|---------|--------|
+| R2 | Minor | `README.md`, `SKILL.md` | Documentation does not state the test command and its `scripts/` execution directory. | Open |
+
 ## Implementation Log
 
 - 2026-09-08 Started Steps 1-3 after completing portable path, environment discovery, and Node runtime contract work.
 - 2026-09-08 Completed Steps 1-3. Aligned both READMEs and skills on Node 22.18, dependency-free execution, global/project-local configuration, and shell > repository `.env` > skill `.env` precedence.
+- 2026-09-08 Review completed. Scope: 0090b00..00b71bf integration setup documentation. Checks: Jira `npm test` (17 tests), Azure DevOps `npm test` (31 tests), CLI usage paths, and `git diff --check`. Findings: Blocker 0, Major 0, Minor 1, Suggestion 0. Unresolved: R2. Detailed findings remain in conversation and cannot be reconstructed from this log entry alone.
