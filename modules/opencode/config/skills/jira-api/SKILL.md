@@ -1,7 +1,7 @@
 ---
 name: jira-api
 description: |
-  Use the local Jira API script to search issues, fetch issue details, create issues, read comments, inspect transitions, and update issue descriptions or summaries in Jira Cloud. Trigger when the user asks to query Jira, inspect an issue, search with JQL, create an issue, or update an issue description.
+  Use the local Jira API script to search issues, fetch issue details, create issues, read comments, inspect transitions, and update issue descriptions or summaries in Jira Cloud. Trigger when the user explicitly asks to query Jira, inspect a Jira issue, search with JQL, create a Jira issue, or update Jira content.
 ---
 
 # Skill: jira api
@@ -22,6 +22,7 @@ Use the executable at `{skill-directory}/scripts/jira-api` to talk to Jira Cloud
 - The user wants to update an existing issue comment
 - The user wants to transition an issue to another workflow state
 - The user wants to archive an issue
+- A generic request to create an "issue" belongs to the local `create-ticket` workflow; use this skill for explicit Jira requests.
 
 ## Authentication
 

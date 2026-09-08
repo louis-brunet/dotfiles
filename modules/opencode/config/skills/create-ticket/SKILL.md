@@ -1,8 +1,8 @@
 ---
 name: create-ticket
 description: |
-  Create or refine structured local ticket files for features, bugs, and tasks, including cases like "specify issue ADRP-42" or "refine issue ADRP-42". Use this skill when the user wants to write a ticket, create an issue, document a task, or refine/specify an existing remote issue into a local ticket. When a Jira issue ID is provided, first use the jira-api skill to read it, then create the local ticket file, then suggest writing the refined content back to the remote issue.
-  Triggers on: "write a ticket", "create a ticket", "write an issue", "create an issue", "document a task", "create a task", "specify issue ADRP-42", "refine issue ADRP-42", or when the user describes a feature/bug/task that should be captured as a ticket.
+  Create or refine structured local `.planning/tickets/` files for features, bugs, and tasks. Use this skill when the user wants to write a local ticket, document a task, or turn a feature/bug request into a local planning artifact. When a Jira issue ID or explicit Jira request is provided, first use the jira-api skill to read it, then create the local ticket file, then suggest writing the refined content back to Jira.
+  Triggers on: "write a local ticket", "create a planning ticket", "document a task", "create a local task", "specify Jira issue PROJ-42", "refine Jira issue PROJ-42", or when the user describes a feature/bug/task that should be captured as a local planning ticket.
 ---
 
 # Skill: create ticket
@@ -11,10 +11,11 @@ Create well-structured markdown ticket files that are clear for both AI agents a
 
 ## When to use
 
-- User says "write a ticket for X" or "create a ticket"
+- User says "write a local ticket for X" or "create a planning ticket"
 - User describes a feature/bug/task that should be captured as a ticket
 - User wants to document work that needs to be done
-- User asks to specify or refine an existing Jira issue such as `ADRP-42`
+- User asks to specify or refine an existing Jira issue such as `PROJ-42`
+- Treat a generic request to create an "issue" as a request for a local `.planning/tickets/` file. Use Jira only when the user explicitly names Jira or a remote Jira issue.
 
 ## Directory Structure
 
@@ -61,7 +62,7 @@ High-level approach or solution description.
 ## Process
 
 1. **Fetch the Jira issue first when a Jira issue ID is provided**:
-   - If the user gives a Jira issue ID such as `ADRP-42`, use the `jira-api` skill first to read the existing issue
+   - If the user gives a Jira issue ID such as `PROJ-42` or explicitly asks about Jira, use the `jira-api` skill first to read the existing issue
    - Treat the Jira issue as source context to refine, not as the final local output
    - If the user gives a non-Jira remote issue ID and no remote-reading integration is available, still include that ID in the filename and use the user's request as the primary source
    - If no remote issue ID is provided, continue with the user's request as the primary source
