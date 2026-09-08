@@ -6,7 +6,7 @@ description: |
 
 # Skill: azure devops api
 
-Use the local CLI at `{repo-root}/.agents/skills/azure-devops-api/scripts/azure-devops-api` to talk to Azure DevOps.
+Use the executable at `{skill-directory}/scripts/azure-devops-api` to talk to Azure DevOps. `{skill-directory}` is the directory containing this `SKILL.md`, whether the skill is globally installed or copied into a repository.
 
 ## When to use
 
@@ -38,7 +38,7 @@ Optional values:
 The script automatically loads environment variables from either of these files when present:
 
 - `{repo-root}/.env`
-- `{repo-root}/.agents/skills/azure-devops-api/.env`
+- `{skill-directory}/.env`
 
 Shell environment variables override `.env` values.
 
@@ -282,7 +282,7 @@ azure-devops-api build test-summary 12345
 
 ## Notes
 
-- The script is implemented in TypeScript under `{repo-root}/.agents/skills/azure-devops-api/scripts/src/`
-- The executable entrypoint remains `{repo-root}/.agents/skills/azure-devops-api/scripts/azure-devops-api`
-- The checked-in API references for this skill now include git, builds, pipelines, and test-results related specs under `{repo-root}/.agents/skills/azure-devops-api/references/`
+- The script is implemented in TypeScript under `{skill-directory}/scripts/src/`
+- The executable entrypoint is `{skill-directory}/scripts/azure-devops-api`
+- Checked-in API references include git, builds, pipelines, and test-results related specs under `{skill-directory}/references/`
 - If this skill file is changed, restart the agent harness so the updated skill content is reloaded

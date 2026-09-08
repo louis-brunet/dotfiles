@@ -6,7 +6,7 @@ description: |
 
 # Skill: jira api
 
-Use the local CLI at `{repo-root}/.agents/skills/jira-api/scripts/jira-api` to talk to Jira Cloud.
+Use the executable at `{skill-directory}/scripts/jira-api` to talk to Jira Cloud. `{skill-directory}` is the directory containing this `SKILL.md`, whether the skill is globally installed or copied into a repository.
 
 ## When to use
 
@@ -38,7 +38,7 @@ Optional project default:
 The script automatically loads environment variables from either of these files when present:
 
 - `{repo-root}/.env`
-- `{repo-root}/.agents/skills/jira-api/.env`
+- `{skill-directory}/.env`
 
 Shell environment variables override `.env` values.
 
@@ -110,14 +110,14 @@ jira-api issue update-summary DAR-123 "New summary"
 ## Detailed ADF reference
 
 - For routine ticket syncs, prefer structured ticket text and let the local script convert it.
-- If you need to send explicit ADF JSON or use richer nodes than the built-in converter supports, first read `{repo-root}/.agents/skills/jira-api/references/ADF_REFERENCE.md`.
+- If you need to send explicit ADF JSON or use richer nodes than the built-in converter supports, first read `{skill-directory}/references/ADF_REFERENCE.md`.
 - Use the companion reference for exact node shapes, required attributes, and complete ADF examples before composing a manual description payload.
 
 ## Detailed JQL reference
 
 - For simple known-key lookups, prefer `issue get` instead of writing JQL.
 - For routine filters, write the shortest clear JQL directly.
-- If you need to compose or revise non-trivial JQL, first read `{repo-root}/.agents/skills/jira-api/references/JQL_REFERENCE.md`.
+- If you need to compose or revise non-trivial JQL, first read `{skill-directory}/references/JQL_REFERENCE.md`.
 - Use the companion reference for clause shape, common fields, operators, functions, quoting rules, and ready-to-adapt query patterns.
 
 Default `issue list` JQL:
@@ -261,6 +261,6 @@ For richer formatting beyond headings, paragraphs, lists, and task lists, send e
 
 ## Notes
 
-- The script is implemented in TypeScript at `{repo-root}/.agents/skills/jira-api/scripts/src/jira-api.ts`
-- The executable entrypoint remains `{repo-root}/.agents/skills/jira-api/scripts/jira-api`
+- The script is implemented in TypeScript at `{skill-directory}/scripts/src/jira-api.ts`
+- The executable entrypoint is `{skill-directory}/scripts/jira-api`
 - If this skill file is changed, restart the agent harness so the updated skill content is reloaded

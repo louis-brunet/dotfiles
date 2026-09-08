@@ -2,7 +2,7 @@
 
 Use this file only when you need to send explicit Atlassian Document Format (ADF) JSON to Jira.
 
-For normal ticket refinement flows in this repo, prefer structured ticket text and let `.agents/skills/jira-api/scripts/jira-api.ts` convert it into Jira-native headings, paragraphs, bullet lists, ordered lists, task lists, and supported image blocks.
+For normal ticket refinement flows, prefer structured ticket text and let the Jira API skill convert it into Jira-native headings, paragraphs, bullet lists, ordered lists, task lists, and supported image blocks.
 
 Read this file before composing explicit ADF when:
 
