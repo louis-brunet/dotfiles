@@ -1,6 +1,6 @@
 import process from "node:process";
 
-import { DEFAULT_ENV_PATHS } from "../env.ts";
+import { getEnvironmentPaths } from "../env.ts";
 import type { JiraAuthConfig } from "../env.ts";
 import {
   DEFAULT_LIST_JQL,
@@ -279,7 +279,7 @@ function printUsage(): void {
   console.error(`  JIRA_LIST_JQL       Defaults to \"${DEFAULT_LIST_JQL}\"`);
   console.error("");
   console.error("Loaded automatically when present:");
-  console.error(`  ${DEFAULT_ENV_PATHS.join("\n  ")}`);
+  console.error(`  ${getEnvironmentPaths().join("\n  ")}`);
 }
 
 function parseIssueCreateCommand(args: string[]): IssueCreateCommand | null {

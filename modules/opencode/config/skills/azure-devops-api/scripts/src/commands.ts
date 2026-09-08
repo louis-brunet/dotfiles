@@ -1,7 +1,7 @@
 import process from "node:process";
 import { execFileSync } from "node:child_process";
 
-import { DEFAULT_API_VERSION, DEFAULT_ENV_PATHS } from "./env.ts";
+import { DEFAULT_API_VERSION, getEnvironmentPaths } from "./env.ts";
 import type { AzureDevOpsAuthConfig } from "./env.ts";
 import { buildRequestOptions, requestRequiredJson, requestRequiredJsonResponse, requestText } from "./http.ts";
 
@@ -1920,5 +1920,5 @@ function printUsage(): void {
   console.error(`  AZURE_DEVOPS_API_VERSION Defaults to \"${DEFAULT_API_VERSION}\"`);
   console.error("");
   console.error("Loaded automatically when present:");
-  console.error(`  ${DEFAULT_ENV_PATHS.join("\n  ")}`);
+  console.error(`  ${getEnvironmentPaths().join("\n  ")}`);
 }

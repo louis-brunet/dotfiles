@@ -14,12 +14,10 @@ export type JiraAuthConfig = {
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_DIR = path.resolve(SCRIPT_DIR, "..", "..");
-const REPO_ROOT = path.resolve(SKILL_DIR, "..", "..", "..");
-
-export const DEFAULT_ENV_PATHS: readonly string[] = [
-  path.join(REPO_ROOT, ".env"),
-  path.join(SKILL_DIR, ".env"),
-];
+export function getEnvironmentPaths(cwd = process.cwd()): readonly string[] {
+  const repoRoot = findRepositoryRoot(cwd);
+  return [path.join(SKILL_DIR, ".env"), ...(repoRoot ? [path.join(repoRoot, ".env")] : [])];
+}
 
 export function loadJiraAuthConfigFromEnv(): JiraAuthConfig {
   loadJiraEnvironment();
@@ -51,9 +49,26 @@ export function loadJiraEnvironment(): void {
 function loadDotEnvFiles(): void {
   const protectedKeys = new Set(Object.keys(process.env));
 
-  DEFAULT_ENV_PATHS.forEach((filePath) => {
+  getEnvironmentPaths().forEach((filePath) => {
     loadDotEnvFile(filePath, protectedKeys);
   });
+}
+
+export function findRepositoryRoot(cwd: string): string | undefined {
+  let currentDirectory = path.resolve(cwd);
+
+  while (true) {
+    if (fs.existsSync(path.join(currentDirectory, ".git"))) {
+      return currentDirectory;
+    }
+
+    const parentDirectory = path.dirname(currentDirectory);
+    if (parentDirectory === currentDirectory) {
+      return undefined;
+    }
+
+    currentDirectory = parentDirectory;
+  }
 }
 
 function loadDotEnvFile(filePath: string, protectedKeys: Set<string>): void {
