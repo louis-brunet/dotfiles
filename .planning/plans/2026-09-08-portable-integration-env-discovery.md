@@ -82,10 +82,12 @@ Update setup documentation after behavior and tests are complete.
 
 | ID | Severity | Location | Summary | Status |
 |----|----------|----------|---------|--------|
-| R1 | Major | `scripts/src/env.test.ts` | Tests do not verify shell, repository, and skill `.env` precedence or skill-only fallback. | Open |
+| R1 | Major | `scripts/src/env.test.ts` | Tests do not verify shell, repository, and skill `.env` precedence or skill-only fallback. | Resolved |
 
 ## Implementation Log
 
 - 2026-09-08 Started Steps 1-3. Repository discovery will begin at the active command working directory; skill-local configuration remains located relative to each CLI.
 - 2026-09-08 Completed Steps 1-3. Both integrations now load skill `.env` first, then active repository `.env`, while preserving pre-existing shell values. Added isolated Git-directory, Git-worktree-file, and no-repository discovery coverage. Per user decision, dotenv parsing remains permissive rather than allowlisted.
 - 2026-09-08 Review completed. Scope: 0090b00..00b71bf portable environment implementation. Checks: Jira `npm test` (17 tests), Azure DevOps `npm test` (31 tests), CLI usage paths, and `git diff --check`. Findings: Blocker 0, Major 1, Minor 0, Suggestion 0. Unresolved: R1. Detailed findings remain in conversation and cannot be reconstructed from this log entry alone.
+- 2026-09-08 Accepted R1 for correction. Added isolated environment-loading tests for shell > repository `.env` > skill `.env` precedence and skill-only fallback.
+- 2026-09-08 Re-review completed. R1 Resolved: both integrations test `cwd` discovery through the default loader, shell > repository `.env` > skill `.env` precedence, and skill-only fallback. Checks: Jira `npm test` (18 tests), Azure DevOps `npm test` (32 tests), `git diff --check`.

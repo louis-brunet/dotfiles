@@ -57,6 +57,8 @@ Configuration precedence is: shell environment variables, repository-root `.env`
 
 Do not commit `.env` or `node_modules`.
 
+To run tests, execute `npm test` from the skill's `scripts/` directory.
+
 ### Optional defaults
 
 - `JIRA_PROJECT`: default project for issue creation and default listing behavior.

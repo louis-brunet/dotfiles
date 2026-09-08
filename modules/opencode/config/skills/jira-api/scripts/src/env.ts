@@ -14,9 +14,9 @@ export type JiraAuthConfig = {
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_DIR = path.resolve(SCRIPT_DIR, "..", "..");
-export function getEnvironmentPaths(cwd = process.cwd()): readonly string[] {
+export function getEnvironmentPaths(cwd = process.cwd(), skillDirectory = SKILL_DIR): readonly string[] {
   const repoRoot = findRepositoryRoot(cwd);
-  return [path.join(SKILL_DIR, ".env"), ...(repoRoot ? [path.join(repoRoot, ".env")] : [])];
+  return [path.join(skillDirectory, ".env"), ...(repoRoot ? [path.join(repoRoot, ".env")] : [])];
 }
 
 export function loadJiraAuthConfigFromEnv(): JiraAuthConfig {
@@ -42,14 +42,15 @@ export function loadJiraAuthConfigFromEnv(): JiraAuthConfig {
   return { jiraBaseUrl, jiraEmail, jiraApiToken, jiraProject };
 }
 
-export function loadJiraEnvironment(): void {
-  loadDotEnvFiles();
+export function loadJiraEnvironment(cwd = process.cwd(), skillDirectory = SKILL_DIR): void {
+  const environmentPaths = getEnvironmentPaths(cwd, skillDirectory);
+  loadDotEnvFiles(environmentPaths);
 }
 
-function loadDotEnvFiles(): void {
+function loadDotEnvFiles(environmentPaths: readonly string[]): void {
   const protectedKeys = new Set(Object.keys(process.env));
 
-  getEnvironmentPaths().forEach((filePath) => {
+  environmentPaths.forEach((filePath) => {
     loadDotEnvFile(filePath, protectedKeys);
   });
 }

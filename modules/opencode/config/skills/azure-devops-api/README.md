@@ -61,6 +61,8 @@ Configuration precedence is: shell environment variables, repository-root `.env`
 
 Do not commit `.env` or `node_modules`.
 
+To run tests, execute `npm test` from the skill's `scripts/` directory.
+
 ## What the skill supports
 
 At a high level, the skill can:
