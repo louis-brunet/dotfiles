@@ -104,7 +104,7 @@ High-level approach or solution description.
 
 7. **Suggest next step**:
    - If the ticket came from a Jira issue, suggest updating the corresponding remote ticket using the safe append/replace workflow above rather than mirroring the local ticket verbatim
-   - Suggest using the **plan-writer** skill to create an implementation plan
+    - Suggest using the **create-plan** skill to create an implementation plan
 
 ## Output
 
@@ -112,4 +112,4 @@ High-level approach or solution description.
 - Display the ticket content in the conversation for user review
 - Confirm the file path where it was saved
 - If a Jira issue ID was used, suggest: "Would you like me to update the corresponding remote ticket {REMOTE-ISSUE-ID}?" This will use the jira-api skill, by first fetching the current Jira summary and description, then updating only `Spécification additionnelle par IA`. If the ticket already contains Jira-native embedded media, you should preserve the fetched ADF structure instead of rebuilding those sections from markdown.
-- Suggest: "Would you like me to create an implementation plan for this ticket?" This will use the plan-writer skill.
+- Suggest: "Would you like me to create an implementation plan for this ticket?" This will use the create-plan skill.
