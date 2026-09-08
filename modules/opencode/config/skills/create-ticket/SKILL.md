@@ -99,7 +99,8 @@ High-level approach or solution description.
    - If the fetched Jira description already contains Jira-native media such as embedded attachments or images, preserve the existing ADF structure for those sections instead of reconstructing them from markdown image links
    - In that case, use the fetched Jira ADF as the base document, replace or append only the final `Spécification additionnelle par IA` section, and send the final merged ADF through `jira-api issue update-description`
    - Keep your modifications inside `Spécification additionnelle par IA`, even when adding additional details to an existing ticket section
-   - Use `jira-api issue update-description <issue-id> <description>` only for the final merged Jira description or merged ADF document, not as a shortcut to push the raw local ticket text
+    - Use `jira-api issue update-description <issue-id> <description>` only for the final merged Jira description or merged ADF document, not as a shortcut to push the raw local ticket text
+    - Before running the remote update, show the target and merged effect, then obtain explicit user confirmation as required by `jira-api`
 
 7. **Suggest next step**:
    - If the ticket came from a Jira issue, suggest updating the corresponding remote ticket using the safe append/replace workflow above rather than mirroring the local ticket verbatim

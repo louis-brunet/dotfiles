@@ -74,6 +74,14 @@ jira-api issue update-description DAR-123 "New description"
 jira-api issue update-summary DAR-123 "New summary"
 ```
 
+## Remote Mutation Confirmation
+
+Read-only commands (`search`, `issue get`, `issue list`, `issue comments`, and `issue transitions`) do not need confirmation. Before running any remote mutation (`issue create`, `issue add-comment`, `issue update-comment`, `issue transition`, `issue archive`, `issue update-description`, or `issue update-summary`), show the target and intended effect, then obtain explicit user confirmation immediately before execution.
+
+- Warn that `issue archive` archives the remote issue.
+- Warn that `issue update-description` replaces the full remote description; fetch and merge the current description first unless the user explicitly requests a full rewrite.
+- Mention local-image uploads when a description or comment mutation includes local markdown images.
+
 ## Behavior
 
 - `search <jql>` calls Jira enhanced search at `/rest/api/3/search/jql`
