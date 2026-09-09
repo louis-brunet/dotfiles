@@ -20,7 +20,7 @@ Use the executable at `{skill-directory}/scripts/azure-devops-api` to talk to Az
 
 ## Authentication
 
-The script uses Azure DevOps basic auth with a personal access token.
+The script authenticates with a personal access token through Microsoft's `azure-devops-node-api` client.
 
 - `AZURE_DEVOPS_API_TOKEN`
 
@@ -30,14 +30,20 @@ Required context values:
 - `AZURE_DEVOPS_PROJECT`
 - `AZURE_DEVOPS_REPOSITORY_ID`
 
-Optional values:
+Optional value:
 
-- `AZURE_DEVOPS_USERNAME`
-- `AZURE_DEVOPS_API_VERSION`
+- `AZURE_DEVOPS_API_VERSION`, which defaults to `7.1` for the pull-request commit pagination fallback
 
 ## Setup
 
-Requires Node.js 22.18 or newer. No npm installation is required to run or test this skill.
+Requires Node.js 22.18 or newer. Install the pinned script dependencies before running or testing this skill:
+
+```bash
+cd {skill-directory}/scripts
+npm ci
+```
+
+Each copied skill has its own `scripts/package-lock.json` and must be installed independently.
 
 Copy `.env.example` to a gitignored `.env` in the active skill directory, then set the required values. A project can instead provide repository-specific values in its root `.env`.
 
@@ -86,10 +92,9 @@ azure-devops-api build test-summary <build-id>
   - It also includes a short log-derived root-cause snippet when a failed record has a log
 - `build timeline <build-id>` returns the build timeline, including phases, jobs, tasks, results, log references, and issues
 - `build logs <build-id>` returns build log metadata entries, including log ids, URLs, and line counts
-- `build log-text <build-id> <log-id>` resolves the log URL from the build logs response and fetches the raw text for that log
+- `build log-text <build-id> <log-id>` fetches raw text directly through the Build API
 - `build test-summary <build-id>` returns a build-level test result summary from the Azure DevOps Test Results API
 - The command reads organization, project, and repository ID from `AZURE_DEVOPS_ORGANIZATION`, `AZURE_DEVOPS_PROJECT`, and `AZURE_DEVOPS_REPOSITORY_ID`
-- The command uses Azure DevOps REST API version `7.1` by default
 - Commands return machine-readable JSON. Simple reads preserve Azure DevOps response shapes; paginated commands may aggregate pages into the documented command-level shapes.
 - The first version is read-only and does not create, update, reply to, or delete pull request comments
 

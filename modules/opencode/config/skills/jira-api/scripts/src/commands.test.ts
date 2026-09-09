@@ -87,3 +87,11 @@ test("parseCommand accepts description plus parent for issue create", () => {
     parentIssueId: "ADRP-5",
   });
 });
+
+test("parseCommand preserves option-like free-text payloads", () => {
+  assert.deepEqual(parseCommand(["issue", "add-comment", "ADRP-42", "--starts-with-dashes"]), {
+    type: "issue-add-comment",
+    issueId: "ADRP-42",
+    comment: "--starts-with-dashes",
+  });
+});

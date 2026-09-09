@@ -38,7 +38,14 @@ Optional project default:
 
 ## Setup
 
-Requires Node.js 22.18 or newer. No npm installation is required to run or test this skill.
+Requires Node.js 22.18 or newer. Install the pinned script dependencies before running or testing this skill:
+
+```bash
+cd {skill-directory}/scripts
+npm ci
+```
+
+Each copied skill has its own `scripts/package-lock.json` and must be installed independently.
 
 Copy `.env.example` to a gitignored `.env` in the active skill directory, then set the required values. A project can instead provide repository-specific values in its root `.env`.
 

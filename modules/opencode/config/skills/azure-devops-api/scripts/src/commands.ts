@@ -1,421 +1,39 @@
-import process from "node:process";
 import { execFileSync } from "node:child_process";
 
-import { DEFAULT_API_VERSION, getEnvironmentPaths } from "./env.ts";
+import { Command as CommanderCommand } from "commander";
+import { BuildReason, BuildResult, BuildStatus, DefinitionQueueStatus, DefinitionType, IssueType, TaskResult, TimelineRecordState } from "azure-devops-node-api/interfaces/BuildInterfaces.js";
+import { CommentThreadStatus, CommentType, GitStatusState, PullRequestAsyncStatus, PullRequestStatus, VersionControlChangeType } from "azure-devops-node-api/interfaces/GitInterfaces.js";
+import { GitPullRequestMergeStrategy, PullRequestMergeFailureType } from "azure-devops-node-api/interfaces/GitInterfaces.js";
+import { TestOutcome, TestResultsContextType, TestRunOutcome, TestRunState } from "azure-devops-node-api/interfaces/TestInterfaces.js";
+
+import type { AzureDevOpsClient } from "./client.ts";
+import { createAzureDevOpsClient } from "./client.ts";
 import type { AzureDevOpsAuthConfig } from "./env.ts";
-import { buildRequestOptions, requestRequiredJson, requestRequiredJsonResponse, requestText } from "./http.ts";
 
-type PullRequestThreadsCommand = {
-  type: "pull-request-threads";
+type PullRequestCommand = {
+  type:
+    | "pull-request-get"
+    | "pull-request-changes"
+    | "pull-request-commits"
+    | "pull-request-threads"
+    | "pull-request-latest-failed-build"
+    | "pull-request-builds"
+    | "pull-request-statuses"
+    | "pull-request-failure-history";
   pullRequestId?: string;
 };
 
-type PullRequestGetCommand = {
-  type: "pull-request-get";
-  pullRequestId?: string;
-};
+type BuildCommand =
+  | { type: "build-timeline" | "build-logs" | "build-test-summary"; buildId: string }
+  | { type: "build-log-text"; buildId: string; logId: string };
 
-type PullRequestChangesCommand = {
-  type: "pull-request-changes";
-  pullRequestId?: string;
-};
+export type Command = PullRequestCommand | BuildCommand;
 
-type PullRequestCommitsCommand = {
-  type: "pull-request-commits";
-  pullRequestId?: string;
-};
+type Request = AzureDevOpsAuthConfig & { client?: AzureDevOpsClient };
+type PullRequestRequest = Request & { pullRequestId: string };
+type BuildRequest = Request & { buildId: string };
 
-type PullRequestLatestFailedBuildCommand = {
-  type: "pull-request-latest-failed-build";
-  pullRequestId?: string;
-};
-
-type PullRequestBuildsCommand = {
-  type: "pull-request-builds";
-  pullRequestId?: string;
-};
-
-type PullRequestStatusesCommand = {
-  type: "pull-request-statuses";
-  pullRequestId?: string;
-};
-
-type PullRequestFailureHistoryCommand = {
-  type: "pull-request-failure-history";
-  pullRequestId?: string;
-};
-
-type BuildTimelineCommand = {
-  type: "build-timeline";
-  buildId: string;
-};
-
-type BuildLogsCommand = {
-  type: "build-logs";
-  buildId: string;
-};
-
-type BuildLogTextCommand = {
-  type: "build-log-text";
-  buildId: string;
-  logId: string;
-};
-
-type BuildTestSummaryCommand = {
-  type: "build-test-summary";
-  buildId: string;
-};
-
-export type Command =
-  | PullRequestThreadsCommand
-  | PullRequestGetCommand
-  | PullRequestChangesCommand
-  | PullRequestCommitsCommand
-  | PullRequestLatestFailedBuildCommand
-  | PullRequestBuildsCommand
-  | PullRequestStatusesCommand
-  | PullRequestFailureHistoryCommand
-  | BuildTimelineCommand
-  | BuildLogsCommand
-  | BuildLogTextCommand
-  | BuildTestSummaryCommand;
-
-export function parseCommand(args: string[]): Command {
-  if (args[0] === "pr" && args[1] === "get" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-get",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "changes" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-changes",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "commits" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-commits",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "threads" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-threads",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "latest-failed-build" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-latest-failed-build",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "builds" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-builds",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "statuses" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-statuses",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "pr" && args[1] === "failure-history" && (args.length === 2 || args.length === 3)) {
-    return {
-      type: "pull-request-failure-history",
-      pullRequestId: args[2],
-    };
-  }
-
-  if (args[0] === "build" && args[1] === "timeline" && args.length === 3) {
-    return {
-      type: "build-timeline",
-      buildId: args[2],
-    };
-  }
-
-  if (args[0] === "build" && args[1] === "logs" && args.length === 3) {
-    return {
-      type: "build-logs",
-      buildId: args[2],
-    };
-  }
-
-  if (args[0] === "build" && args[1] === "log-text" && args.length === 4) {
-    return {
-      type: "build-log-text",
-      buildId: args[2],
-      logId: args[3],
-    };
-  }
-
-  if (args[0] === "build" && args[1] === "test-summary" && args.length === 3) {
-    return {
-      type: "build-test-summary",
-      buildId: args[2],
-    };
-  }
-
-  return printUsageAndExit();
-}
-
-export async function dispatchCommand(command: Command, auth: AzureDevOpsAuthConfig): Promise<void> {
-  const pullRequestId = isPullRequestCommand(command)
-    ? await resolvePullRequestId({ ...auth, pullRequestId: command.pullRequestId })
-    : undefined;
-
-  if (command.type === "pull-request-get") {
-    const result = await getPullRequest({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "pull-request-changes") {
-    const result = await getLatestPullRequestChanges({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "pull-request-commits") {
-    const result = await getPullRequestCommits({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "pull-request-builds") {
-    const result = await getPullRequestBuilds({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "pull-request-statuses") {
-    const result = await getPullRequestStatuses({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "pull-request-failure-history") {
-    const result = await getPullRequestFailureHistory({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "pull-request-latest-failed-build") {
-    const result = await getLatestFailedBuildForPullRequest({
-      ...auth,
-      pullRequestId: pullRequestId as string,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "build-timeline") {
-    const result = await getBuildTimeline({
-      ...auth,
-      buildId: command.buildId,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "build-logs") {
-    const result = await getBuildLogs({
-      ...auth,
-      buildId: command.buildId,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  if (command.type === "build-log-text") {
-    const result = await getBuildLogText({
-      ...auth,
-      buildId: command.buildId,
-      logId: command.logId,
-    });
-    console.log(result);
-    return;
-  }
-
-  if (command.type === "build-test-summary") {
-    const result = await getBuildTestSummary({
-      ...auth,
-      buildId: command.buildId,
-    });
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  const result = await getPullRequestThreads({
-    ...auth,
-    pullRequestId: pullRequestId as string,
-  });
-
-  console.log(JSON.stringify(result, null, 2));
-}
-
-type PullRequestThreadsRequest = AzureDevOpsAuthConfig & {
-  organization?: string;
-  project?: string;
-  repositoryId?: string;
-  pullRequestId: string;
-};
-
-type PullRequestRequest = AzureDevOpsAuthConfig & {
-  pullRequestId: string;
-};
-
-type PullRequestLatestFailedBuildRequest = AzureDevOpsAuthConfig & {
-  pullRequestId: string;
-};
-
-type PullRequestBuildsRequest = AzureDevOpsAuthConfig & {
-  pullRequestId: string;
-};
-
-type PullRequestStatusesRequest = AzureDevOpsAuthConfig & {
-  pullRequestId: string;
-};
-
-type PullRequestFailureHistoryRequest = AzureDevOpsAuthConfig & {
-  pullRequestId: string;
-};
-
-type BuildRequest = AzureDevOpsAuthConfig & {
-  buildId: string;
-};
-
-type BuildLogTextRequest = AzureDevOpsAuthConfig & {
-  buildId: string;
-  logId: string;
-};
-
-type AzureDevOpsBuildListResponse = {
-  value?: unknown[];
-};
-
-type AzureDevOpsBuild = {
-  id?: number;
-  buildNumber?: string;
-  status?: string;
-  result?: string;
-  sourceBranch?: string;
-  sourceVersion?: string;
-  reason?: string;
-  queueTime?: string;
-  startTime?: string;
-  finishTime?: string;
-  parameters?: string;
-  definition?: { id?: number; name?: string };
-  repository?: { id?: string; name?: string; defaultBranch?: string };
-  url?: string;
-  _links?: Record<string, unknown>;
-};
-
-type AzureDevOpsPullRequestIterationsResponse = {
-  value?: unknown[];
-};
-
-type AzureDevOpsPullRequestChangesResponse = {
-  changeEntries?: unknown[];
-  nextSkip?: number;
-  nextTop?: number;
-};
-
-type AzureDevOpsPullRequestCommitsResponse = {
-  count?: number;
-  value?: unknown[];
-};
-
-type AzureDevOpsPullRequestsResponse = {
-  value?: unknown[];
-};
-
-type AzureDevOpsPullRequestSummary = {
-  pullRequestId?: number;
-  creationDate?: string;
-  sourceRefName?: string;
-  status?: string;
-};
-
-type AzureDevOpsPullRequestIteration = {
-  id?: number;
-  createdDate?: string;
-  updatedDate?: string;
-  sourceRefCommit?: {
-    commitId?: string;
-  };
-};
-
-type AzureDevOpsPullRequestStatusesResponse = {
-  value?: unknown[];
-};
-
-type AzureDevOpsPullRequestStatus = {
-  id?: number;
-  iterationId?: number;
-  state?: string;
-  description?: string;
-  creationDate?: string;
-  updatedDate?: string;
-  targetUrl?: string;
-  context?: {
-    name?: string;
-    genre?: string;
-  };
-};
-
-type AzureDevOpsTimelineResponse = {
-  records?: unknown[];
-};
-
-type AzureDevOpsTimelineRecord = {
-  id?: string;
-  parentId?: string;
-  type?: string;
-  name?: string;
-  result?: string;
-  errorCount?: number;
-  warningCount?: number;
-  log?: {
-    id?: number;
-  };
-  issues?: Array<{
-    type?: string;
-    category?: string;
-    message?: string;
-  }>;
-};
-
-type PullRequestFailureStatusSummary = {
+type FailureStatus = {
   id: number | null;
   iterationId: number;
   state: string;
@@ -426,19 +44,7 @@ type PullRequestFailureStatusSummary = {
   targetUrl: string | null;
 };
 
-type PullRequestIterationSummary = {
-  id: number;
-  createdDate: string | null;
-  updatedDate: string | null;
-  sourceCommit: string | null;
-};
-
-type LogSnippetSummary = {
-  text: string;
-  lines: string[];
-};
-
-type BuildFailureRecordSummary = {
+type FailedRecord = {
   type: string | null;
   name: string | null;
   result: string | null;
@@ -448,1477 +54,410 @@ type BuildFailureRecordSummary = {
   issues: string[];
 };
 
-type BuildFailureEntry = {
+type FailureEntry = {
   iterationId: number | null;
   iterationCreatedDate: string | null;
   sourceCommit: string | null;
   buildId: number | null;
   buildNumber: string | null;
   definitionName: string | null;
-  result: string | null;
+  result: unknown;
   queueTime: string | null;
   finishTime: string | null;
   summary: string;
-  failedRecord: BuildFailureRecordSummary | null;
-  logSnippet: LogSnippetSummary | null;
-  statuses: PullRequestFailureStatusSummary[];
+  failedRecord: FailedRecord | null;
+  logSnippet: { text: string; lines: string[] } | null;
+  statuses: FailureStatus[];
 };
 
-type AzureDevOpsBuildLogsResponse = {
-  count?: number;
-  value?: Array<{
-    id?: number;
-    type?: string;
-    url?: string;
-    lineCount?: number;
-    createdOn?: string;
-    lastChangedOn?: string;
-  }>;
-};
+export function parseCommand(args: string[]): Command {
+  let result: Command | undefined;
+  const program = new CommanderCommand().name("azure-devops-api").exitOverride();
+  const pullRequest = program.command("pr");
 
-export async function getPullRequestThreads({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-}: PullRequestThreadsRequest): Promise<unknown> {
-  const trimmedOrganization = organization?.trim() || azureDevopsOrganization.trim();
-  const trimmedProject = project?.trim() || azureDevopsProject.trim();
-  const trimmedRepositoryId = repositoryId?.trim() || azureDevopsRepositoryId.trim();
-  const trimmedPullRequestId = pullRequestId.trim();
+  const addPullRequestCommand = (name: string, type: PullRequestCommand["type"]): void => {
+    pullRequest.command(`${name} [pull-request-id]`).action((pullRequestId?: string) => {
+      result = { type, pullRequestId };
+    });
+  };
 
-  if (!trimmedOrganization) {
-    throw new Error("Azure DevOps pull request threads require a non-empty organization.");
+  addPullRequestCommand("get", "pull-request-get");
+  addPullRequestCommand("changes", "pull-request-changes");
+  addPullRequestCommand("commits", "pull-request-commits");
+  addPullRequestCommand("threads", "pull-request-threads");
+  addPullRequestCommand("latest-failed-build", "pull-request-latest-failed-build");
+  addPullRequestCommand("builds", "pull-request-builds");
+  addPullRequestCommand("statuses", "pull-request-statuses");
+  addPullRequestCommand("failure-history", "pull-request-failure-history");
+
+  const build = program.command("build");
+  build.command("timeline <build-id>").action((buildId: string) => {
+    result = { type: "build-timeline", buildId };
+  });
+  build.command("logs <build-id>").action((buildId: string) => {
+    result = { type: "build-logs", buildId };
+  });
+  build.command("log-text <build-id> <log-id>").action((buildId: string, logId: string) => {
+    result = { type: "build-log-text", buildId, logId };
+  });
+  build.command("test-summary <build-id>").action((buildId: string) => {
+    result = { type: "build-test-summary", buildId };
+  });
+
+  program.parse(["node", "azure-devops-api", ...args]);
+  if (!result) {
+    throw new Error("Invalid Azure DevOps command.");
   }
 
-  if (!trimmedProject) {
-    throw new Error("Azure DevOps pull request threads require a non-empty project.");
-  }
-
-  if (!trimmedRepositoryId) {
-    throw new Error("Azure DevOps pull request threads require a non-empty repository ID.");
-  }
-
-  if (!/^\d+$/.test(trimmedPullRequestId)) {
-    throw new Error("Azure DevOps pull request threads require a numeric pull request ID.");
-  }
-
-  return await requestRequiredJson(
-    buildPullRequestThreadsUrl({
-      organization: trimmedOrganization,
-      project: trimmedProject,
-      repositoryId: trimmedRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps pull request threads for ${trimmedProject}/${trimmedRepositoryId}#${trimmedPullRequestId}`,
-  );
+  return result;
 }
 
-export async function getLatestPullRequestChanges({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request changes require a numeric pull request ID.",
+export async function dispatchCommand(command: Command, auth: AzureDevOpsAuthConfig): Promise<void> {
+  const sdk = await createAzureDevOpsClient(auth);
+  const pullRequestId = "pullRequestId" in command
+    ? await resolvePullRequestId({ ...auth, client: sdk, pullRequestId: command.pullRequestId })
+    : undefined;
+
+  if (command.type === "build-log-text") {
+    console.log(await getBuildLogText({ ...auth, client: sdk, buildId: command.buildId, logId: command.logId }));
+    return;
+  }
+
+  let result: unknown;
+  switch (command.type) {
+    case "pull-request-get": result = await getPullRequest({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-changes": result = await getLatestPullRequestChanges({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-commits": result = await getPullRequestCommits({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-threads": result = await getPullRequestThreads({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-latest-failed-build": result = await getLatestFailedBuildForPullRequest({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-builds": result = await getPullRequestBuilds({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-statuses": result = await getPullRequestStatuses({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "pull-request-failure-history": result = await getPullRequestFailureHistory({ ...auth, client: sdk, pullRequestId: pullRequestId! }); break;
+    case "build-timeline": result = await getBuildTimeline({ ...auth, client: sdk, buildId: command.buildId }); break;
+    case "build-logs": result = await getBuildLogs({ ...auth, client: sdk, buildId: command.buildId }); break;
+    case "build-test-summary": result = await getBuildTestSummary({ ...auth, client: sdk, buildId: command.buildId }); break;
+  }
+
+  console.log(JSON.stringify(normalizeSdkOutput(result), null, 2));
+}
+
+export async function resolvePullRequestId(request: Request & { pullRequestId?: string; currentBranch?: string }): Promise<string> {
+  if (request.pullRequestId !== undefined) {
+    return numeric(request.pullRequestId, "Azure DevOps pull request commands require a numeric pull request ID.");
+  }
+
+  const sourceRefName = `refs/heads/${request.currentBranch?.trim() || currentBranch()}`;
+  const pullRequests = await client(request).getPullRequests(
+    request.azureDevopsRepositoryId,
+    sourceRefName,
+    request.azureDevopsProject,
   );
-  const requestOptions = buildRequestOptions(azureDevopsUsername, azureDevopsApiToken);
-  const iterationsResponse = await getPullRequestIterations({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    azureDevopsRepositoryId,
-    pullRequestId: trimmedPullRequestId,
-  });
-  const latestIteration = selectLatestPullRequestIteration(iterationsResponse);
+  const matches = pullRequests
+    .filter((pullRequest) => pullRequest.pullRequestId !== undefined && pullRequest.status === 1 && pullRequest.sourceRefName === sourceRefName)
+    .sort((left, right) => dateValue(right.creationDate) - dateValue(left.creationDate));
+  const selected = matches[0];
+
+  if (!selected?.pullRequestId) {
+    throw new Error(`No active Azure DevOps pull request found for current branch ${sourceRefName}. Provide a pull request ID explicitly.`);
+  }
+
+  console.error(matches.length > 1
+    ? `Found ${matches.length} active Azure DevOps pull requests for ${sourceRefName}; using newest PR ${selected.pullRequestId}.`
+    : `Using active Azure DevOps PR ${selected.pullRequestId} for ${sourceRefName}.`);
+  return String(selected.pullRequestId);
+}
+
+export async function getPullRequest(request: PullRequestRequest): Promise<unknown> {
+  return client(request).getPullRequest(request.azureDevopsRepositoryId, Number(numeric(request.pullRequestId, "Azure DevOps pull request lookup requires a numeric pull request ID.")), request.azureDevopsProject);
+}
+
+export async function getPullRequestThreads(request: PullRequestRequest): Promise<unknown> {
+  const value = await client(request).getThreads(request.azureDevopsRepositoryId, Number(numeric(request.pullRequestId, "Azure DevOps pull request threads require a numeric pull request ID.")), request.azureDevopsProject);
+  return collection(value);
+}
+
+export async function getPullRequestStatuses(request: PullRequestRequest): Promise<unknown> {
+  const value = await client(request).getPullRequestStatuses(request.azureDevopsRepositoryId, Number(numeric(request.pullRequestId, "Azure DevOps pull request statuses require a numeric pull request ID.")), request.azureDevopsProject);
+  return collection(value);
+}
+
+export async function getLatestPullRequestChanges(request: PullRequestRequest): Promise<unknown> {
+  const pullRequestId = numeric(request.pullRequestId, "Azure DevOps pull request changes require a numeric pull request ID.");
+  const sdk = client(request);
+  const iteration = selectLatestPullRequestIteration(await sdk.getPullRequestIterations(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject));
   const changeEntries: unknown[] = [];
   let skip = 0;
   let top = 2000;
 
   do {
-    const response = await requestRequiredJson(
-      buildPullRequestChangesUrl({
-        organization: azureDevopsOrganization,
-        project: azureDevopsProject,
-        repositoryId: azureDevopsRepositoryId,
-        pullRequestId: trimmedPullRequestId,
-        iterationId: String(latestIteration.id),
-        skip,
-        top,
-        apiVersion: azureDevopsApiVersion,
-      }),
-      requestOptions,
-      `Azure DevOps pull request changes for ${trimmedPullRequestId} iteration ${latestIteration.id}`,
-    );
-    const page = parsePullRequestChangesPage(response);
-    changeEntries.push(...page.changeEntries);
-    skip = page.nextSkip;
-    top = page.nextTop;
+    const page = await sdk.getPullRequestIterationChanges(request.azureDevopsRepositoryId, Number(pullRequestId), iteration.id, request.azureDevopsProject, top, skip);
+    changeEntries.push(...(page.changeEntries ?? []));
+    skip = page.nextSkip ?? 0;
+    top = page.nextTop ?? 0;
   } while (skip > 0 && top > 0);
 
-  return {
-    pullRequestId: Number(trimmedPullRequestId),
-    iteration: latestIteration,
-    count: changeEntries.length,
-    changeEntries,
-  };
+  return { pullRequestId: Number(pullRequestId), iteration, count: changeEntries.length, changeEntries };
 }
 
-export async function getPullRequestCommits({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request commits require a numeric pull request ID.",
-  );
-  const requestOptions = buildRequestOptions(azureDevopsUsername, azureDevopsApiToken);
-  const commits: unknown[] = [];
-  let continuationToken: string | undefined;
-
-  do {
-    const { body, headers } = await requestRequiredJsonResponse(
-      buildPullRequestCommitsUrl({
-        organization: azureDevopsOrganization,
-        project: azureDevopsProject,
-        repositoryId: azureDevopsRepositoryId,
-        pullRequestId: trimmedPullRequestId,
-        continuationToken,
-        apiVersion: azureDevopsApiVersion,
-      }),
-      requestOptions,
-      `Azure DevOps pull request commits for ${trimmedPullRequestId}`,
-    );
-    commits.push(...parsePullRequestCommitsPage(body));
-    continuationToken = headers.get("x-ms-continuationtoken") ?? undefined;
-  } while (continuationToken);
-
-  return {
-    count: commits.length,
-    value: commits,
-  };
+export async function getPullRequestCommits(request: PullRequestRequest): Promise<unknown> {
+  const pullRequestId = numeric(request.pullRequestId, "Azure DevOps pull request commits require a numeric pull request ID.");
+  const value = await client(request).getPullRequestCommits(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject);
+  return collection(value);
 }
 
-export async function getLatestFailedBuildForPullRequest({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestLatestFailedBuildRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps latest failed build lookup requires a numeric pull request ID.",
-  );
-
-  const [pullRequest, iterationsResponse, statusesResponse] = await Promise.all([
-    getPullRequest({
-      azureDevopsApiToken,
-      azureDevopsUsername,
-      azureDevopsApiVersion,
-      azureDevopsOrganization,
-      azureDevopsProject,
-      pullRequestId: trimmedPullRequestId,
-    }),
-    getPullRequestIterations({
-      azureDevopsApiToken,
-      azureDevopsUsername,
-      azureDevopsApiVersion,
-      azureDevopsOrganization,
-      azureDevopsProject,
-      azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-    }),
-    getPullRequestStatuses({
-      azureDevopsApiToken,
-      azureDevopsUsername,
-      azureDevopsApiVersion,
-      azureDevopsOrganization,
-      azureDevopsProject,
-      azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-    }),
+export async function getPullRequestBuilds(request: PullRequestRequest): Promise<unknown> {
+  const pullRequestId = numeric(request.pullRequestId, "Azure DevOps pull request builds require a numeric pull request ID.");
+  const sdk = client(request);
+  const pullRequest = await sdk.getPullRequest(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject);
+  const source = sourceBranch(pullRequest, pullRequestId);
+  const mergeBranch = mergeBranchFor(pullRequestId);
+  const [sourceBuilds, mergeBuilds] = await Promise.all([
+    sdk.getBuilds(request.azureDevopsProject, source),
+    sdk.getBuilds(request.azureDevopsProject, mergeBranch),
   ]);
-
-  const sourceBranch = getPullRequestSourceBranch(pullRequest, trimmedPullRequestId);
-  const mergeBranch = buildPullRequestMergeBranch(trimmedPullRequestId);
-  const iterations = listPullRequestIterations(iterationsResponse);
-  const iterationById = new Map(iterations.map((iteration) => [iteration.id, iteration]));
-  const failedStatusesByIteration = groupStatusesByIteration(listFailedPullRequestStatuses(statusesResponse));
-  const mergeBuildsResponse = await getBuildsForBranch({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    branchName: mergeBranch,
-  });
-  const sourceBuildsResponse = await getBuildsForBranch({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    branchName: sourceBranch,
-  });
-  const latestFailedBuild = selectLatestFailedBuild(listBuilds(mergeBuildsResponse), mergeBranch)
-    ?? selectLatestFailedBuild(listBuilds(sourceBuildsResponse), sourceBranch);
-
-  if (!latestFailedBuild) {
-    throw new Error(`No failed Azure DevOps builds found for pull request ${trimmedPullRequestId}.`);
-  }
-
-  const latestFailure = await buildFailureEntry({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    build: latestFailedBuild,
-    iterationById,
-    failedStatusesByIteration,
-  });
-
-  return {
-    pullRequestId: Number(trimmedPullRequestId),
-    sourceBranch,
-    mergeBranch,
-    latestFailedBuild: latestFailure,
-  };
+  return { pullRequestId: Number(pullRequestId), sourceBranch: source, mergeBranch, sourceBuilds: collection(sourceBuilds), mergeBuilds: collection(mergeBuilds) };
 }
 
-export async function getPullRequestBuilds({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  pullRequestId,
-}: PullRequestBuildsRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request builds require a numeric pull request ID.",
-  );
-
-  const pullRequest = await getPullRequest({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    pullRequestId: trimmedPullRequestId,
-  });
-
-  const sourceBranch = getPullRequestSourceBranch(pullRequest, trimmedPullRequestId);
-  const mergeBranch = buildPullRequestMergeBranch(trimmedPullRequestId);
-  const sourceBuilds = await getBuildsForBranch({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    branchName: sourceBranch,
-  });
-  const mergeBuilds = await getBuildsForBranch({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    branchName: mergeBranch,
-  });
-
-  return {
-    pullRequestId: Number(trimmedPullRequestId),
-    sourceBranch,
-    mergeBranch,
-    sourceBuilds,
-    mergeBuilds,
-  };
-}
-
-export async function getPullRequestStatuses({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestStatusesRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request statuses require a numeric pull request ID.",
-  );
-
-  return await requestRequiredJson(
-    buildPullRequestStatusesUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      repositoryId: azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps pull request statuses for ${trimmedPullRequestId}`,
-  );
-}
-
-export async function getPullRequestFailureHistory({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestFailureHistoryRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request failure history requires a numeric pull request ID.",
-  );
-
-  const [pullRequest, iterationsResponse, statusesResponse] = await Promise.all([
-    getPullRequest({
-      azureDevopsApiToken,
-      azureDevopsUsername,
-      azureDevopsApiVersion,
-      azureDevopsOrganization,
-      azureDevopsProject,
-      pullRequestId: trimmedPullRequestId,
-    }),
-    getPullRequestIterations({
-      azureDevopsApiToken,
-      azureDevopsUsername,
-      azureDevopsApiVersion,
-      azureDevopsOrganization,
-      azureDevopsProject,
-      azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-    }),
-    getPullRequestStatuses({
-      azureDevopsApiToken,
-      azureDevopsUsername,
-      azureDevopsApiVersion,
-      azureDevopsOrganization,
-      azureDevopsProject,
-      azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-    }),
+export async function getLatestFailedBuildForPullRequest(request: PullRequestRequest): Promise<unknown> {
+  const pullRequestId = numeric(request.pullRequestId, "Azure DevOps latest failed build lookup requires a numeric pull request ID.");
+  const sdk = client(request);
+  const [pullRequest, iterations, statuses] = await Promise.all([
+    sdk.getPullRequest(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject),
+    sdk.getPullRequestIterations(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject),
+    sdk.getPullRequestStatuses(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject),
   ]);
+  const source = sourceBranch(pullRequest, pullRequestId);
+  const mergeBranch = mergeBranchFor(pullRequestId);
+  const [mergeBuilds, sourceBuilds] = await Promise.all([
+    sdk.getBuilds(request.azureDevopsProject, mergeBranch),
+    sdk.getBuilds(request.azureDevopsProject, source),
+  ]);
+  const build = latestFailedBuild(mergeBuilds, mergeBranch) ?? latestFailedBuild(sourceBuilds, source);
+  if (!build) throw new Error(`No failed Azure DevOps builds found for pull request ${pullRequestId}.`);
 
-  const sourceBranch = getPullRequestSourceBranch(pullRequest, trimmedPullRequestId);
-  const mergeBranch = buildPullRequestMergeBranch(trimmedPullRequestId);
-  const iterations = listPullRequestIterations(iterationsResponse);
-  const iterationById = new Map(iterations.map((iteration) => [iteration.id, iteration]));
-  const failedStatuses = listFailedPullRequestStatuses(statusesResponse);
-  const failedStatusesByIteration = groupStatusesByIteration(failedStatuses);
-  const buildsResponse = await getBuildsForBranch({
-    azureDevopsApiToken,
-    azureDevopsUsername,
-    azureDevopsApiVersion,
-    azureDevopsOrganization,
-    azureDevopsProject,
-    branchName: mergeBranch,
-  });
-  const problematicBuilds = listBuilds(buildsResponse)
-    .filter((build) => build.result === "failed" || build.result === "partiallySucceeded")
-    .sort((left, right) => getBuildTimestamp(left) - getBuildTimestamp(right));
+  return {
+    pullRequestId: Number(pullRequestId),
+    sourceBranch: source,
+    mergeBranch,
+    latestFailedBuild: await failureEntry(sdk, request.azureDevopsProject, build, iterationMap(iterations), failedStatuses(statuses)),
+  };
+}
 
+export async function getPullRequestFailureHistory(request: PullRequestRequest): Promise<unknown> {
+  const pullRequestId = numeric(request.pullRequestId, "Azure DevOps pull request failure history requires a numeric pull request ID.");
+  const sdk = client(request);
+  const mergeBranch = mergeBranchFor(pullRequestId);
+  const [pullRequest, iterations, statuses, builds] = await Promise.all([
+    sdk.getPullRequest(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject),
+    sdk.getPullRequestIterations(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject),
+    sdk.getPullRequestStatuses(request.azureDevopsRepositoryId, Number(pullRequestId), request.azureDevopsProject),
+    sdk.getBuilds(request.azureDevopsProject, mergeBranch),
+  ]);
+  const failuresByIteration = failedStatuses(statuses);
   const buildFailures = await Promise.all(
-    problematicBuilds.map((build) =>
-      buildFailureEntry({
-        azureDevopsApiToken,
-        azureDevopsUsername,
-        azureDevopsApiVersion,
-        azureDevopsOrganization,
-        azureDevopsProject,
-        build,
-        iterationById,
-        failedStatusesByIteration,
-      }),
-    ),
+    builds.filter(isProblematicBuild).sort((left, right) => dateValue(left.finishTime) - dateValue(right.finishTime))
+      .map((build) => failureEntry(sdk, request.azureDevopsProject, build, iterationMap(iterations), failuresByIteration)),
   );
-
-  const iterationIdsWithBuildFailures = new Set(
-    buildFailures.map((failure) => failure.iterationId).filter((iterationId): iterationId is number => typeof iterationId === "number"),
-  );
-  const statusOnlyFailures = failedStatuses.filter((status) => !iterationIdsWithBuildFailures.has(status.iterationId));
+  const usedIterations = new Set(buildFailures.map((failure) => failure.iterationId).filter((id): id is number => id !== null));
 
   return {
-    pullRequestId: Number(trimmedPullRequestId),
-    sourceBranch,
+    pullRequestId: Number(pullRequestId),
+    sourceBranch: sourceBranch(pullRequest, pullRequestId),
     mergeBranch,
     buildFailures,
-    statusOnlyFailures,
+    statusOnlyFailures: [...failuresByIteration.values()].flat().filter((status) => !usedIterations.has(status.iterationId)),
   };
 }
 
-export async function getBuildTimeline({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  buildId,
-}: BuildRequest): Promise<unknown> {
-  const trimmedBuildId = validateNumericBuildId(buildId, "timeline");
-
-  return await requestRequiredJson(
-    buildBuildTimelineUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      buildId: trimmedBuildId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps build timeline for ${trimmedBuildId}`,
-  );
+export async function getBuildTimeline(request: BuildRequest): Promise<unknown> {
+  return client(request).getBuildTimeline(request.azureDevopsProject, Number(buildId(request.buildId, "timeline")));
 }
 
-export async function getBuildLogs({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  buildId,
-}: BuildRequest): Promise<unknown> {
-  const trimmedBuildId = validateNumericBuildId(buildId, "logs");
-
-  return await requestRequiredJson(
-    buildBuildLogsUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      buildId: trimmedBuildId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps build logs for ${trimmedBuildId}`,
-  );
+export async function getBuildLogs(request: BuildRequest): Promise<unknown> {
+  const value = await client(request).getBuildLogs(request.azureDevopsProject, Number(buildId(request.buildId, "logs")));
+  return collection(value);
 }
 
-export async function getBuildLogText({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  buildId,
-  logId,
-}: BuildLogTextRequest): Promise<string> {
-  const trimmedBuildId = validateNumericBuildId(buildId, "log text");
-  const trimmedLogId = validateNumericIdentifier(logId, "Azure DevOps build log text requires a numeric log ID.");
-
-  const logs = await requestRequiredJson(
-    buildBuildLogsUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      buildId: trimmedBuildId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps build logs for ${trimmedBuildId}`,
-  );
-
-  const logUrl = findBuildLogUrl(logs, trimmedLogId);
-
-  return await requestText(
-    logUrl,
-    {
-      headers: {
-        Accept: "text/plain",
-        Authorization: (buildRequestOptions(azureDevopsUsername, azureDevopsApiToken).headers as Record<string, string>).Authorization,
-      },
-    },
-    `Azure DevOps build log text for ${trimmedBuildId}/${trimmedLogId}`,
-  );
+export async function getBuildLogText(request: BuildRequest & { logId: string }): Promise<string> {
+  return client(request).getBuildLogText(request.azureDevopsProject, Number(buildId(request.buildId, "log text")), Number(numeric(request.logId, "Azure DevOps build log text requires a numeric log ID.")));
 }
 
-export async function getBuildTestSummary({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  buildId,
-}: BuildRequest): Promise<unknown> {
-  const trimmedBuildId = validateNumericBuildId(buildId, "test summary");
-
-  return await requestRequiredJson(
-    buildBuildTestSummaryUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      buildId: trimmedBuildId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps build test summary for ${trimmedBuildId}`,
-  );
+export async function getBuildTestSummary(request: BuildRequest): Promise<unknown> {
+  return client(request).getBuildTestSummary(request.azureDevopsProject, Number(buildId(request.buildId, "test summary")));
 }
 
-export function buildPullRequestThreadsUrl({
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId: string;
-  pullRequestId: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(repositoryId)}/pullrequests/${encodeURIComponent(pullRequestId)}/threads`,
-  );
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
+export function selectLatestPullRequestIteration(iterations: Array<{ id?: number; createdDate?: Date | string; updatedDate?: Date | string; sourceRefCommit?: { commitId?: string } }>): { id: number; createdDate: string | null; updatedDate: string | null; sourceCommit: string | null } {
+  const iteration = iterations.filter((value) => typeof value.id === "number").sort((left, right) => right.id! - left.id!)[0];
+  if (!iteration?.id) throw new Error("Azure DevOps pull request iterations did not include a valid iteration.");
+  return { id: iteration.id, createdDate: dateText(iteration.createdDate), updatedDate: dateText(iteration.updatedDate), sourceCommit: iteration.sourceRefCommit?.commitId ?? null };
 }
 
-function buildPullRequestStatusesUrl({
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId: string;
-  pullRequestId: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(repositoryId)}/pullrequests/${encodeURIComponent(pullRequestId)}/statuses`,
-  );
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
+function collection<T>(value: T[]): { count: number; value: T[] } { return { count: value.length, value }; }
+function client(request: Request): AzureDevOpsClient { if (!request.client) throw new Error("Azure DevOps client was not initialized."); return request.client; }
+function numeric(value: string, message: string): string { const result = value.trim(); if (!/^\d+$/.test(result)) throw new Error(message); return result; }
+function buildId(value: string, context: string): string { return numeric(value, `Azure DevOps build ${context} requires a numeric build ID.`); }
+function mergeBranchFor(id: string): string { return `refs/pull/${id}/merge`; }
+function sourceBranch(pullRequest: { sourceRefName?: string }, id: string): string { if (!pullRequest.sourceRefName?.trim()) throw new Error(`Azure DevOps pull request get for ${id} did not return a sourceRefName.`); return pullRequest.sourceRefName; }
+function dateValue(value: string | Date | undefined): number { return value ? Date.parse(String(value)) || 0 : 0; }
+function currentBranch(): string { try { const branch = execFileSync("git", ["branch", "--show-current"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim(); if (branch) return branch; } catch {} throw new Error("Cannot detect an Azure DevOps pull request because the current Git branch is unavailable. Provide a pull request ID explicitly."); }
+
+function iterationMap(iterations: Array<{ id?: number; createdDate?: Date | string; sourceRefCommit?: { commitId?: string } }>): Map<number, { createdDate?: string; sourceCommit?: string }> {
+  return new Map(iterations.filter((iteration): iteration is { id: number; createdDate?: Date | string; sourceRefCommit?: { commitId?: string } } => iteration.id !== undefined)
+    .map((iteration) => [iteration.id, { createdDate: dateText(iteration.createdDate) ?? undefined, sourceCommit: iteration.sourceRefCommit?.commitId }]));
 }
 
-function buildPullRequestIterationsUrl({
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId: string;
-  pullRequestId: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(repositoryId)}/pullrequests/${encodeURIComponent(pullRequestId)}/iterations`,
-  );
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
-}
-
-export function buildPullRequestChangesUrl({
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-  iterationId,
-  skip,
-  top,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId: string;
-  pullRequestId: string;
-  iterationId: string;
-  skip: number;
-  top: number;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(repositoryId)}/pullrequests/${encodeURIComponent(pullRequestId)}/iterations/${encodeURIComponent(iterationId)}/changes`,
-  );
-  url.searchParams.set("$top", String(top));
-  url.searchParams.set("$skip", String(skip));
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
-}
-
-export function buildPullRequestCommitsUrl({
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-  continuationToken,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId: string;
-  pullRequestId: string;
-  continuationToken?: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(repositoryId)}/pullrequests/${encodeURIComponent(pullRequestId)}/commits`,
-  );
-  url.searchParams.set("$top", "2000");
-  if (continuationToken) {
-    url.searchParams.set("continuationToken", continuationToken);
+function failedStatuses(statuses: Array<{ id?: number; iterationId?: number; state?: string | number; description?: string; creationDate?: Date | string; targetUrl?: string; context?: { name?: string; genre?: string } }>): Map<number, FailureStatus[]> {
+  const result = new Map<number, FailureStatus[]>();
+  for (const status of statuses.filter((status) => status.state === GitStatusState.Failed && status.iterationId !== undefined).sort((left, right) => dateValue(left.creationDate) - dateValue(right.creationDate))) {
+    const summary: FailureStatus = { id: status.id ?? null, iterationId: status.iterationId!, state: gitStatusStateText(status.state), description: status.description ?? null, contextName: status.context?.name ?? null, contextGenre: status.context?.genre ?? null, creationDate: dateText(status.creationDate), targetUrl: status.targetUrl ?? null };
+    result.set(summary.iterationId, [...(result.get(summary.iterationId) ?? []), summary]);
   }
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
+  return result;
 }
 
-export function buildActivePullRequestsForBranchUrl({
-  organization,
-  project,
-  repositoryId,
-  sourceRefName,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId: string;
-  sourceRefName: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(repositoryId)}/pullrequests`,
-  );
-  url.searchParams.set("searchCriteria.sourceRefName", sourceRefName);
-  url.searchParams.set("searchCriteria.status", "active");
-  url.searchParams.set("$top", "1000");
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
-}
+function isProblematicBuild(build: { result?: unknown }): boolean { return build.result === BuildResult.Failed || build.result === BuildResult.PartiallySucceeded; }
+function latestFailedBuild<T extends { sourceBranch?: string; finishTime?: Date | string; startTime?: Date | string; queueTime?: Date | string; result?: unknown }>(builds: T[], branch: string): T | undefined { return builds.filter((build) => build.sourceBranch === branch && isProblematicBuild(build)).sort((left, right) => dateValue(right.finishTime ?? right.startTime ?? right.queueTime) - dateValue(left.finishTime ?? left.startTime ?? left.queueTime))[0]; }
 
-function buildPullRequestUrl({
-  organization,
-  project,
-  repositoryId,
-  pullRequestId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  repositoryId?: string;
-  pullRequestId: string;
-  apiVersion: string;
-  repositoryNameOrId?: boolean;
-}): string {
-  const effectiveRepositoryId = repositoryId?.trim() || process.env.AZURE_DEVOPS_REPOSITORY_ID?.trim();
-  if (!effectiveRepositoryId) {
-    throw new Error("Azure DevOps pull request get requires a repository ID or name.");
-  }
-
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(
-    `${baseUrl}/${encodeURIComponent(project)}/_apis/git/repositories/${encodeURIComponent(effectiveRepositoryId)}/pullrequests/${encodeURIComponent(pullRequestId)}`,
-  );
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
-}
-
-function buildBuildsListUrl({
-  organization,
-  project,
-  apiVersion,
-  branchName,
-  reasonFilter,
-  resultFilter,
-  top,
-}: {
-  organization: string;
-  project: string;
-  apiVersion: string;
-  branchName: string;
-  reasonFilter: string;
-  resultFilter?: string;
-  top: number;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(`${baseUrl}/${encodeURIComponent(project)}/_apis/build/builds`);
-  url.searchParams.set("api-version", apiVersion);
-  url.searchParams.set("branchName", branchName);
-  url.searchParams.set("reasonFilter", reasonFilter);
-  if (resultFilter) {
-    url.searchParams.set("resultFilter", resultFilter);
-  }
-  url.searchParams.set("statusFilter", "completed");
-  url.searchParams.set("$top", String(top));
-  return url.toString();
-}
-
-function buildBuildTimelineUrl({
-  organization,
-  project,
-  buildId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  buildId: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(`${baseUrl}/${encodeURIComponent(project)}/_apis/build/builds/${encodeURIComponent(buildId)}/timeline`);
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
-}
-
-function buildBuildLogsUrl({
-  organization,
-  project,
-  buildId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  buildId: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(`${baseUrl}/${encodeURIComponent(project)}/_apis/build/builds/${encodeURIComponent(buildId)}/logs`);
-  url.searchParams.set("api-version", apiVersion);
-  return url.toString();
-}
-
-function buildBuildTestSummaryUrl({
-  organization,
-  project,
-  buildId,
-  apiVersion,
-}: {
-  organization: string;
-  project: string;
-  buildId: string;
-  apiVersion: string;
-}): string {
-  const baseUrl = buildOrganizationBaseUrl(organization);
-  const url = new URL(`${baseUrl}/${encodeURIComponent(project)}/_apis/testresults/resultsummarybybuild`);
-  url.searchParams.set("api-version", apiVersion);
-  url.searchParams.set("buildId", buildId);
-  url.searchParams.set("includeFailureDetails", "true");
-  return url.toString();
-}
-
-function buildOrganizationBaseUrl(organization: string): string {
-  const trimmedOrganization = organization.trim().replace(/\/+$/, "");
-
-  if (/^https?:\/\//i.test(trimmedOrganization)) {
-    return trimmedOrganization;
-  }
-
-  return `https://dev.azure.com/${encodeURIComponent(trimmedOrganization)}`;
-}
-
-function validateNumericBuildId(buildId: string, context: string): string {
-  return validateNumericIdentifier(buildId, `Azure DevOps build ${context} requires a numeric build ID.`);
-}
-
-function validateNumericPullRequestId(pullRequestId: string, message: string): string {
-  return validateNumericIdentifier(pullRequestId, message);
-}
-
-function validateNumericIdentifier(value: string, message: string): string {
-  const trimmedValue = value.trim();
-  if (!/^\d+$/.test(trimmedValue)) {
-    throw new Error(message);
-  }
-
-  return trimmedValue;
-}
-
-function isPullRequestCommand(command: Command): command is Extract<Command, { pullRequestId?: string }> {
-  return command.type.startsWith("pull-request-");
-}
-
-export async function resolvePullRequestId({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-  currentBranch,
-}: AzureDevOpsAuthConfig & { pullRequestId?: string; currentBranch?: string }): Promise<string> {
-  if (pullRequestId !== undefined) {
-    return validateNumericPullRequestId(
-      pullRequestId,
-      "Azure DevOps pull request commands require a numeric pull request ID.",
-    );
-  }
-
-  const branch = currentBranch?.trim() || getCurrentGitBranch();
-  const sourceRefName = `refs/heads/${branch}`;
-  const response = await requestRequiredJson(
-    buildActivePullRequestsForBranchUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      repositoryId: azureDevopsRepositoryId,
-      sourceRefName,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps active pull requests for branch ${sourceRefName}`,
-  );
-  const matchingPullRequests = listActivePullRequests(response, sourceRefName);
-  const selectedPullRequest = matchingPullRequests[0];
-
-  if (!selectedPullRequest) {
-    throw new Error(
-      `No active Azure DevOps pull request found for current branch ${sourceRefName}. Provide a pull request ID explicitly.`,
-    );
-  }
-
-  if (matchingPullRequests.length > 1) {
-    console.error(
-      `Found ${matchingPullRequests.length} active Azure DevOps pull requests for ${sourceRefName}; using newest PR ${selectedPullRequest.pullRequestId}.`,
-    );
-  } else {
-    console.error(`Using active Azure DevOps PR ${selectedPullRequest.pullRequestId} for ${sourceRefName}.`);
-  }
-
-  return String(selectedPullRequest.pullRequestId);
-}
-
-function getCurrentGitBranch(): string {
-  try {
-    const branch = execFileSync("git", ["branch", "--show-current"], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    }).trim();
-    if (!branch) {
-      throw new Error("detached HEAD");
-    }
-    return branch;
-  } catch {
-    throw new Error(
-      "Cannot detect an Azure DevOps pull request because the current Git branch is unavailable. Provide a pull request ID explicitly.",
-    );
-  }
-}
-
-function listActivePullRequests(response: unknown, sourceRefName: string): Array<AzureDevOpsPullRequestSummary & { pullRequestId: number }> {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps pull request discovery returned a non-object response.");
-  }
-
-  const pullRequests = (response as AzureDevOpsPullRequestsResponse).value;
-  if (!Array.isArray(pullRequests)) {
-    throw new Error("Azure DevOps pull request discovery did not include a value array.");
-  }
-
-  return pullRequests
-    .filter((pullRequest): pullRequest is AzureDevOpsPullRequestSummary =>
-      typeof pullRequest === "object" && pullRequest !== null
-    )
-    .filter((pullRequest): pullRequest is AzureDevOpsPullRequestSummary & { pullRequestId: number } =>
-      typeof pullRequest.pullRequestId === "number"
-      && pullRequest.status === "active"
-      && pullRequest.sourceRefName === sourceRefName
-    )
-    .sort((left, right) => getDateSortValue(right.creationDate) - getDateSortValue(left.creationDate));
-}
-
-function getPullRequestSourceBranch(response: unknown, pullRequestId: string): string {
-  if (typeof response !== "object" || response === null) {
-    throw new Error(`Azure DevOps pull request get for ${pullRequestId} returned a non-object response.`);
-  }
-
-  const sourceBranch = (response as { sourceRefName?: string }).sourceRefName;
-  if (typeof sourceBranch !== "string" || !sourceBranch.trim()) {
-    throw new Error(`Azure DevOps pull request get for ${pullRequestId} did not return a sourceRefName.`);
-  }
-
-  return sourceBranch;
-}
-
-export async function getPullRequest({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request lookup requires a numeric pull request ID.",
-  );
-
-  return await requestRequiredJson(
-    buildPullRequestUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      repositoryId: azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-      apiVersion: azureDevopsApiVersion,
-      repositoryNameOrId: true,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps pull request get for ${trimmedPullRequestId}`,
-  );
-}
-
-async function getPullRequestIterations({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  azureDevopsRepositoryId,
-  pullRequestId,
-}: PullRequestFailureHistoryRequest): Promise<unknown> {
-  const trimmedPullRequestId = validateNumericPullRequestId(
-    pullRequestId,
-    "Azure DevOps pull request iterations require a numeric pull request ID.",
-  );
-
-  return await requestRequiredJson(
-    buildPullRequestIterationsUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      repositoryId: azureDevopsRepositoryId,
-      pullRequestId: trimmedPullRequestId,
-      apiVersion: azureDevopsApiVersion,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps pull request iterations for ${trimmedPullRequestId}`,
-  );
-}
-
-async function getBuildsForBranch({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  branchName,
-}: AzureDevOpsAuthConfig & { branchName: string }): Promise<unknown> {
-  return await requestRequiredJson(
-    buildBuildsListUrl({
-      organization: azureDevopsOrganization,
-      project: azureDevopsProject,
-      apiVersion: azureDevopsApiVersion,
-      branchName,
-      reasonFilter: "pullRequest,manual,individualBatchedCI,buildCompletion",
-      top: 50,
-    }),
-    buildRequestOptions(azureDevopsUsername, azureDevopsApiToken),
-    `Azure DevOps builds list for branch ${branchName}`,
-  );
-}
-
-function buildPullRequestMergeBranch(pullRequestId: string): string {
-  return `refs/pull/${pullRequestId}/merge`;
-}
-
-async function buildFailureEntry({
-  azureDevopsApiToken,
-  azureDevopsUsername,
-  azureDevopsApiVersion,
-  azureDevopsOrganization,
-  azureDevopsProject,
-  build,
-  iterationById,
-  failedStatusesByIteration,
-}: AzureDevOpsAuthConfig & {
-  build: AzureDevOpsBuild;
-  iterationById: Map<number, PullRequestIterationSummary>;
-  failedStatusesByIteration: Map<number, PullRequestFailureStatusSummary[]>;
-}): Promise<BuildFailureEntry> {
-  const buildId = String(build.id ?? "");
-  const timeline = build.id
-    ? await getBuildTimeline({
-        azureDevopsApiToken,
-        azureDevopsUsername,
-        azureDevopsApiVersion,
-        azureDevopsOrganization,
-        azureDevopsProject,
-        buildId,
-      })
+async function failureEntry(sdk: AzureDevOpsClient, project: string, build: { id?: number; buildNumber?: string; definition?: { name?: string }; result?: unknown; queueTime?: Date | string; finishTime?: Date | string; parameters?: string; sourceVersion?: string }, iterations: Map<number, { createdDate?: string; sourceCommit?: string }>, statusesByIteration: Map<number, FailureStatus[]>): Promise<FailureEntry> {
+  const metadata = metadataFor(build);
+  const timeline = build.id === undefined ? null : await sdk.getBuildTimeline(project, build.id);
+  const evidence = summarizeTimelineFailure(timeline);
+  const logSnippet = build.id !== undefined && evidence.failedRecord?.logId !== undefined && evidence.failedRecord.logId !== null
+    ? extractRelevantLogSnippet(await sdk.getBuildLogText(project, build.id, evidence.failedRecord.logId))
     : null;
-  const buildMetadata = getPullRequestBuildMetadata(build);
-  const iteration = buildMetadata.iterationId ? iterationById.get(buildMetadata.iterationId) : undefined;
-  const relatedStatuses = buildMetadata.iterationId ? (failedStatusesByIteration.get(buildMetadata.iterationId) ?? []) : [];
-  const failureSummary = summarizeTimelineFailure(timeline);
-  const logSnippet =
-    build.id && failureSummary.failedRecord?.logId
-      ? extractRelevantLogSnippet(
-          await getBuildLogText({
-            azureDevopsApiToken,
-            azureDevopsUsername,
-            azureDevopsApiVersion,
-            azureDevopsOrganization,
-            azureDevopsProject,
-            buildId,
-            logId: String(failureSummary.failedRecord.logId),
-          }),
-        )
-      : null;
+  const iteration = metadata.iterationId === null ? undefined : iterations.get(metadata.iterationId);
 
-  return {
-    iterationId: buildMetadata.iterationId ?? null,
-    iterationCreatedDate: iteration?.createdDate ?? null,
-    sourceCommit: buildMetadata.sourceCommit ?? iteration?.sourceCommit ?? null,
-    buildId: build.id ?? null,
-    buildNumber: build.buildNumber ?? null,
-    definitionName: build.definition?.name ?? null,
-    result: build.result ?? null,
-    queueTime: build.queueTime ?? null,
-    finishTime: build.finishTime ?? null,
-    summary: failureSummary.summary,
-    failedRecord: failureSummary.failedRecord,
-    logSnippet,
-    statuses: relatedStatuses,
-  };
+  return { iterationId: metadata.iterationId, iterationCreatedDate: iteration?.createdDate ?? null, sourceCommit: metadata.sourceCommit ?? iteration?.sourceCommit ?? null, buildId: build.id ?? null, buildNumber: build.buildNumber ?? null, definitionName: build.definition?.name ?? null, result: buildResultText(build.result), queueTime: dateText(build.queueTime), finishTime: dateText(build.finishTime), summary: evidence.summary, failedRecord: evidence.failedRecord, logSnippet, statuses: metadata.iterationId === null ? [] : statusesByIteration.get(metadata.iterationId) ?? [] };
 }
 
-function listBuilds(response: unknown): AzureDevOpsBuild[] {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps builds list returned a non-object response.");
-  }
-
-  const builds = (response as AzureDevOpsBuildListResponse).value;
-  if (!Array.isArray(builds)) {
-    throw new Error("Azure DevOps builds list did not include a value array.");
-  }
-
-  return builds.filter((build): build is AzureDevOpsBuild => typeof build === "object" && build !== null);
+function metadataFor(build: { parameters?: string; sourceVersion?: string }): { iterationId: number | null; sourceCommit: string | null } {
+  const fallback = { iterationId: null, sourceCommit: build.sourceVersion ?? null };
+  try { const values = JSON.parse(build.parameters ?? "") as Record<string, unknown>; const iteration = values["system.pullRequest.pullRequestIteration"]; return { iterationId: typeof iteration === "string" && /^\d+$/.test(iteration) ? Number(iteration) : null, sourceCommit: typeof values["system.pullRequest.sourceCommitId"] === "string" ? values["system.pullRequest.sourceCommitId"] : fallback.sourceCommit }; } catch { return fallback; }
 }
 
-function listPullRequestIterations(response: unknown): PullRequestIterationSummary[] {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps pull request iterations returned a non-object response.");
-  }
-
-  const iterations = (response as AzureDevOpsPullRequestIterationsResponse).value;
-  if (!Array.isArray(iterations)) {
-    throw new Error("Azure DevOps pull request iterations did not include a value array.");
-  }
-
-  return iterations
-    .filter((iteration): iteration is AzureDevOpsPullRequestIteration => typeof iteration === "object" && iteration !== null)
-    .filter((iteration) => typeof iteration.id === "number")
-    .map((iteration) => ({
-      id: iteration.id as number,
-      createdDate: typeof iteration.createdDate === "string" ? iteration.createdDate : null,
-      updatedDate: typeof iteration.updatedDate === "string" ? iteration.updatedDate : null,
-      sourceCommit:
-        typeof iteration.sourceRefCommit?.commitId === "string" ? iteration.sourceRefCommit.commitId : null,
-    }));
+function summarizeTimelineFailure(timeline: { records?: Array<{ type?: string; name?: string; result?: string | number; errorCount?: number; warningCount?: number; log?: { id?: number }; issues?: Array<{ message?: string }> }> } | null): { summary: string; failedRecord: FailedRecord | null } {
+  if (!timeline) return { summary: "Build failed, but the timeline response was not available.", failedRecord: null };
+  if (!Array.isArray(timeline.records)) return { summary: "Build failed, but no timeline records were returned.", failedRecord: null };
+  const failed = timeline.records.filter((record) => record.result === TaskResult.Failed || (record.errorCount ?? 0) > 0);
+  const record = failed.find((item) => item.type === "Task") ?? failed.find((item) => item.type === "Job") ?? failed[0];
+  if (!record) return { summary: "Build failed, but no failed timeline records were reported.", failedRecord: null };
+  const issues = (record.issues ?? []).map((issue) => issue.message?.trim() ?? "").filter(Boolean);
+  const failedRecord: FailedRecord = { type: record.type ?? null, name: record.name ?? null, result: taskResultText(record.result), errorCount: record.errorCount ?? 0, warningCount: record.warningCount ?? 0, logId: record.log?.id ?? null, issues };
+  return { summary: issues[0] ? `${failedRecord.name ?? failedRecord.type ?? "Build"}: ${issues[0]}` : `${failedRecord.type ?? "Record"}${failedRecord.name ? ` ${failedRecord.name}` : ""} failed.`, failedRecord };
 }
 
-export function selectLatestPullRequestIteration(response: unknown): PullRequestIterationSummary {
-  const iterations = listPullRequestIterations(response);
-  const latestIteration = iterations.sort((left, right) => right.id - left.id)[0];
-  if (!latestIteration) {
-    throw new Error("Azure DevOps pull request iterations did not include a valid iteration.");
-  }
-
-  return latestIteration;
+function dateText(value: Date | string | undefined): string | null {
+  return value === undefined ? null : value instanceof Date ? value.toISOString() : value;
 }
 
-function parsePullRequestChangesPage(response: unknown): {
-  changeEntries: unknown[];
-  nextSkip: number;
-  nextTop: number;
-} {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps pull request changes returned a non-object response.");
-  }
-
-  const page = response as AzureDevOpsPullRequestChangesResponse;
-  if (!Array.isArray(page.changeEntries)) {
-    throw new Error("Azure DevOps pull request changes did not include a changeEntries array.");
-  }
-
-  return {
-    changeEntries: page.changeEntries,
-    nextSkip: typeof page.nextSkip === "number" ? page.nextSkip : 0,
-    nextTop: typeof page.nextTop === "number" ? page.nextTop : 0,
-  };
+function gitStatusStateText(value: string | number | undefined): string {
+  return value === GitStatusState.Failed ? "failed" : String(value ?? "");
 }
 
-function parsePullRequestCommitsPage(response: unknown): unknown[] {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps pull request commits returned a non-object response.");
-  }
-
-  const commits = (response as AzureDevOpsPullRequestCommitsResponse).value;
-  if (!Array.isArray(commits)) {
-    throw new Error("Azure DevOps pull request commits did not include a value array.");
-  }
-
-  return commits;
+function taskResultText(value: string | number | undefined): string | null {
+  if (value === undefined) return null;
+  return value === TaskResult.Failed ? "failed" : String(value);
 }
 
-function listFailedPullRequestStatuses(response: unknown): PullRequestFailureStatusSummary[] {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps pull request statuses returned a non-object response.");
-  }
-
-  const statuses = (response as AzureDevOpsPullRequestStatusesResponse).value;
-  if (!Array.isArray(statuses)) {
-    throw new Error("Azure DevOps pull request statuses did not include a value array.");
-  }
-
-  return statuses
-    .filter((status): status is AzureDevOpsPullRequestStatus => typeof status === "object" && status !== null)
-    .filter((status) => status.state === "failed" && typeof status.iterationId === "number")
-    .sort((left, right) => getDateSortValue(left.creationDate) - getDateSortValue(right.creationDate))
-    .map((status) => ({
-      id: typeof status.id === "number" ? status.id : null,
-      iterationId: status.iterationId as number,
-      state: status.state as string,
-      description: typeof status.description === "string" ? status.description : null,
-      contextName: typeof status.context?.name === "string" ? status.context.name : null,
-      contextGenre: typeof status.context?.genre === "string" ? status.context.genre : null,
-      creationDate: typeof status.creationDate === "string" ? status.creationDate : null,
-      targetUrl: typeof status.targetUrl === "string" ? status.targetUrl : null,
-    }));
+function buildResultText(value: unknown): string | null {
+  if (value === undefined || value === null) return null;
+  if (value === BuildResult.Failed) return "failed";
+  if (value === BuildResult.PartiallySucceeded) return "partiallySucceeded";
+  return String(value);
 }
 
-function groupStatusesByIteration(statuses: PullRequestFailureStatusSummary[]): Map<number, PullRequestFailureStatusSummary[]> {
-  const grouped = new Map<number, PullRequestFailureStatusSummary[]>();
+export function normalizeSdkOutput(value: unknown): unknown {
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) return value.map(normalizeSdkOutput);
+  if (value === null || typeof value !== "object") return value;
 
-  statuses.forEach((status) => {
-    const existing = grouped.get(status.iterationId) ?? [];
-    existing.push(status);
-    grouped.set(status.iterationId, existing);
-  });
-
-  return grouped;
+  const output: Record<string, unknown> = {};
+  for (const [key, nestedValue] of Object.entries(value)) {
+    output[key] = normalizeSdkOutput(nestedValue);
+  }
+  if (typeof value === "object") {
+    if ("pullRequestId" in value && typeof output.status === "number") output.status = pullRequestStatusText(output.status);
+    if ("pullRequestId" in value && typeof output.mergeStatus === "number") output.mergeStatus = enumText(PullRequestAsyncStatus, output.mergeStatus);
+    if ("pullRequestId" in value && typeof output.mergeFailureType === "number") output.mergeFailureType = enumText(PullRequestMergeFailureType, output.mergeFailureType);
+    if ("comments" in value && typeof output.status === "number") output.status = commentThreadStatusText(output.status);
+    if ("commentType" in value && typeof output.commentType === "number") output.commentType = enumText(CommentType, output.commentType);
+    if ("context" in value && typeof output.state === "number") output.state = gitStatusStateText(output.state);
+    if ("buildNumber" in value) {
+      if (typeof output.status === "number") output.status = buildStatusText(output.status);
+      if (typeof output.result === "number") output.result = buildResultText(output.result);
+      if (typeof output.reason === "number") output.reason = buildReasonText(output.reason);
+    }
+    if ("type" in value && typeof output.result === "number") output.result = taskResultText(output.result);
+    if ("type" in value && typeof output.state === "number") output.state = enumText(TimelineRecordState, output.state);
+    if ("item" in value && typeof output.changeType === "number") output.changeType = versionControlChangeTypeText(output.changeType);
+    if (typeof output.mergeStrategy === "number") output.mergeStrategy = enumText(GitPullRequestMergeStrategy, output.mergeStrategy);
+    if (typeof output.queueStatus === "number") output.queueStatus = enumText(DefinitionQueueStatus, output.queueStatus);
+    if (typeof output.type === "number" && "queueStatus" in value) output.type = enumText(DefinitionType, output.type);
+    if (typeof output.type === "number" && "category" in value) output.type = enumText(IssueType, output.type);
+    if (typeof output.outcome === "number") output.outcome = "runsCount" in value ? enumText(TestRunOutcome, output.outcome) : enumText(TestOutcome, output.outcome);
+    if (typeof output.state === "number" && "runsCount" in value) output.state = enumText(TestRunState, output.state);
+    if (typeof output.contextType === "number") output.contextType = enumText(TestResultsContextType, output.contextType);
+  }
+  return output;
 }
 
-function getPullRequestBuildMetadata(build: AzureDevOpsBuild): {
-  iterationId: number | null;
-  sourceCommit: string | null;
-} {
-  const defaultMetadata = {
-    iterationId: null,
-    sourceCommit: typeof build.sourceVersion === "string" ? build.sourceVersion : null,
-  };
-
-  if (typeof build.parameters !== "string" || !build.parameters.trim()) {
-    return defaultMetadata;
-  }
-
-  try {
-    const parsed = JSON.parse(build.parameters) as Record<string, unknown>;
-    const rawIterationId = parsed["system.pullRequest.pullRequestIteration"];
-    const rawSourceCommit = parsed["system.pullRequest.sourceCommitId"];
-
-    return {
-      iterationId: typeof rawIterationId === "string" && /^\d+$/.test(rawIterationId) ? Number(rawIterationId) : null,
-      sourceCommit: typeof rawSourceCommit === "string" && rawSourceCommit.trim() ? rawSourceCommit : defaultMetadata.sourceCommit,
-    };
-  } catch {
-    return defaultMetadata;
-  }
+function pullRequestStatusText(value: number): string {
+  return ({ [PullRequestStatus.NotSet]: "notSet", [PullRequestStatus.Active]: "active", [PullRequestStatus.Abandoned]: "abandoned", [PullRequestStatus.Completed]: "completed", [PullRequestStatus.All]: "all" })[value] ?? String(value);
 }
 
-function summarizeTimelineFailure(timeline: unknown): {
-  summary: string;
-  failedRecord: BuildFailureRecordSummary | null;
-} {
-  if (typeof timeline !== "object" || timeline === null) {
-    return {
-      summary: "Build failed, but the timeline response was not available.",
-      failedRecord: null,
-    };
-  }
+function commentThreadStatusText(value: number): string {
+  return ({ [CommentThreadStatus.Unknown]: "unknown", [CommentThreadStatus.Active]: "active", [CommentThreadStatus.Fixed]: "fixed", [CommentThreadStatus.WontFix]: "wontFix", [CommentThreadStatus.Closed]: "closed", [CommentThreadStatus.ByDesign]: "byDesign", [CommentThreadStatus.Pending]: "pending" })[value] ?? String(value);
+}
 
-  const records = (timeline as AzureDevOpsTimelineResponse).records;
-  if (!Array.isArray(records)) {
-    return {
-      summary: "Build failed, but no timeline records were returned.",
-      failedRecord: null,
-    };
-  }
+function buildStatusText(value: number): string {
+  return ({ [BuildStatus.None]: "none", [BuildStatus.InProgress]: "inProgress", [BuildStatus.Completed]: "completed", [BuildStatus.Cancelling]: "cancelling", [BuildStatus.Postponed]: "postponed", [BuildStatus.NotStarted]: "notStarted", [BuildStatus.All]: "all" })[value] ?? String(value);
+}
 
-  const failedRecords = records
-    .filter((record): record is AzureDevOpsTimelineRecord => typeof record === "object" && record !== null)
-    .filter((record) => record.result === "failed" || (record.errorCount ?? 0) > 0);
+function versionControlChangeTypeText(value: number): string {
+  if (value === VersionControlChangeType.None) return "none";
+  const names: Array<[number, string]> = [
+    [VersionControlChangeType.Add, "add"], [VersionControlChangeType.Edit, "edit"], [VersionControlChangeType.Encoding, "encoding"],
+    [VersionControlChangeType.Rename, "rename"], [VersionControlChangeType.Delete, "delete"], [VersionControlChangeType.Undelete, "undelete"],
+    [VersionControlChangeType.Branch, "branch"], [VersionControlChangeType.Merge, "merge"], [VersionControlChangeType.Lock, "lock"],
+    [VersionControlChangeType.Rollback, "rollback"], [VersionControlChangeType.SourceRename, "sourceRename"], [VersionControlChangeType.TargetRename, "targetRename"], [VersionControlChangeType.Property, "property"],
+  ];
+  return names.filter(([flag]) => (value & flag) === flag).map(([, name]) => name).join(",") || String(value);
+}
 
-  if (failedRecords.length === 0) {
-    return {
-      summary: "Build failed, but no failed timeline records were reported.",
-      failedRecord: null,
-    };
-  }
+function enumText(enumValues: Record<string | number, string | number>, value: number): string {
+  const name = enumValues[value];
+  return typeof name === "string" ? `${name[0].toLowerCase()}${name.slice(1)}` : String(value);
+}
 
-  const selectedRecord =
-    failedRecords.find((record) => record.type === "Task") ??
-    failedRecords.find((record) => record.type === "Job") ??
-    failedRecords[0];
-  const issues = Array.isArray(selectedRecord.issues)
-    ? selectedRecord.issues
-        .map((issue) => (typeof issue.message === "string" ? issue.message.trim() : ""))
-        .filter(Boolean)
-    : [];
-  const recordName = typeof selectedRecord.name === "string" ? selectedRecord.name : null;
-  const recordType = typeof selectedRecord.type === "string" ? selectedRecord.type : null;
-  const summary = issues[0]
-    ? `${recordName ?? recordType ?? "Build"}: ${issues[0]}`
-    : `${recordType ?? "Record"}${recordName ? ` ${recordName}` : ""} failed.`;
-
-  return {
-    summary,
-    failedRecord: {
-      type: recordType,
-      name: recordName,
-      result: typeof selectedRecord.result === "string" ? selectedRecord.result : null,
-      errorCount: selectedRecord.errorCount ?? 0,
-      warningCount: selectedRecord.warningCount ?? 0,
-      logId: typeof selectedRecord.log?.id === "number" ? selectedRecord.log.id : null,
-      issues,
-    },
-  };
+function buildReasonText(value: number): string {
+  if (value === BuildReason.None) return "none";
+  const names: Array<[number, string]> = [
+    [BuildReason.Manual, "manual"], [BuildReason.IndividualCI, "individualCI"], [BuildReason.BatchedCI, "batchedCI"],
+    [BuildReason.Schedule, "schedule"], [BuildReason.ScheduleForced, "scheduleForced"], [BuildReason.UserCreated, "userCreated"],
+    [BuildReason.ValidateShelveset, "validateShelveset"], [BuildReason.CheckInShelveset, "checkInShelveset"], [BuildReason.PullRequest, "pullRequest"],
+    [BuildReason.BuildCompletion, "buildCompletion"], [BuildReason.ResourceTrigger, "resourceTrigger"],
+  ];
+  return names.filter(([flag]) => (value & flag) === flag).map(([, name]) => name).join(",") || String(value);
 }
 
 function extractRelevantLogSnippet(logText: string): { text: string; lines: string[] } | null {
-  const lines = logText
-    .split(/\r?\n/)
-    .map(stripAzureDevopsLogPrefix)
-    .map(cleanLogContentLine)
-    .map((line) => line.trimEnd());
-  const startIndex = findRelevantLogStartIndex(lines);
-
-  if (startIndex < 0) {
-    return null;
-  }
-
-  const snippetLines = collectSnippetLines(lines, startIndex, 8);
-  if (snippetLines.length === 0) {
-    return null;
-  }
-
-  return {
-    text: snippetLines.join("\n"),
-    lines: snippetLines,
-  };
-}
-
-function stripAzureDevopsLogPrefix(line: string): string {
-  return line.replace(/^\d{4}-\d{2}-\d{2}T[^\s]+Z\s*/, "");
-}
-
-function cleanLogContentLine(line: string): string {
-  return line.replace(/^E\s+/, "").replace(/^>\s+/, "");
-}
-
-function findRelevantLogStartIndex(lines: string[]): number {
+  const lines = logText.split(/\r?\n/).map((line) => line.replace(/^\d{4}-\d{2}-\d{2}T[^\s]+Z\s*/, "").replace(/^E\s+/, "").replace(/^>\s+/, "").trimEnd());
   let bestIndex = -1;
   let bestScore = 0;
-
-  for (let index = 0; index < lines.length; index += 1) {
-    const score = scoreRelevantLogLine(lines[index], index, lines.length);
-    if (score > bestScore) {
-      bestScore = score;
-      bestIndex = index;
-    }
-  }
-
-  return bestIndex;
+  for (let index = 0; index < lines.length; index += 1) { const score = logSignalScore(lines[index], index, lines.length); if (score > bestScore) { bestScore = score; bestIndex = index; } }
+  if (bestIndex < 0) return null;
+  const snippet: string[] = [];
+  for (let index = bestIndex; index < lines.length && snippet.length < 8; index += 1) { const line = lines[index].trim(); if (!line) { if (snippet.length) break; continue; } if (snippet.length && /^##\[/.test(line)) break; snippet.push(line); }
+  return snippet.length ? { text: snippet.join("\n"), lines: snippet } : null;
 }
 
-function scoreRelevantLogLine(line: string, index: number, totalLines: number): number {
-  const trimmedLine = line.trim();
-  if (!trimmedLine) {
-    return 0;
-  }
-
-  const signalPatterns: Array<{ pattern: RegExp; score: number }> = [
-    { pattern: /Multiple head revisions are present/, score: 140 },
-    { pattern: /The API version .* is not supported by Azurite/, score: 140 },
-    {
-      pattern:
-        /\b(?:[A-Za-z_]+\.)*(?:AssertionError|RuntimeError|ValueError|TypeError|KeyError|AttributeError|ImportError|ModuleNotFoundError|HttpResponseError|ClientAuthenticationError|ResourceNotFoundError|ResourceExistsError|CalledProcessError):/,
-      score: 130,
-    },
-    { pattern: /Traceback \(most recent call last\):/, score: 110 },
-    { pattern: /^FAILED\b/, score: 100 },
-    { pattern: /^ERROR\b/, score: 95 },
-    { pattern: /\b(?:failed|failure|error|exception)\b/i, score: 70 },
-  ];
-  const noisePatterns = [
-    /^INFO\b/,
-    /^Request URL:/,
-    /^Request method:/,
-    /^Request headers:/,
-    /^Response headers:/,
-    /^No body was attached/,
-    /^platform /,
-    /^cachedir:/,
-    /^rootdir:/,
-    /^configfile:/,
-    /^plugins:/,
-    /^Name\s+Stmts/,
-    /^TOTAL\s+/,
-    /^-{5,}/,
-    /^={5,}/,
-    /^_{5,}/,
-    /^\[[0-9]{1,3}%\]$/,
-  ];
-
-  let score = 0;
-  for (const entry of signalPatterns) {
-    if (entry.pattern.test(trimmedLine)) {
-      score = Math.max(score, entry.score);
-    }
-  }
-
-  if (score === 0) {
-    return 0;
-  }
-
-  if (noisePatterns.some((pattern) => pattern.test(trimmedLine))) {
-    score -= 80;
-  }
-
-  if (/Coverage failure/.test(trimmedLine)) {
-    score -= 20;
-  }
-
-  score += Math.floor((index / Math.max(totalLines, 1)) * 10);
-  return score;
-}
-
-function collectSnippetLines(lines: string[], startIndex: number, maxLines: number): string[] {
-  const snippetLines: string[] = [];
-
-  for (let index = startIndex; index < lines.length && snippetLines.length < maxLines; index += 1) {
-    const line = lines[index].trim();
-
-    if (!line) {
-      if (snippetLines.length > 0) {
-        break;
-      }
-
-      continue;
-    }
-
-    if (snippetLines.length > 0 && /^##\[/.test(line)) {
-      break;
-    }
-
-    snippetLines.push(line);
-  }
-
-  return snippetLines;
-}
-
-function getDateSortValue(dateValue: string | undefined): number {
-  if (!dateValue) {
-    return 0;
-  }
-
-  const timestamp = Date.parse(dateValue);
-  return Number.isNaN(timestamp) ? 0 : timestamp;
-}
-
-function selectLatestFailedBuild(builds: AzureDevOpsBuild[], branchName: string): AzureDevOpsBuild | null {
-  const matchingBuilds = builds
-    .filter((build) => build.sourceBranch === branchName)
-    .filter((build) => build.result === "failed" || build.result === "partiallySucceeded")
-    .sort((left, right) => getBuildTimestamp(right) - getBuildTimestamp(left));
-
-  return matchingBuilds[0] ?? null;
-}
-
-function getBuildTimestamp(build: AzureDevOpsBuild): number {
-  const dateValue = build.finishTime || build.startTime || build.queueTime;
-  if (!dateValue) {
-    return 0;
-  }
-
-  const timestamp = Date.parse(dateValue);
-  return Number.isNaN(timestamp) ? 0 : timestamp;
-}
-
-function findBuildLogUrl(response: unknown, logId: string): string {
-  if (typeof response !== "object" || response === null) {
-    throw new Error("Azure DevOps build logs response was not an object.");
-  }
-
-  const logs = (response as AzureDevOpsBuildLogsResponse).value;
-  if (!Array.isArray(logs)) {
-    throw new Error("Azure DevOps build logs response did not include a value array.");
-  }
-
-  const matchingLog = logs.find((log) => String(log.id) === logId);
-  if (!matchingLog?.url) {
-    throw new Error(`Azure DevOps build log ${logId} was not found in the build logs response.`);
-  }
-
-  return matchingLog.url;
-}
-
-function printUsageAndExit(): never {
-  printUsage();
-  process.exitCode = 1;
-  throw new Error("Invalid Azure DevOps command.");
-}
-
-function printUsage(): void {
-  console.error("Usage:");
-  console.error("  azure-devops-api pr get [pull-request-id]");
-  console.error("  azure-devops-api pr changes [pull-request-id]");
-  console.error("  azure-devops-api pr commits [pull-request-id]");
-  console.error("  azure-devops-api pr threads [pull-request-id]");
-  console.error("  azure-devops-api pr latest-failed-build [pull-request-id]");
-  console.error("  azure-devops-api pr builds [pull-request-id]");
-  console.error("  azure-devops-api pr statuses [pull-request-id]");
-  console.error("  azure-devops-api pr failure-history [pull-request-id]");
-  console.error("  azure-devops-api build timeline <build-id>");
-  console.error("  azure-devops-api build logs <build-id>");
-  console.error("  azure-devops-api build log-text <build-id> <log-id>");
-  console.error("  azure-devops-api build test-summary <build-id>");
-  console.error("");
-  console.error("Required environment variables:");
-  console.error("  AZURE_DEVOPS_API_TOKEN");
-  console.error("  AZURE_DEVOPS_ORGANIZATION");
-  console.error("  AZURE_DEVOPS_PROJECT");
-  console.error("  AZURE_DEVOPS_REPOSITORY_ID");
-  console.error("");
-  console.error("Optional environment variables:");
-  console.error("  AZURE_DEVOPS_USERNAME    Defaults to \"azure-devops-user\"");
-  console.error(`  AZURE_DEVOPS_API_VERSION Defaults to \"${DEFAULT_API_VERSION}\"`);
-  console.error("");
-  console.error("Loaded automatically when present:");
-  console.error(`  ${getEnvironmentPaths().join("\n  ")}`);
+function logSignalScore(line: string, index: number, total: number): number {
+  const text = line.trim();
+  if (!text) return 0;
+  const signals: Array<[RegExp, number]> = [[/Multiple head revisions are present/, 140], [/The API version .* is not supported by Azurite/, 140], [/\b(?:[A-Za-z_]+\.)*(?:AssertionError|RuntimeError|ValueError|TypeError|KeyError|AttributeError|ImportError|ModuleNotFoundError|HttpResponseError|ClientAuthenticationError|ResourceNotFoundError|ResourceExistsError|CalledProcessError):/, 130], [/Traceback \(most recent call last\):/, 110], [/^FAILED\b/, 100], [/^ERROR\b/, 95], [/\b(?:failed|failure|error|exception)\b/i, 70]];
+  let score = Math.max(0, ...signals.filter(([pattern]) => pattern.test(text)).map(([, value]) => value));
+  if (!score) return 0;
+  if ([/^INFO\b/, /^Request URL:/, /^Request method:/, /^Request headers:/, /^Response headers:/, /^No body was attached/, /^platform /, /^cachedir:/, /^rootdir:/, /^configfile:/, /^plugins:/, /^Name\s+Stmts/, /^TOTAL\s+/, /^-{5,}/, /^={5,}/, /^_{5,}/, /^\[[0-9]{1,3}%\]$/].some((pattern) => pattern.test(text))) score -= 80;
+  if (/Coverage failure/.test(text)) score -= 20;
+  return score + Math.floor((index / Math.max(total, 1)) * 10);
 }

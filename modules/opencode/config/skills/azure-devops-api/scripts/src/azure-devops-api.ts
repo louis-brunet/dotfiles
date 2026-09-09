@@ -1,22 +1,19 @@
 #!/usr/bin/env node
 
 import process from "node:process";
+import { CommanderError } from "commander";
 
 import { dispatchCommand, parseCommand } from "./commands.ts";
 import { loadAzureDevOpsAuthConfigFromEnv, loadAzureDevOpsEnvironment } from "./env.ts";
 
 main().catch((error: unknown) => {
-  console.error(getErrorMessage(error));
+  if (!(error instanceof CommanderError)) console.error(getErrorMessage(error));
   process.exitCode = 1;
 });
 
 async function main(): Promise<void> {
   if (!isSupportedNodeVersion()) {
     throw new Error("This script requires Node.js 22.18 or newer for native TypeScript execution.");
-  }
-
-  if (typeof fetch !== "function") {
-    throw new Error("This script requires native fetch support.");
   }
 
   loadAzureDevOpsEnvironment();

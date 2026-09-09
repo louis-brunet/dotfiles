@@ -1,6 +1,4 @@
-import process from "node:process";
-
-import { getEnvironmentPaths } from "../env.ts";
+import { Command as CommanderCommand } from "commander";
 import type { JiraAuthConfig } from "../env.ts";
 import {
   DEFAULT_LIST_JQL,
@@ -74,100 +72,31 @@ export type Command =
   | IssueUpdateSummaryCommand;
 
 export function parseCommand(args: string[]): Command {
-  if (args[0] === "search" && args.length >= 2) {
-    return {
-      type: "search",
-      jql: args.slice(1).join(" "),
-    };
-  }
-
-  if (args[0] !== "issue") {
-    return printUsageAndExit();
-  }
-
-  if (args[1] === "get" && args.length === 3) {
-    return {
-      type: "issue-get",
-      issueId: args[2],
-    };
-  }
-
-  if (args[1] === "archive" && args.length === 3) {
-    return {
-      type: "issue-archive",
-      issueId: args[2],
-    };
-  }
-
-  if (args[1] === "create") {
-    const parsedCreateCommand = parseIssueCreateCommand(args);
-    if (parsedCreateCommand) {
-      return parsedCreateCommand;
+  let result: Command | undefined;
+  const program = new CommanderCommand().name("jira-api").exitOverride();
+  const assign = (command: Command) => { result = command; };
+  const search = program.command("search <jql...>").allowUnknownOption().action((jql: string[]) => assign({ type: "search", jql: jql.join(" ") }));
+  const issue = program.command("issue");
+  issue.command("get <issue-id>").action((issueId: string) => assign({ type: "issue-get", issueId }));
+  issue.command("archive <issue-id>").action((issueId: string) => assign({ type: "issue-archive", issueId }));
+  const issueCreate = issue.command("create <values...>").allowUnknownOption().action((values: string[]) => {
+    try {
+      assign(normalizeIssueCreate(values));
+    } catch (error) {
+      issueCreate.error(error instanceof Error ? error.message : "Invalid Jira issue create command.");
     }
-  }
-
-  if (args[1] === "list" && args.length === 2) {
-    return {
-      type: "issue-list",
-    };
-  }
-
-  if (args[1] === "comments" && args.length === 3) {
-    return {
-      type: "issue-comments",
-      issueId: args[2],
-    };
-  }
-
-  if (args[1] === "transitions" && args.length === 3) {
-    return {
-      type: "issue-transitions",
-      issueId: args[2],
-    };
-  }
-
-  if (args[1] === "update-description" && args.length >= 4) {
-    return {
-      type: "issue-update-description",
-      issueId: args[2],
-      description: args.slice(3).join(" "),
-    };
-  }
-
-  if (args[1] === "add-comment" && args.length >= 4) {
-    return {
-      type: "issue-add-comment",
-      issueId: args[2],
-      comment: args.slice(3).join(" "),
-    };
-  }
-
-  if (args[1] === "update-comment" && args.length >= 5) {
-    return {
-      type: "issue-update-comment",
-      issueId: args[2],
-      commentId: args[3],
-      comment: args.slice(4).join(" "),
-    };
-  }
-
-  if (args[1] === "transition" && args.length >= 4) {
-    return {
-      type: "issue-transition",
-      issueId: args[2],
-      transitionName: args.slice(3).join(" "),
-    };
-  }
-
-  if (args[1] === "update-summary" && args.length >= 4) {
-    return {
-      type: "issue-update-summary",
-      issueId: args[2],
-      summary: args.slice(3).join(" "),
-    };
-  }
-
-  return printUsageAndExit();
+  });
+  issue.command("list").action(() => assign({ type: "issue-list" }));
+  issue.command("comments <issue-id>").action((issueId: string) => assign({ type: "issue-comments", issueId }));
+  issue.command("transitions <issue-id>").action((issueId: string) => assign({ type: "issue-transitions", issueId }));
+  issue.command("update-description <issue-id> <description...>").allowUnknownOption().action((issueId: string, description: string[]) => assign({ type: "issue-update-description", issueId, description: description.join(" ") }));
+  issue.command("add-comment <issue-id> <comment...>").allowUnknownOption().action((issueId: string, comment: string[]) => assign({ type: "issue-add-comment", issueId, comment: comment.join(" ") }));
+  issue.command("update-comment <issue-id> <comment-id> <comment...>").allowUnknownOption().action((issueId: string, commentId: string, comment: string[]) => assign({ type: "issue-update-comment", issueId, commentId, comment: comment.join(" ") }));
+  issue.command("transition <issue-id> <transition-name...>").allowUnknownOption().action((issueId: string, transitionName: string[]) => assign({ type: "issue-transition", issueId, transitionName: transitionName.join(" ") }));
+  issue.command("update-summary <issue-id> <summary...>").allowUnknownOption().action((issueId: string, summary: string[]) => assign({ type: "issue-update-summary", issueId, summary: summary.join(" ") }));
+  program.parse(["node", "jira-api", ...args]);
+  if (!result) throw new Error("Invalid Jira command.");
+  return result;
 }
 
 export async function dispatchCommand(command: Command, auth: JiraAuthConfig): Promise<void> {
@@ -248,86 +177,40 @@ export async function dispatchCommand(command: Command, auth: JiraAuthConfig): P
   console.log(`Updated description for ${command.issueId}.`);
 }
 
-function printUsageAndExit(): never {
-  printUsage();
-  process.exitCode = 1;
-  throw new Error("Invalid Jira command.");
-}
-
-function printUsage(): void {
-  console.error("Usage:");
-  console.error("  jira-api search <jql>");
-  console.error("  jira-api issue get <issue-id>");
-  console.error("  jira-api issue archive <issue-id>");
-  console.error("  jira-api issue create <project-key> <issue-type> <summary> <description> [parent-issue-id]");
-  console.error("  jira-api issue list");
-  console.error("  jira-api issue comments <issue-id>");
-  console.error("  jira-api issue transitions <issue-id>");
-  console.error("  jira-api issue add-comment <issue-id> <comment>");
-  console.error("  jira-api issue update-comment <issue-id> <comment-id> <comment>");
-  console.error("  jira-api issue transition <issue-id> <transition-name>");
-  console.error("  jira-api issue update-description <issue-id> <description>");
-  console.error("  jira-api issue update-summary <issue-id> <summary>");
-  console.error("");
-  console.error("Required environment variables:");
-  console.error("  JIRA_BASE_URL");
-  console.error("  JIRA_EMAIL");
-  console.error("  JIRA_API_TOKEN");
-  console.error("");
-  console.error("Optional environment variables:");
-  console.error("  JIRA_PROJECT        Default project key for issue create/list");
-  console.error(`  JIRA_LIST_JQL       Defaults to \"${DEFAULT_LIST_JQL}\"`);
-  console.error("");
-  console.error("Loaded automatically when present:");
-  console.error(`  ${getEnvironmentPaths().join("\n  ")}`);
-}
-
-function parseIssueCreateCommand(args: string[]): IssueCreateCommand | null {
+function normalizeIssueCreate(values: string[]): IssueCreateCommand {
   const defaultProjectKey = process.env.JIRA_PROJECT?.trim();
 
-  if (args.length === 6) {
-    if (defaultProjectKey && !looksLikeProjectKey(args[2]) && looksLikeIssueId(args[5])) {
+  if (values.length === 4) {
+    if (defaultProjectKey && !looksLikeProjectKey(values[0]) && looksLikeIssueId(values[3])) {
       return {
         type: "issue-create",
         projectKey: defaultProjectKey,
-        issueType: args[2],
-        summary: args[3],
-        description: args[4],
-        parentIssueId: args[5],
+        issueType: values[0], summary: values[1], description: values[2], parentIssueId: values[3],
       };
     }
 
     return {
       type: "issue-create",
-      projectKey: args[2],
-      issueType: args[3],
-      summary: args[4],
-      description: args[5],
+      projectKey: values[0], issueType: values[1], summary: values[2], description: values[3],
     };
   }
 
-  if (args.length === 7) {
+  if (values.length === 5) {
     return {
       type: "issue-create",
-      projectKey: args[2],
-      issueType: args[3],
-      summary: args[4],
-      description: args[5],
-      parentIssueId: args[6],
+      projectKey: values[0], issueType: values[1], summary: values[2], description: values[3], parentIssueId: values[4],
     };
   }
 
-  if (args.length === 5 && defaultProjectKey) {
+  if (values.length === 3 && defaultProjectKey) {
     return {
       type: "issue-create",
       projectKey: defaultProjectKey,
-      issueType: args[2],
-      summary: args[3],
-      description: args[4],
+      issueType: values[0], summary: values[1], description: values[2],
     };
   }
 
-  return null;
+  throw new Error("Invalid Jira issue create command.");
 }
 
 function looksLikeProjectKey(value: string): boolean {

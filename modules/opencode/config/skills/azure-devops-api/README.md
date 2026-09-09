@@ -28,7 +28,14 @@ Instead, ask the agent for the Azure DevOps task you want. For example:
 
 The skill needs Azure DevOps credentials available in the environment.
 
-Node.js 22.18 or newer is required. The CLI has no npm runtime dependencies and does not require `npm install`.
+Node.js 22.18 or newer and npm are required. Install the pinned dependencies from the skill's `scripts/` directory before running or developing the CLI:
+
+```bash
+cd scripts
+npm ci
+```
+
+Each copy of the skill is self-contained and has its own `scripts/package-lock.json`; run `npm ci` separately after copying or updating a skill.
 
 Generate an Azure DevOps personal access token for this skill.
 
@@ -46,8 +53,7 @@ Generate an Azure DevOps personal access token for this skill.
 
 ### Optional values
 
-- `AZURE_DEVOPS_USERNAME`: username paired with the PAT for basic auth. Defaults to `azure-devops-user`.
-- `AZURE_DEVOPS_API_VERSION`: Azure DevOps REST API version. Defaults to `7.1`.
+- `AZURE_DEVOPS_API_VERSION`: Azure DevOps REST API version for the pull-request commit pagination fallback. Defaults to `7.1`.
 
 The usual skill-local setup flow is:
 
@@ -61,7 +67,14 @@ Configuration precedence is: shell environment variables, repository-root `.env`
 
 Do not commit `.env` or `node_modules`.
 
-To run tests, execute `npm test` from the skill's `scripts/` directory.
+For development and verification, run these commands from the skill's `scripts/` directory after `npm ci`:
+
+```bash
+npm test
+npm run typecheck
+```
+
+The CLI uses `commander` for command definitions, `dotenv` for environment-file parsing, and Microsoft's `azure-devops-node-api` client for Azure DevOps reads. Pull-request commit paging is isolated in the client adapter because the SDK exposes a continuation token but does not accept one when requesting the next page.
 
 ## What the skill supports
 

@@ -34,7 +34,14 @@ The skill needs Jira credentials available in the environment.
 
 ### Prerequisite
 
-Node.js 22.18 or newer is required. The CLI has no npm runtime dependencies and does not require `npm install`.
+Node.js 22.18 or newer and npm are required. Install the pinned dependencies from the skill's `scripts/` directory before running or developing the CLI:
+
+```bash
+cd scripts
+npm ci
+```
+
+Each copy of the skill is self-contained and has its own `scripts/package-lock.json`; run `npm ci` separately after copying or updating a skill.
 
 ### Required values
 
@@ -57,7 +64,14 @@ Configuration precedence is: shell environment variables, repository-root `.env`
 
 Do not commit `.env` or `node_modules`.
 
-To run tests, execute `npm test` from the skill's `scripts/` directory.
+For development and verification, run these commands from the skill's `scripts/` directory after `npm ci`:
+
+```bash
+npm test
+npm run typecheck
+```
+
+The CLI uses `commander` for command definitions and `dotenv` for environment-file parsing. Jira REST and ADF behavior remains implemented locally.
 
 ### Optional defaults
 

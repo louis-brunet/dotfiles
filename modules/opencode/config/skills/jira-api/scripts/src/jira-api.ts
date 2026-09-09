@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 import process from "node:process";
+import { CommanderError } from "commander";
 
 import { dispatchCommand, parseCommand } from "./commands/index.ts";
 import { loadJiraAuthConfigFromEnv, loadJiraEnvironment } from "./env.ts";
 
 main().catch((error: unknown) => {
-  console.error(getErrorMessage(error));
+  if (!(error instanceof CommanderError)) console.error(getErrorMessage(error));
   process.exitCode = 1;
 });
 
