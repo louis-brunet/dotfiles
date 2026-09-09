@@ -62,24 +62,21 @@ Never commit `.env` or `node_modules` when copying this skill.
 Use these exact command shapes:
 
 ```bash
-jira-api search "project = DAR ORDER BY updated DESC"
-jira-api issue get DAR-123
-jira-api issue create DAR Task "Clarify DAR export permissions" ""
-jira-api issue create Task "Clarify DAR export permissions" ""
-jira-api issue create DAR Story "Add Dashboard filters" "" DAR-456
-jira-api issue create Story "Add Dashboard filters" "" DAR-456
-jira-api issue create DAR Story "Add Dashboard filters" "Description" DAR-456
-jira-api issue create Story "Add Dashboard filters" "Description" DAR-456
+jira-api search <jql...>
+jira-api issue get <issue-id>
+jira-api issue create <issue-type> <summary> <description> [--project <key>] [--parent <issue-id>]
 jira-api issue list
-jira-api issue comments DAR-123
-jira-api issue transitions DAR-123
-jira-api issue add-comment DAR-123 "Investigated locally; root cause is in auth middleware."
-jira-api issue update-comment DAR-123 10001 "Revised comment text"
-jira-api issue transition DAR-123 "In Progress"
-jira-api issue archive DAR-123
-jira-api issue update-description DAR-123 "New description"
-jira-api issue update-summary DAR-123 "New summary"
+jira-api issue comments <issue-id>
+jira-api issue transitions <issue-id>
+jira-api issue add-comment <issue-id> <comment...>
+jira-api issue update-comment <issue-id> <comment-id> <comment...>
+jira-api issue transition <issue-id> <transition-name...>
+jira-api issue archive <issue-id>
+jira-api issue update-description <issue-id> <description...>
+jira-api issue update-summary <issue-id> <summary...>
 ```
+
+Use `--help` after the command or subcommand for Commander help without credentials. To pass a literal payload beginning with `-`, place `--` before it, for example `jira-api issue update-summary DAR-123 -- --help`.
 
 ## Remote Mutation Confirmation
 
@@ -91,27 +88,27 @@ Read-only commands (`search`, `issue get`, `issue list`, `issue comments`, and `
 
 ## Behavior
 
-- `search <jql>` calls Jira enhanced search at `/rest/api/3/search/jql`
+- `search <jql...>` calls Jira enhanced search at `/rest/api/3/search/jql`
 - `issue get <issue-id>` returns the raw issue JSON
-- `issue create <project-key> <issue-type> <summary> <description> [parent-issue-id]` creates a Jira issue and returns the raw creation JSON
-- When `JIRA_PROJECT` is set, `issue create <issue-type> <summary> <description> [parent-issue-id]` uses that default project automatically
+- `issue create <issue-type> <summary> <description> [--project <key>] [--parent <issue-id>]` creates a Jira issue and returns the raw creation JSON
+- When `--project` is absent, `issue create` uses `JIRA_PROJECT` as its default project
 - `issue create` requires a description argument, but `""` is allowed when the issue should be created without description content
 - `issue create` accepts a description as either explicit ADF JSON or as structured text that the script converts into native Jira headings, paragraphs, bullet lists, ordered lists, and task lists
-- `issue create` accepts an optional positional parent issue ID as the last argument to set the Jira parent relationship at creation time when the target issue type supports it
+- `issue create --parent <issue-id>` sets the Jira parent relationship at creation time when the target issue type supports it
 - `issue create` supports local markdown image paths in the initial description by creating the issue first, then uploading local files and updating the created issue description
 - Because that path is multi-step, `issue create` can succeed in creating the issue but still fail afterward while processing local images; the command reports that partial-success state explicitly
 - `issue list` runs a default bounded JQL query and returns raw search JSON
   - When `JIRA_PROJECT` is set and `JIRA_LIST_JQL` is unset, the default JQL becomes `project = "<JIRA_PROJECT>" ORDER BY updated DESC`
 - `issue comments <issue-id>` returns the raw issue comment JSON from Jira
 - `issue transitions <issue-id>` returns the raw available-transition JSON from Jira
-- `issue add-comment <issue-id> <comment>` appends a new issue comment using Atlassian Document Format (ADF)
+- `issue add-comment <issue-id> <comment...>` appends a new issue comment using Atlassian Document Format (ADF)
   - `issue add-comment` accepts either explicit ADF JSON or structured text that the script converts into native Jira headings, paragraphs, bullet lists, ordered lists, task lists, and supported image blocks
-- `issue update-comment <issue-id> <comment-id> <comment>` rewrites an existing issue comment using Atlassian Document Format (ADF)
+- `issue update-comment <issue-id> <comment-id> <comment...>` rewrites an existing issue comment using Atlassian Document Format (ADF)
   - `issue update-comment` accepts either explicit ADF JSON or structured text that the script converts into native Jira headings, paragraphs, bullet lists, ordered lists, task lists, and supported image blocks
-- `issue transition <issue-id> <transition-name>` resolves a transition by case-insensitive visible name and executes it
+- `issue transition <issue-id> <transition-name...>` resolves a transition by case-insensitive visible name and executes it
   - If the visible name is ambiguous, the command fails and reports the matching transition ids
 - `issue archive <issue-id>` archives the issue in Jira
-- `issue update-description <issue-id> <description>` replaces the issue description using Atlassian Document Format (ADF)
+- `issue update-description <issue-id> <description...>` replaces the issue description using Atlassian Document Format (ADF)
   - `issue update-description` accepts either explicit ADF JSON or structured ticket text that the script converts into native Jira headings, paragraphs, bullet lists, ordered lists, task lists, and supported image blocks
   - `issue update-description` is a raw full-replacement write primitive, not a safe merge operation
   - When refining an existing remote Jira ticket from a local `.planning/tickets/` file, first call `issue get` to inspect the current summary and description, then build a final merged Jira description that preserves the existing remote content and updates only the AI-owned appendix section `Spécification additionnelle par IA`
@@ -119,7 +116,7 @@ Read-only commands (`search`, `issue get`, `issue list`, `issue comments`, and `
   - Do not use `issue update-description` to mirror the entire local ticket markdown into Jira unless the user explicitly wants a full rewrite of the remote description
 - For structured text inputs, the CLI interprets literal escape sequences such as `\n`, `\r`, and `\t` before ADF conversion so quoted shell arguments can still produce multiline Jira content.
 - Explicit raw ADF JSON payloads are passed through as JSON and are not normalized as structured text.
-- `issue update-summary <issue-id> <summary>` replaces the issue summary with plain Jira text
+- `issue update-summary <issue-id> <summary...>` replaces the issue summary with plain Jira text
 
 ## Jira-native formatting
 
@@ -201,19 +198,19 @@ jira-api issue get DAR-123
 Create a new issue:
 
 ```bash
-jira-api issue create DAR Task "Clarify DAR export permissions" ""
+jira-api issue create Task "Clarify DAR export permissions" "" --project DAR
 ```
 
 Create a new child issue attached to a parent:
 
 ```bash
-jira-api issue create DAR Story "Add Dashboard filters" "" DAR-456
+jira-api issue create Story "Add Dashboard filters" "" --project DAR --parent DAR-456
 ```
 
 Create a new child issue with both description and parent:
 
 ```bash
-jira-api issue create DAR Story "Add Dashboard filters" "Description" DAR-456
+jira-api issue create Story "Add Dashboard filters" "Description" --project DAR --parent DAR-456
 ```
 
 Read issue comments:

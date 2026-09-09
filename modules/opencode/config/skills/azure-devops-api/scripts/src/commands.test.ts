@@ -1,17 +1,14 @@
 import assert from "node:assert/strict";
 import test, { mock } from "node:test";
-import { GitStatusState, VersionControlChangeType } from "azure-devops-node-api/interfaces/GitInterfaces.js";
-import { BuildReason, BuildResult, BuildStatus, TaskResult, TimelineRecordState } from "azure-devops-node-api/interfaces/BuildInterfaces.js";
-import { CommentType, GitPullRequestMergeStrategy, PullRequestAsyncStatus, PullRequestMergeFailureType, PullRequestStatus } from "azure-devops-node-api/interfaces/GitInterfaces.js";
-import { TestOutcome } from "azure-devops-node-api/interfaces/TestInterfaces.js";
+import { GitStatusState } from "azure-devops-node-api/interfaces/GitInterfaces.js";
+import { TaskResult } from "azure-devops-node-api/interfaces/BuildInterfaces.js";
 
 import {
+  createProgram,
   getBuildLogText,
   getLatestFailedBuildForPullRequest,
   getPullRequestFailureHistory,
   getPullRequestThreads,
-  normalizeSdkOutput,
-  parseCommand,
   resolvePullRequestId,
 } from "./commands.ts";
 import type { AzureDevOpsClient } from "./client.ts";
@@ -19,38 +16,11 @@ import type { AzureDevOpsAuthConfig } from "./env.ts";
 
 const auth: AzureDevOpsAuthConfig = {
   azureDevopsApiToken: "token",
-  azureDevopsUsername: "user",
   azureDevopsApiVersion: "7.1",
   azureDevopsOrganization: "my-org",
   azureDevopsProject: "My Project",
   azureDevopsRepositoryId: "repo-123",
 };
-
-test("SDK change entries normalize enum flags for JSON output", () => {
-  assert.deepEqual(
-    normalizeSdkOutput({ item: { path: "/file.ts" }, changeType: VersionControlChangeType.Add | VersionControlChangeType.Edit }),
-    { item: { path: "/file.ts" }, changeType: "add,edit" },
-  );
-});
-
-test("SDK raw output normalizes dates and documented enum fields", () => {
-  const date = new Date("2026-01-01T00:00:00.000Z");
-  assert.deepEqual(normalizeSdkOutput({
-    pullRequestId: 1, status: PullRequestStatus.Active, mergeStatus: PullRequestAsyncStatus.Succeeded, mergeFailureType: PullRequestMergeFailureType.None, creationDate: date,
-    completionOptions: { mergeStrategy: GitPullRequestMergeStrategy.Squash },
-    comments: [{ commentType: CommentType.Text }],
-    builds: [{ buildNumber: "1", status: BuildStatus.Completed, result: BuildResult.Failed, reason: BuildReason.PullRequest, finishTime: date }],
-    records: [{ type: "Job", state: TimelineRecordState.Completed, result: TaskResult.Failed }],
-    aggregatedResultsAnalysis: { resultsByOutcome: { 3: { outcome: TestOutcome.Failed } } },
-  }), {
-    pullRequestId: 1, status: "active", mergeStatus: "succeeded", mergeFailureType: "none", creationDate: "2026-01-01T00:00:00.000Z",
-    completionOptions: { mergeStrategy: "squash" },
-    comments: [{ commentType: "text" }],
-    builds: [{ buildNumber: "1", status: "completed", result: "failed", reason: "pullRequest", finishTime: "2026-01-01T00:00:00.000Z" }],
-    records: [{ type: "Job", state: "completed", result: "failed" }],
-    aggregatedResultsAnalysis: { resultsByOutcome: { 3: { outcome: "failed" } } },
-  });
-});
 
 const client: AzureDevOpsClient = {
   getPullRequest: async () => ({ sourceRefName: "refs/heads/feature" }),
@@ -66,19 +36,69 @@ const client: AzureDevOpsClient = {
   getBuildLogText: async () => "",
   getBuildTestSummary: async () => ({}),
 };
+const getContext = async () => ({ auth, client });
 
-test("parseCommand accepts documented command forms", () => {
-  assert.deepEqual(parseCommand(["pr", "failure-history", "42"]), {
-    type: "pull-request-failure-history",
-    pullRequestId: "42",
-  });
-  assert.deepEqual(parseCommand(["pr", "get"]), { type: "pull-request-get", pullRequestId: undefined });
-  assert.deepEqual(parseCommand(["build", "log-text", "12", "4"]), {
-    type: "build-log-text",
-    buildId: "12",
-    logId: "4",
-  });
-  assert.throws(() => parseCommand(["pr", "changes", "1", "2"]));
+test("Commander actions await handlers and emit native SDK arrays", async () => {
+  const output = mock.method(console, "log", () => undefined);
+  try {
+    await createProgram(async () => ({ auth, client: { ...client, getThreads: async () => [{ id: 7 }] } })).parseAsync(["node", "azure-devops-api", "pr", "threads", "42"]);
+    assert.equal(output.mock.calls[0].arguments[0], '[\n  {\n    "id": 7\n  }\n]');
+  } finally {
+    mock.restoreAll();
+  }
+});
+
+test("Commander rejects invalid invocations before loading Azure DevOps context", async () => {
+  let loads = 0;
+  const createTestProgram = () => {
+    const program = createProgram(async () => { loads += 1; return { auth, client }; });
+    program.commands.forEach((command) => command.exitOverride());
+    program.commands.flatMap((command) => command.commands).forEach((command) => command.exitOverride());
+    return program.exitOverride();
+  };
+
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "pr", "threads", "42", "unexpected"]));
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "build", "timeline"]));
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "unknown"]));
+
+  assert.equal(loads, 0);
+});
+
+test("Commander rejects invalid Azure DevOps IDs before loading context", async () => {
+  let loads = 0;
+  const createTestProgram = () => createProgram(async () => { loads += 1; return { auth, client }; });
+
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "pr", "threads", "invalid"]), /numeric pull request ID/);
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "build", "timeline", "invalid"]), /numeric build ID/);
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "build", "log-text", "12", "invalid"]), /numeric log ID/);
+
+  assert.equal(loads, 0);
+});
+
+test("Commander rejects zero and unsafe Azure DevOps IDs before loading context", async () => {
+  let loads = 0;
+  const program = createProgram(async () => {
+    loads += 1;
+    return { auth, client };
+  }).exitOverride();
+
+  await assert.rejects(program.parseAsync(["node", "azure-devops-api", "pr", "get", "0"]));
+  await assert.rejects(program.parseAsync(["node", "azure-devops-api", "build", "timeline", "9007199254740993"]));
+  assert.equal(loads, 0);
+});
+
+test("Commander renders Azure DevOps help without loading context", async () => {
+  let loads = 0;
+  const createTestProgram = () => {
+    const program = createProgram(async () => { loads += 1; return { auth, client }; });
+    program.commands.forEach((command) => command.exitOverride());
+    return program.exitOverride();
+  };
+
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "--help"]));
+  await assert.rejects(createTestProgram().parseAsync(["node", "azure-devops-api", "pr", "--help"]));
+
+  assert.equal(loads, 0);
 });
 
 test("PR discovery uses the newest exact active SDK match and stderr only", async () => {
@@ -102,13 +122,13 @@ test("PR discovery uses the newest exact active SDK match and stderr only", asyn
   }
 });
 
-test("SDK collection reads retain documented count/value response shapes", async () => {
+test("SDK collection reads return native arrays", async () => {
   const result = await getPullRequestThreads({
     ...auth,
     client: { ...client, getThreads: async () => [{ id: 7 }] },
     pullRequestId: "42",
   });
-  assert.deepEqual(result, { count: 1, value: [{ id: 7 }] });
+  assert.deepEqual(result, [{ id: 7 }]);
 });
 
 test("failure history includes compact status, timeline, and log evidence", async () => {

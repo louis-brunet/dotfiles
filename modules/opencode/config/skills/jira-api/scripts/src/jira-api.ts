@@ -3,7 +3,7 @@
 import process from "node:process";
 import { CommanderError } from "commander";
 
-import { dispatchCommand, parseCommand } from "./commands/index.ts";
+import { createJiraProgram } from "./commands/index.ts";
 import { loadJiraAuthConfigFromEnv, loadJiraEnvironment } from "./env.ts";
 
 main().catch((error: unknown) => {
@@ -20,11 +20,10 @@ async function main(): Promise<void> {
     throw new Error("This script requires native fetch support.");
   }
 
-  loadJiraEnvironment();
-  const command = parseCommand(process.argv.slice(2));
-  const auth = loadJiraAuthConfigFromEnv();
-
-  await dispatchCommand(command, auth);
+  await createJiraProgram(async () => {
+    loadJiraEnvironment();
+    return loadJiraAuthConfigFromEnv();
+  }).parseAsync(process.argv);
 }
 
 function isSupportedNodeVersion(): boolean {

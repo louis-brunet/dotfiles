@@ -6,7 +6,6 @@ import type { AzureDevOpsAuthConfig } from "./env.ts";
 
 const auth: AzureDevOpsAuthConfig = {
   azureDevopsApiToken: "token",
-  azureDevopsUsername: "unused",
   azureDevopsApiVersion: "7.1",
   azureDevopsOrganization: "my-org",
   azureDevopsProject: "My Project",

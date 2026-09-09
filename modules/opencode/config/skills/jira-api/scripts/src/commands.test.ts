@@ -1,97 +1,154 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import process from "node:process";
 
-import { parseCommand } from "./commands/index.ts";
+import { createJiraProgram } from "./commands/index.ts";
 
-test("parseCommand parses issue archive", () => {
-  const command = parseCommand(["issue", "archive", "ADRP-42"]);
+const auth = {
+  jiraBaseUrl: "https://example.atlassian.net",
+  jiraEmail: "test@example.com",
+  jiraApiToken: "token",
+  jiraProject: "ADRP",
+};
+const getAuth = async () => auth;
 
-  assert.deepEqual(command, {
-    type: "issue-archive",
-    issueId: "ADRP-42",
-  });
-});
+test("issue create uses JIRA_PROJECT when --project is absent", async () => {
+  const request = await runCreate(["Story", "Mon titre", "Description simple"]);
 
-test("parseCommand uses JIRA_PROJECT for issue create when project key is omitted", () => {
-  process.env.JIRA_PROJECT = "ADRP";
-
-  const command = parseCommand(["issue", "create", "Story", "Mon titre", "Description simple"]);
-
-  assert.deepEqual(command, {
-    type: "issue-create",
-    projectKey: "ADRP",
-    issueType: "Story",
+  assert.deepEqual(request.fields, {
+    project: { key: "ADRP" },
+    issuetype: { name: "Story" },
     summary: "Mon titre",
-    description: "Description simple",
-  });
-
-  delete process.env.JIRA_PROJECT;
-});
-
-test("parseCommand uses JIRA_PROJECT for issue create with parent when project key is omitted", () => {
-  process.env.JIRA_PROJECT = "ADRP";
-
-  const command = parseCommand(["issue", "create", "Story", "Mon titre", "Description simple", "ADRP-5"]);
-
-  assert.deepEqual(command, {
-    type: "issue-create",
-    projectKey: "ADRP",
-    issueType: "Story",
-    summary: "Mon titre",
-    description: "Description simple",
-    parentIssueId: "ADRP-5",
-  });
-
-  delete process.env.JIRA_PROJECT;
-});
-
-test("parseCommand requires description for issue create", () => {
-  assert.throws(() => parseCommand(["issue", "create", "ADRP", "Story", "Mon titre"]));
-  process.exitCode = 0;
-});
-
-test("parseCommand treats the sixth argument as description for issue create", () => {
-  const command = parseCommand(["issue", "create", "ADRP", "Story", "Mon titre", "Description simple"]);
-
-  assert.deepEqual(command, {
-    type: "issue-create",
-    projectKey: "ADRP",
-    issueType: "Story",
-    summary: "Mon titre",
-    description: "Description simple",
+    description: {
+      type: "doc",
+      version: 1,
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Description simple" }] }],
+    },
   });
 });
 
-test("parseCommand accepts an empty description for issue create", () => {
-  const command = parseCommand(["issue", "create", "ADRP", "Story", "Mon titre", ""]);
+test("issue create accepts --project and --parent options", async () => {
+  const request = await runCreate(["Story", "Mon titre", "Description simple", "--project", "DAR", "--parent", "DAR-456"]);
 
-  assert.deepEqual(command, {
-    type: "issue-create",
-    projectKey: "ADRP",
-    issueType: "Story",
-    summary: "Mon titre",
-    description: "",
-  });
+  assert.equal((request.fields.project as { key: string }).key, "DAR");
+  assert.deepEqual(request.fields.parent, { key: "DAR-456" });
 });
 
-test("parseCommand accepts description plus parent for issue create", () => {
-  const command = parseCommand(["issue", "create", "ADRP", "Story", "Mon titre", "Description simple", "ADRP-5"]);
+test("issue create defines the required grammar", () => {
+  const issue = createJiraProgram(getAuth).commands.find((command) => command.name() === "issue");
+  const create = issue?.commands.find((command) => command.name() === "create");
 
-  assert.deepEqual(command, {
-    type: "issue-create",
-    projectKey: "ADRP",
-    issueType: "Story",
-    summary: "Mon titre",
-    description: "Description simple",
-    parentIssueId: "ADRP-5",
-  });
+  assert.ok(create);
+  assert.deepEqual(create.registeredArguments.map((argument) => ({ name: argument.name(), required: argument.required })), [
+    { name: "issue-type", required: true },
+    { name: "summary", required: true },
+    { name: "description", required: true },
+  ]);
+  assert.deepEqual(create.options.map((option) => option.long), ["--project", "--parent"]);
 });
 
-test("parseCommand preserves option-like free-text payloads", () => {
-  assert.deepEqual(parseCommand(["issue", "add-comment", "ADRP-42", "--starts-with-dashes"]), {
-    type: "issue-add-comment",
-    issueId: "ADRP-42",
-    comment: "--starts-with-dashes",
-  });
+test("Commander rejects invalid invocations before loading Jira auth", async () => {
+  let loads = 0;
+  const createTestProgram = () => {
+    const program = createJiraProgram(async () => { loads += 1; return auth; });
+    program.commands.forEach((command) => command.exitOverride());
+    program.commands.flatMap((command) => command.commands).forEach((command) => command.exitOverride());
+    return program.exitOverride();
+  };
+
+  await assert.rejects(createTestProgram().parseAsync(["issue", "get"], { from: "user" }));
+  await assert.rejects(createTestProgram().parseAsync(["issue", "list", "unexpected"], { from: "user" }));
+  await assert.rejects(createTestProgram().parseAsync(["unknown"], { from: "user" }));
+
+  assert.equal(loads, 0);
 });
+
+test("Commander rejects empty Jira inputs before loading auth", async () => {
+  let loads = 0;
+  const createTestProgram = () => createJiraProgram(async () => { loads += 1; return auth; });
+
+  await assert.rejects(createTestProgram().parseAsync(["search", " "], { from: "user" }), /non-empty JQL/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "get", " "], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "archive", " "], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "create", " ", "summary", "description"], { from: "user" }), /non-empty issue type/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "create", "Story", " ", "description"], { from: "user" }), /non-empty summary/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "create", "Story", "summary", "description", "--project", " "], { from: "user" }), /non-empty project key/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "create", "Story", "summary", "description", "--parent", " "], { from: "user" }), /non-empty parent issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "comments", " "], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "transitions", " "], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "update-description", " ", "description"], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "add-comment", " ", "comment"], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "add-comment", "ADRP-1", " "], { from: "user" }), /non-empty comment/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "update-comment", " ", "1", "comment"], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "update-comment", "ADRP-1", " ", "comment"], { from: "user" }), /non-empty comment ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "update-comment", "ADRP-1", "1", " "], { from: "user" }), /non-empty comment/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "transition", " ", "Done"], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "transition", "ADRP-1", " "], { from: "user" }), /non-empty transition name/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "update-summary", " ", "summary"], { from: "user" }), /non-empty issue ID/);
+  await assert.rejects(createTestProgram().parseAsync(["issue", "update-summary", "ADRP-1", " "], { from: "user" }), /non-empty summary/);
+
+  assert.equal(loads, 0);
+});
+
+test("issue update-description rejects whitespace-only descriptions before loading auth", async () => {
+  let loads = 0;
+  const program = createJiraProgram(async () => { loads += 1; return auth; });
+
+  await assert.rejects(
+    program.parseAsync(["issue", "update-description", "ADRP-1", " "], { from: "user" }),
+    /non-empty description/,
+  );
+
+  assert.equal(loads, 0);
+});
+
+test("Commander renders Jira help without loading auth", async () => {
+  let loads = 0;
+  const createTestProgram = () => {
+    const program = createJiraProgram(async () => { loads += 1; return auth; });
+    program.commands.forEach((command) => command.exitOverride());
+    return program.exitOverride();
+  };
+
+  await assert.rejects(createTestProgram().parseAsync(["--help"], { from: "user" }));
+  await assert.rejects(createTestProgram().parseAsync(["issue", "--help"], { from: "user" }));
+
+  assert.equal(loads, 0);
+});
+
+test("literal help-like payloads invoke Jira command actions", async () => {
+  let loads = 0;
+  const requestBodies: Array<{ fields: { summary: string } }> = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, options) => {
+    requestBodies.push(JSON.parse(String(options?.body)) as { fields: { summary: string } });
+    return new Response(null, { status: 204 });
+  };
+
+  try {
+    await createJiraProgram(async () => { loads += 1; return auth; }).parseAsync(["issue", "update-summary", "ADRP-123", "--", "--help"], { from: "user" });
+    await createJiraProgram(async () => { loads += 1; return auth; }).parseAsync(["issue", "update-summary", "ADRP-123", "--", "-h"], { from: "user" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.equal(loads, 2);
+  assert.deepEqual(requestBodies.map((body) => body.fields.summary), ["--help", "-h"]);
+});
+
+async function runCreate(args: string[]): Promise<{ fields: Record<string, unknown> }> {
+  let requestBody: { fields: Record<string, unknown> } | undefined;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, options) => {
+    requestBody = JSON.parse(String(options?.body)) as { fields: Record<string, unknown> };
+    return new Response(JSON.stringify({ key: "ADRP-123" }), { status: 201 });
+  };
+
+  try {
+    await createJiraProgram(getAuth).parseAsync(["issue", "create", ...args], { from: "user" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.ok(requestBody);
+  return requestBody;
+}

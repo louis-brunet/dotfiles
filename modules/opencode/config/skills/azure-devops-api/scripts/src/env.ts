@@ -6,7 +6,6 @@ import { parse } from "dotenv";
 
 export type AzureDevOpsAuthConfig = {
   azureDevopsApiToken: string;
-  azureDevopsUsername: string;
   azureDevopsApiVersion: string;
   azureDevopsOrganization: string;
   azureDevopsProject: string;
@@ -26,7 +25,6 @@ export function loadAzureDevOpsAuthConfigFromEnv(): AzureDevOpsAuthConfig {
   loadAzureDevOpsEnvironment();
 
   const azureDevopsApiToken = normalizeRequiredValue(process.env.AZURE_DEVOPS_API_TOKEN);
-  const azureDevopsUsername = normalizeOptionalValue(process.env.AZURE_DEVOPS_USERNAME) || "azure-devops-user";
   const azureDevopsApiVersion = normalizeOptionalValue(process.env.AZURE_DEVOPS_API_VERSION) || DEFAULT_API_VERSION;
   const azureDevopsOrganization = normalizeRequiredValue(process.env.AZURE_DEVOPS_ORGANIZATION);
   const azureDevopsProject = normalizeRequiredValue(process.env.AZURE_DEVOPS_PROJECT);
@@ -50,7 +48,6 @@ export function loadAzureDevOpsAuthConfigFromEnv(): AzureDevOpsAuthConfig {
 
   return {
     azureDevopsApiToken,
-    azureDevopsUsername,
     azureDevopsApiVersion,
     azureDevopsOrganization,
     azureDevopsProject,

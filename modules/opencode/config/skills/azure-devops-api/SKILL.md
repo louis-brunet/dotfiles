@@ -117,22 +117,20 @@ azure-devops-api build test-summary <build-id>
 
 - `pr get` returns a PR object. High-value fields include `pullRequestId`, `title`, `status`, `creationDate`, `sourceRefName`, `targetRefName`, `lastMergeSourceCommit.commitId`, `lastMergeTargetCommit.commitId`, `lastMergeCommit.commitId`, and `repository.{id,name}`
 - `pr changes` returns `{ pullRequestId, iteration, count, changeEntries }`. `iteration` contains `id`, dates, and `sourceCommit`; each change commonly contains `changeId`, `changeTrackingId`, `changeType`, `originalPath`, and `item.{path,objectId,originalObjectId}`
-- `pr commits` returns `{ count, value }`; each commit commonly contains `commitId`, `parents`, `comment`, `author.{name,email,date}`, and `committer.{name,email,date}`
+- `pr commits` returns an array; each commit commonly contains `commitId`, `parents`, `comment`, `author.{name,email,date}`, and `committer.{name,email,date}`
 - `pr latest-failed-build` returns an object containing `pullRequestId`, `sourceBranch`, `mergeBranch`, and `latestFailedBuild`
 - `pr builds` returns an object containing `pullRequestId`, `sourceBranch`, `mergeBranch`, `sourceBuilds`, and `mergeBuilds`
-- `pr statuses` returns the raw pull request statuses response, usually with a top-level `count` and `value`
+- `pr statuses` returns a native SDK array of pull request statuses
 - `pr failure-history` returns an object containing `pullRequestId`, `sourceBranch`, `mergeBranch`, `buildFailures`, and `statusOnlyFailures`
   - `buildFailures` items and `latestFailedBuild` share the same enriched failure-entry shape, including `failedRecord`, `logSnippet`, and related failed statuses
 - `build timeline` returns a `Timeline` object with a top-level `records` array
 - Each timeline record typically includes `id`, `parentId`, `type`, `name`, `state`, `result`, `errorCount`, `warningCount`, optional `log`, and optional `issues`
-- `build logs` returns an object with `count` and `value`; each `value` item typically includes `id`, `type`, `url`, and `lineCount`
+- `build logs` returns a native SDK array; each item typically includes `id`, `type`, `url`, and `lineCount`
 - `build test-summary` returns a test summary object from the Test Results API; inspect top-level totals and failure-related sections before diving deeper
-- `pr threads` returns `{ count, value }`; each thread commonly contains `id`, `status`, `threadContext`, and `comments[]` with `id`, `parentCommentId`, `commentType`, `content`, `publishedDate`, `lastUpdatedDate`, and `author.displayName`
-- `pr statuses` returns `{ count, value }`; status entries commonly contain `id`, `iterationId`, `state`, `description`, dates, `targetUrl`, and `context.{name,genre}`
-- `pr builds` returns `{ pullRequestId, sourceBranch, mergeBranch, sourceBuilds, mergeBuilds }`; each build collection is the raw Azure DevOps `{ count, value }` shape
-- `pr failure-history` returns `{ pullRequestId, sourceBranch, mergeBranch, buildFailures, statusOnlyFailures }`
-- `build timeline` returns an object with `records[]`; records commonly contain `id`, `parentId`, `type`, `name`, `state`, `result`, counts, `log.id`, and `issues[]`
-- `build logs` returns `{ count, value }`; log entries commonly contain `id`, `type`, `url`, `lineCount`, `createdOn`, and `lastChangedOn`
+- `pr threads` returns a native SDK array; each thread commonly contains `id`, `status`, `threadContext`, and `comments[]` with `id`, `parentCommentId`, `commentType`, `content`, `publishedDate`, `lastUpdatedDate`, and `author.displayName`
+- `pr statuses` entries commonly contain `id`, `iterationId`, `state`, `description`, dates, `targetUrl`, and `context.{name,genre}`
+- `pr builds` returns `{ pullRequestId, sourceBranch, mergeBranch, sourceBuilds, mergeBuilds }`; both build properties are native SDK arrays
+- SDK-native fields, including enum values and dates, are emitted without compatibility normalization. Use their numeric enum values in filters when needed.
 
 ## Proactive jq filters
 
@@ -153,25 +151,25 @@ azure-devops-api pr changes 123 | jq '{pullRequestId, iteration: .iteration.id, 
 Current commit history in chronological API order:
 
 ```bash
-azure-devops-api pr commits 123 | jq '{count, commits: [.value[]? | {commitId, parents, comment, author: {name: .author.name, email: .author.email, date: .author.date}, committer: {name: .committer.name, date: .committer.date}}]}'
+azure-devops-api pr commits 123 | jq '{count: length, commits: [.[]? | {commitId, parents, comment, author: {name: .author.name, email: .author.email, date: .author.date}, committer: {name: .committer.name, date: .committer.date}}]}'
 ```
 
 Active or unresolved thread comments flattened with file context:
 
 ```bash
-azure-devops-api pr threads 123 | jq '[.value[]? | select(.status == "active" or .status == "pending") | . as $thread | .comments[]? | {threadId: $thread.id, status: $thread.status, filePath: $thread.threadContext.filePath, rightFileStart: $thread.threadContext.rightFileStart, commentId: .id, parentCommentId, author: .author.displayName, publishedDate, commentType, content}]'
+azure-devops-api pr threads 123 | jq '[.[]? | select(.status == 1 or .status == 6) | . as $thread | .comments[]? | {threadId: $thread.id, status: $thread.status, filePath: $thread.threadContext.filePath, rightFileStart: $thread.threadContext.rightFileStart, commentId: .id, parentCommentId, author: .author.displayName, publishedDate, commentType, content}]'
 ```
 
 Failed or error PR statuses only:
 
 ```bash
-azure-devops-api pr statuses 123 | jq '[.value[]? | select(.state == "failed" or .state == "error") | {id, iterationId, state, description, context: .context, creationDate, updatedDate, targetUrl}]'
+azure-devops-api pr statuses 123 | jq '[.[]? | select(.state == 3 or .state == 4) | {id, iterationId, state, description, context: .context, creationDate, updatedDate, targetUrl}]'
 ```
 
 Compact PR build inventory, newest first within each ref:
 
 ```bash
-azure-devops-api pr builds 123 | jq '{pullRequestId, sourceBranch, mergeBranch, sourceBuilds: [.sourceBuilds.value[]? | {id, buildNumber, status, result, definition: .definition.name, sourceVersion, finishTime}] | sort_by(.finishTime) | reverse, mergeBuilds: [.mergeBuilds.value[]? | {id, buildNumber, status, result, definition: .definition.name, sourceVersion, finishTime}] | sort_by(.finishTime) | reverse}'
+azure-devops-api pr builds 123 | jq '{pullRequestId, sourceBranch, mergeBranch, sourceBuilds: [.sourceBuilds[]? | {id, buildNumber, status, result, definition: .definition.name, sourceVersion, finishTime}] | sort_by(.finishTime) | reverse, mergeBuilds: [.mergeBuilds[]? | {id, buildNumber, status, result, definition: .definition.name, sourceVersion, finishTime}] | sort_by(.finishTime) | reverse}'
 ```
 
 Latest failed build root-cause evidence:
@@ -189,13 +187,13 @@ azure-devops-api pr failure-history 123 | jq '{pullRequestId, failures: [.buildF
 Failed or error-bearing timeline records:
 
 ```bash
-azure-devops-api build timeline 456 | jq '[.records[]? | select(.result == "failed" or (.errorCount // 0) > 0) | {id, parentId, type, name, state, result, errorCount, warningCount, logId: .log.id, issues: [.issues[]? | {type, category, message}]}]'
+azure-devops-api build timeline 456 | jq '[.records[]? | select(.result == 8 or (.errorCount // 0) > 0) | {id, parentId, type, name, state, result, errorCount, warningCount, logId: .log.id, issues: [.issues[]? | {type, category, message}]}]'
 ```
 
 Logs with useful size metadata, largest first:
 
 ```bash
-azure-devops-api build logs 456 | jq '[.value[]? | {id, type, lineCount, createdOn, lastChangedOn, url}] | sort_by(.lineCount // 0) | reverse'
+azure-devops-api build logs 456 | jq '[.[]? | {id, type, lineCount, createdOn, lastChangedOn, url}] | sort_by(.lineCount // 0) | reverse'
 ```
 
 `build log-text` returns plain text, not JSON. Filter it only after selecting a high-signal log ID from timeline or log metadata; use a bounded text search rather than `jq`.
@@ -247,7 +245,7 @@ azure-devops-api pr changes 123 | jq '[.changeEntries[]? | {changeType, path: .i
 List current PR commits:
 
 ```bash
-azure-devops-api pr commits 123 | jq '[.value[]? | {commitId, comment, author: .author.name, date: .author.date}]'
+azure-devops-api pr commits 123 | jq '[.[]? | {commitId, comment, author: .author.name, date: .author.date}]'
 ```
 
 Find the latest failed build for a PR:

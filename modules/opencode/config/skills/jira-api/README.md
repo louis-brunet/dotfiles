@@ -78,6 +78,39 @@ The CLI uses `commander` for command definitions and `dotenv` for environment-fi
 - `JIRA_PROJECT`: default project for issue creation and default listing behavior.
 - `JIRA_LIST_JQL`: override the default query used for recent issue listings.
 
+### Issue creation grammar
+
+Create issues with this exact command shape:
+
+```bash
+jira-api issue create <issue-type> <summary> <description> [--project <key>] [--parent <issue-id>]
+```
+
+`JIRA_PROJECT` supplies the project when `--project` is absent. Pass `--project` to override that default, and pass `--parent` to create a child issue when the issue type supports a Jira parent relationship. The description argument is required; use `""` to create an issue without description content.
+
+Other command grammar is:
+
+```bash
+jira-api search <jql...>
+jira-api issue get <issue-id>
+jira-api issue archive <issue-id>
+jira-api issue list
+jira-api issue comments <issue-id>
+jira-api issue transitions <issue-id>
+jira-api issue update-description <issue-id> <description...>
+jira-api issue add-comment <issue-id> <comment...>
+jira-api issue update-comment <issue-id> <comment-id> <comment...>
+jira-api issue transition <issue-id> <transition-name...>
+jira-api issue update-summary <issue-id> <summary...>
+```
+
+Use `--help` after the command or subcommand for Commander help without credentials. To pass a literal payload beginning with `-`, put `--` before the payload, such as `jira-api issue update-summary DAR-123 -- --help`.
+
+```bash
+jira-api issue create Task "Clarify DAR export permissions" "" --project DAR
+jira-api issue create Story "Add Dashboard filters" "Description" --project DAR --parent DAR-456
+```
+
 ## What the skill supports
 
 At a high level, the skill can:

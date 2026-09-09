@@ -111,7 +111,7 @@ The remaining pull request location context comes from environment variables.
 
 The PR ID is optional for every `pr` command. When omitted, the CLI reads the current local Git branch, finds active PRs whose source ref exactly matches that branch in the configured Azure DevOps repository, and uses the newest match. It reports the selected PR on stderr so stdout remains valid JSON. Provide an explicit ID when outside a Git branch, in detached HEAD state, or when reviewing a PR unrelated to the current branch.
 
-Responses remain machine-readable JSON. `SKILL.md` documents the expected response structures and high-value `jq` pipelines agents should append proactively so verbose API payloads are filtered before entering model context.
+Responses remain machine-readable JSON. Simple SDK reads emit their native objects and arrays without compatibility wrappers or enum normalization; the custom failure-history commands retain their documented DTOs. `SKILL.md` documents the expected response structures and high-value `jq` pipelines agents should append proactively so verbose API payloads are filtered before entering model context.
 
 The first version is intentionally read-only.
 

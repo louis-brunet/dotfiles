@@ -77,7 +77,7 @@ export async function createIssue({
 }: IssueCreateParams): Promise<unknown> {
   const trimmedProjectKey = projectKey?.trim() || jiraProject?.trim();
   if (!trimmedProjectKey) {
-    throw new Error("Jira issue create requires a non-empty project key. Set JIRA_PROJECT or pass <project-key> explicitly.");
+    throw new Error("Jira issue create requires a non-empty project key. Set JIRA_PROJECT or pass --project <key>.");
   }
 
   const trimmedIssueType = issueType.trim();

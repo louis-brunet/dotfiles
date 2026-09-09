@@ -3,8 +3,9 @@
 import process from "node:process";
 import { CommanderError } from "commander";
 
-import { dispatchCommand, parseCommand } from "./commands.ts";
-import { loadAzureDevOpsAuthConfigFromEnv, loadAzureDevOpsEnvironment } from "./env.ts";
+import { createProgram } from "./commands.ts";
+import { createAzureDevOpsClient } from "./client.ts";
+import { loadAzureDevOpsAuthConfigFromEnv } from "./env.ts";
 
 main().catch((error: unknown) => {
   if (!(error instanceof CommanderError)) console.error(getErrorMessage(error));
@@ -16,11 +17,10 @@ async function main(): Promise<void> {
     throw new Error("This script requires Node.js 22.18 or newer for native TypeScript execution.");
   }
 
-  loadAzureDevOpsEnvironment();
-  const command = parseCommand(process.argv.slice(2));
-  const auth = loadAzureDevOpsAuthConfigFromEnv();
-
-  await dispatchCommand(command, auth);
+  await createProgram(async () => {
+    const auth = loadAzureDevOpsAuthConfigFromEnv();
+    return { auth, client: await createAzureDevOpsClient(auth) };
+  }).parseAsync(process.argv);
 }
 
 function isSupportedNodeVersion(): boolean {
