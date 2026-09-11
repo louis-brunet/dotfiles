@@ -67,6 +67,7 @@
       "sleep *": "allow",
       "sort *": "allow",
       "tail *": "allow",
+      "tee *": "allow",
       "terraform fmt *": "allow",
       "terraform output *": "allow",
       "terraform plan *": "allow",
