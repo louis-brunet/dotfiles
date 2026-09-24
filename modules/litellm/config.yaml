@@ -1,0 +1,11 @@
+model_list:
+  - model_name: claude-sonnet-5
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-sonnet-5
+      aws_region_name: eu-west-3
+  - model_name: claude-sonnet-4.6
+    litellm_params:
+      model: bedrock/eu.anthropic.claude-sonnet-4-6
+      aws_region_name: eu-west-3
+litellm_settings:
+  drop_params: true

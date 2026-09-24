@@ -1,0 +1,14 @@
+name: litellm
+description: "Local proxy server for LLM requests"
+version: "1.0.0"
+platforms:
+  - macos
+depends:
+  - base
+  - python
+provides:
+  - litellm
+tags:
+  - development
+health_check: |
+  litellm --version
