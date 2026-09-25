@@ -64,6 +64,7 @@
       "node --check *": "allow",
       "npm ci --ignore-scripts": "allow",
       "npm ls *": "allow",
+      "playwright-cli *": "allow",
       "printf *": "allow",
       "ps *": "allow",
       "pwd": "allow",
@@ -181,6 +182,7 @@
       /* git */
       "git *": "ask",
       /* git: allow list */
+      "git blame *": "allow",
       "git branch --list *": "allow",
       "git branch --show-current": "allow",
       "git branch -a": "allow",
@@ -189,6 +191,7 @@
       "git check-ignore *": "allow",
       "git diff *": "allow",
       "git diff-tree *": "allow",
+      "git fetch *": "allow",
       "git grep *": "allow",
       "git log *": "allow",
       "git ls-files *": "allow",
@@ -198,6 +201,7 @@
       "git reflog *": "allow",
       "git remote -v": "allow",
       "git remote get-url *": "allow",
+      "git rev-list *": "allow",
       "git rev-parse *": "allow",
       "git show *": "allow",
       "git stash list": "allow",
