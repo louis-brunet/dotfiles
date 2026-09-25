@@ -7,6 +7,7 @@ source_dir = "."
 [symlinks]
 ".config/opencode/opencode.jsonc" = "config/opencode.jsonc"
 ".config/opencode/tui.json" = "config/tui.json"
+".config/opencode/cli.json" = "config/cli.json"
 ".config/opencode/themes" = "config/themes"
 ".config/opencode/agents" = "config/agents"
 ".config/opencode/commands" = "config/commands"
