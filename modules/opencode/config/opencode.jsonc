@@ -11,6 +11,9 @@
       "*": "ask",
       /** General bash commands considered safe */
       ".agents/skills/jira-api/scripts/jira-api issue get *": "allow",
+      ".agents/skills/jira-api/scripts/azure-devops-api *": "allow",
+      "./.agents/skills/jira-api/scripts/azure-devops-api *": "allow",
+      "./azure-devops-api *": "allow",
       "aws --version": "allow",
       "aws configure list-profiles": "allow",
       "az ad sp show *": "allow",
@@ -21,14 +24,25 @@
       "az containerapp job replica list *": "allow",
       "az containerapp job show *": "allow",
       "az containerapp list *": "allow",
+      "az devops configure --list": "allow",
+      "az devops project show *": "allow",
+      "az devops service-endpoint list *": "allow",
+      "az extension list *": "allow",
       "az monitor activity-log list *": "allow",
       "az monitor log-analytics workspace list *": "allow",
       "az monitor log-analytics query *": "allow",
       "az monitor metrics list *": "allow",
+      "az pipelines list *": "allow",
+      "az pipelines runs list *": "allow",
+      "az pipelines show *": "allow",
+      "az resource list *": "allow",
+      "az rest --method get *": "allow",
       "az role assignment list *": "allow",
+      "az search service show *": "allow",
       "az storage account keys list *": "allow",
       "az storage account show *": "allow",
       "az storage account list *": "allow",
+      "az storage blob list *": "allow",
       "az storage blob show *": "allow",
       "az storage container show *": "allow",
       "az storage message peek *": "allow",
@@ -187,6 +201,7 @@
       "git branch --show-current": "allow",
       "git branch -a": "allow",
       "git branch -vv": "allow",
+      "git branch -avv --no-abbrev": "allow",
       "git cat-file *": "allow",
       "git check-ignore *": "allow",
       "git diff *": "allow",
@@ -195,12 +210,14 @@
       "git grep *": "allow",
       "git log *": "allow",
       "git ls-files *": "allow",
+      "git ls-remote *": "allow",
       "git ls-tree *": "allow",
       "git merge-base *": "allow",
       "git merge-tree *": "allow",
       "git reflog *": "allow",
       "git remote -v": "allow",
       "git remote get-url *": "allow",
+      "git range-diff *": "allow",
       "git rev-list *": "allow",
       "git rev-parse *": "allow",
       "git show *": "allow",
@@ -235,8 +252,9 @@
     "doom_loop": "ask"
   },
   "plugin": [
-    "cc-safety-net"
+    // "cc-safety-net"
     // "@spoons-and-mirrors/subtask2@latest"
+    "@dietrichgebert/ponytail"
   ],
   "mcp": {
     "context7": {
@@ -256,7 +274,7 @@
         "@playwright/mcp@latest"
       ],
       "environment": {},
-      "enabled": false
+      "enabled": true
     },
     "shadcn": {
       "type": "local",
@@ -306,6 +324,26 @@
         "gpt-5.6-luna": {
           "name": "GPT 5.6 Luna (RFP Assistant)",
           "reasoning": true,
+          "tool_call": true,
+          "limit": {
+            "output": 128000,
+            "context": 1050000
+          }
+        },
+        "gpt-6-luna": {
+          "name": "GPT 6 Luna (RFP Assistant)",
+          "reasoning": true,
+          "tool_call": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
           "limit": {
             "output": 128000,
             "context": 1050000
