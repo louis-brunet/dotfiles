@@ -1,0 +1,23 @@
+// WSL-specific config values to copy into the main opencode.jsonc config file
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest",
+        // NOTE: WSL-only setup
+        "--executable-path",
+        "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe",
+        "--extension",
+        "--browser",
+        "chrome"
+      ],
+      "environment": {
+        "PLAYWRIGHT_MCP_EXTENSION_TOKEN": ""
+      },
+      "enabled": false
+    }
+  }
+}

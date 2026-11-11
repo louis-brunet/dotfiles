@@ -1,8 +1,0 @@
-#:schema ../symlonk-schema.json
-
-[config]
-extends = "../symlonk-config.toml"
-source_dir = "."
-
-[symlinks]
-".config/pypoetry/config.toml" = "poetry_config.toml"

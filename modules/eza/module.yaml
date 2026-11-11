@@ -1,0 +1,16 @@
+name: eza
+description: "Modern ls replacement with better colors and icons"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+depends:
+  - base
+  - rust
+provides:
+  - eza
+tags:
+  - tool
+  - utility
+health_check: |
+  eza --version

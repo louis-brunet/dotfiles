@@ -1,0 +1,11 @@
+name: i3
+description: "i3 window manager configuration"
+version: "1.0.0"
+platforms:
+  - linux
+depends:
+  - base
+  - shell
+tags:
+  - window-manager
+  - ui

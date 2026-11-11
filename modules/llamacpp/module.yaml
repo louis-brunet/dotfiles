@@ -1,0 +1,16 @@
+name: llamacpp
+description: "Local LLM inference with llama.cpp"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+depends:
+  - base
+  - rust
+provides:
+  - llama-server
+tags:
+  - llm
+  - ai
+health_check: |
+  ls ~/.local/bin/llama-server 2>/dev/null || echo "llama-server not in PATH, may need manual build"

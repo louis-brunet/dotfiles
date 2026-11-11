@@ -1,0 +1,16 @@
+name: snowflake
+description: "Snowflake CLI for data engineering (macOS)"
+version: "1.0.0"
+platforms:
+  - macos
+depends:
+  - base
+  - python
+provides:
+  - snow
+tags:
+  - database
+  - data
+  - macos-only
+health_check: |
+  snow --version

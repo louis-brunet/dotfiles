@@ -1,0 +1,23 @@
+{
+  "skill_name": "plan-implementer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement the feature described in .planning/tickets/user-authentication.md",
+      "expected_output": "Code implementation following the ticket, with validation (build, tests) run and results reported",
+      "files": [".planning/tickets/user-authentication.md"]
+    },
+    {
+      "id": 2,
+      "prompt": "Execute the plan at .planning/plans/rest-api-user-profiles.md to build the user profiles API",
+      "expected_output": "Implementation following the plan steps, with validation results reported",
+      "files": [".planning/plans/rest-api-user-profiles.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "Build the dark mode feature from the ticket and validate it works",
+      "expected_output": "Implementation with build check and test results",
+      "files": []
+    }
+  ]
+}

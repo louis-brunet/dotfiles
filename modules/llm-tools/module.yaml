@@ -1,0 +1,11 @@
+name: llm-tools
+description: "LLM tools and utilities"
+version: "1.0.0"
+platforms:
+  - linux
+depends:
+  - base
+  - node
+tags:
+  - llm
+  - ai

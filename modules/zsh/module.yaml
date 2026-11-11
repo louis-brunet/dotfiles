@@ -1,0 +1,11 @@
+name: zsh
+description: "Additional zsh configuration and aliases"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+depends:
+  - shell
+tags:
+  - shell
+  - config

@@ -1,0 +1,12 @@
+name: mysql
+description: "MySQL database installation (macOS)"
+version: "1.0.0"
+platforms:
+  - macos
+depends:
+  - base
+provides:
+  - mysql
+tags:
+  - database
+  - macos-only

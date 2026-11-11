@@ -1,0 +1,14 @@
+name: terraform
+description: "HashiCorp Terraform infrastructure as code"
+version: "1.0.0"
+platforms:
+  - linux
+depends:
+  - base
+provides:
+  - terraform
+tags:
+  - devops
+  - infrastructure
+health_check: |
+  terraform --version

@@ -1,0 +1,8 @@
+name: vscode
+description: "Visual Studio Code configuration and shell integration"
+version: "1.0.0"
+
+tags:
+  - config
+  - editor
+  - development

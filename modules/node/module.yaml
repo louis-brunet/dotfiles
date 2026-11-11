@@ -1,0 +1,26 @@
+name: node
+description: "Node.js runtime via nvm with npm"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+
+depends:
+  - base
+  - mise
+
+provides:
+  - node
+  - npm
+  - bun
+
+requires:
+  commands:
+    - git
+
+tags:
+  - runtime
+  - development
+
+health_check: |
+  node --version && npm --version

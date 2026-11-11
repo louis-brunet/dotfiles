@@ -1,0 +1,16 @@
+name: rust
+description: "Rust toolchain with rustup"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+depends:
+  - base
+provides:
+  - rustc
+  - cargo
+tags:
+  - language
+  - development
+health_check: |
+  rustc --version && cargo --version

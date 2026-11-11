@@ -1,0 +1,25 @@
+# vim:ft=zsh:
+
+init_dotfiles_path() {
+  # get the absolute path of the symlinked ~/.zshrc file
+  local zshenv_path
+  zshenv_path=$(readlink -f ~/.zshenv)
+
+  # shortcut to this dotfiles path is $DOTFILES
+  # it should be the great-grandparent directory of the symlink target (this file)
+  DOTFILES=$(dirname "$(dirname "$(dirname "$zshenv_path")")")
+  export DOTFILES
+}
+
+init_dotfiles_path
+
+typeset -U zshenv_files
+zshenv_files=("$DOTFILES"/modules/*/zshenv.zsh(N))
+
+for file in $zshenv_files
+do
+  source "$file"
+done
+
+unset file
+unset zshenv_files

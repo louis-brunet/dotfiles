@@ -1,0 +1,17 @@
+name: python
+description: "Python development environment with pyenv, poetry, and uv"
+version: "1.0.0"
+platforms:
+  - linux
+  - macos
+depends:
+  - base
+provides:
+  - python3
+  - poetry
+  - uv
+tags:
+  - language
+  - development
+health_check: |
+  python --version && poetry --version && uv --version

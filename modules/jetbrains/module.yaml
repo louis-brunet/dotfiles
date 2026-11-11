@@ -1,0 +1,6 @@
+name: jetbrains
+description: "JetBrains IDE configurations (Vim bindings)"
+version: "1.0.0"
+tags:
+  - config
+  - editor

@@ -2,7 +2,7 @@ import logging
 from typing import TypedDict
 
 
-class MissingRequiredPromptResult(Exception):
+class MissingRequiredPromptError(Exception):
     def __init__(self, prompt: str) -> None:
         super().__init__(f"value is required for prompt '{prompt}'")
 
@@ -57,9 +57,7 @@ class ColoredFormatter(logging.Formatter):
         # Apply the color for the log level name
         levelname = record.levelname
         if levelname in self.LEVEL_COLORS:
-            colored_levelname = (
-                f"{self.LEVEL_COLORS[levelname]}{levelname}{COLORS['RESET']}"
-            )
+            colored_levelname = f"{self.LEVEL_COLORS[levelname]}{levelname}{COLORS['RESET']}"
             record.levelname = colored_levelname
 
         # Call the original formatter
@@ -72,9 +70,7 @@ class ColoredFormatter(logging.Formatter):
 
 
 # Set up the logger
-def setup_colored_logging(
-    level=logging.DEBUG, format="%(name)s %(levelname)s %(message)s"
-):
+def setup_colored_logging(level=logging.DEBUG, format="%(name)s %(levelname)s %(message)s"):
     logger = logging.getLogger()
     logger.setLevel(level)
 
@@ -96,7 +92,7 @@ def setup_colored_logging(
 
 
 def prompt(message: str) -> str | None:
-    formatted_prompt=f"[{COLORS['BOLD_BLUE']}????{COLORS['RESET']}] {message} > "
+    formatted_prompt = f"[{COLORS['BOLD_BLUE']}????{COLORS['RESET']}] {message} > "
 
     try:
         line = input(formatted_prompt)
@@ -109,11 +105,11 @@ def prompt(message: str) -> str | None:
 
 
 def prompt_required(message: str, default: str | None = None) -> str:
-    default_suffix = '' if default is None else f' [{default}]'
-    result = prompt(f'{message}{default_suffix}')
+    default_suffix = "" if default is None else f" [{default}]"
+    result = prompt(f"{message}{default_suffix}")
     if result is None or result == "":
         if default is None:
-            raise MissingRequiredPromptResult(message)
+            raise MissingRequiredPromptError(message)
         result = default
     return result
 
@@ -137,4 +133,4 @@ def prompt_yes_no(message: str, default: bool | None = None) -> bool:
         return True
     if result_char == "n":
         return False
-    raise MissingRequiredPromptResult(message_with_options)
+    raise MissingRequiredPromptError(message_with_options)
