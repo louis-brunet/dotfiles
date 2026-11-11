@@ -1,5 +1,5 @@
 ### UV CONFIG
-export UV_NATIVE_TLS=true
+export UV_SYSTEM_CERTS=true
 export PATH="$HOME/.local/bin:$PATH"
 
 ### PYENV CONFIG
