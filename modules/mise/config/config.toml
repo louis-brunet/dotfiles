@@ -5,3 +5,5 @@ trusted_config_paths = [
 
 [tools]
 node = "lts"
+# "npm:@playwright/cli" = "latest"
+"npm:@opencode/browse" = "latest"
